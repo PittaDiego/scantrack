@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rafias">
+<title>Rafias Scanner</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+
+  :root {
+    --orange: #FF9900;
+    --orange-dark: #E68A00;
+    --orange-light: #FFF3D6;
+    --blue: #146EB4;
+    --navy: #0F2137;
+    --success: #00875A;
+    --success-bg: #E3F5EE;
+    --danger: #D32F2F;
+    --danger-bg: #FDECEA;
+    --warning-bg: #FFF8E7;
+    --surface: #FFFFFF;
+    --surface2: #F5F7FA;
+    --surface3: #EEF1F6;
+    --text: #0F2137;
+    --text-mid: #3D5166;
+    --text-dim: #8A9BB0;
+    --border: #DDE3EC;
+    --radius: 14px;
+    --shadow: 0 2px 12px rgba(15,33,55,0.08);
+    --shadow-md: 0 4px 24px rgba(15,33,55,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--surface2);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .header {
+    background: var(--navy);
+    padding: 14px 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--orange);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-md);
+  }
+
+  .header-brand { display:flex; align-items:center; gap:10px; }
+
+  .logo-wrap {
+    width: 40px; height: 40px;
+    background: var(--orange);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(255,153,0,0.4);
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800; font-size: 20px; letter-spacing: 1px; color: #fff;
+  }
+  .header-title span { color: var(--orange); }
+  .header-subtitle { font-size: 11px; color: rgba(255,255,255,0.45); font-weight:500; }
+  .header-user { text-align:right; }
+  .header-user strong { display:block; color:#fff; font-size:14px; font-weight:600; }
+  .header-user span { font-size:11px; color:rgba(255,255,255,0.45); }
+
+  .nav-tabs {
+    display:flex; background:var(--surface);
+    border-bottom:1px solid var(--border);
+    overflow-x:auto; scrollbar-width:none;
+    box-shadow:0 2px 8px rgba(15,33,55,0.06);
+  }
+  .nav-tabs::-webkit-scrollbar { display:none; }
+
+  .nav-tab {
+    flex:1; min-width:80px; padding:10px 8px; text-align:center;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700;
+    font-size:12px; letter-spacing:0.5px; color:var(--text-dim);
+    cursor:pointer; border-bottom:3px solid transparent;
+    transition:all 0.2s; white-space:nowrap;
+  }
+  .nav-tab.active { color:var(--orange); border-bottom-color:var(--orange); }
+  .tab-icon { display:block; font-size:18px; margin-bottom:2px; }
+
+  .page { display:none; padding:16px; padding-bottom:80px; }
+  .page.active { display:block; }
+
+  /* LOGIN */
+  .login-page {
+    min-height:100vh; background:var(--navy);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .login-card {
+    background:white; border-radius:24px; padding:32px 24px;
+    width:100%; max-width:340px; box-shadow:var(--shadow-md);
+  }
+  .login-logo-wrap {
+    display:flex; flex-direction:column; align-items:center;
+    margin-bottom:28px; gap:12px;
+  }
+  .login-logo {
+    width:80px; height:80px; background:var(--orange);
+    border-radius:20px; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 24px rgba(255,153,0,0.35);
+  }
+  .login-title {
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:800; font-size:28px; color:var(--navy); letter-spacing:1px;
+  }
+  .login-title span { color:var(--orange); }
+  .login-sub { font-size:13px; color:var(--text-dim); text-align:center; }
+
+  .input-group { display:flex; flex-direction:column; gap:6px; }
+  .input-label { font-size:11px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.8px; }
+
+  .input-field, .select-field {
+    background:var(--surface2); border:1.5px solid var(--border);
+    border-radius:var(--radius); padding:14px 16px;
+    color:var(--text); font-family:'Barlow',sans-serif; font-size:16px;
+    width:100%; outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+    appearance:none;
+  }
+  .input-field:focus, .select-field:focus {
+    border-color:var(--orange);
+    box-shadow:0 0 0 3px rgba(255,153,0,0.12);
+    background:#fff;
+  }
+  .select-field {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB0' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center;
+    background-color:var(--surface2); padding-right:40px;
+  }
+
+  .btn {
+    padding:15px; border-radius:var(--radius); border:none;
+    font-family:'Barlow Condensed',sans-serif; font-weight:700;
+    font-size:17px; letter-spacing:1px; cursor:pointer;
+    transition:all 0.15s; width:100%;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:active { transform:scale(0.97); }
+  .btn-primary { background:var(--orange); color:var(--navy); box-shadow:0 4px 12px rgba(255,153,0,0.3); }
+  .btn-success { background:var(--success); color:white; box-shadow:0 4px 12px rgba(0,135,90,0.25); }
+  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text-mid); }
+  .btn-sm { padding:10px 16px; font-size:14px; width:auto; }
+
+  .scan-type-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+  .scan-type-btn {
+    padding:14px; border-radius:var(--radius);
+    border:2px solid var(--border); background:var(--surface);
+    color:var(--text-dim); font-family:'Barlow Condensed',sans-serif;
+    font-weight:700; font-size:16px; cursor:pointer; text-align:center;
+    transition:all 0.2s; box-shadow:var(--shadow);
+  }
+  .scan-type-btn.active-saida { border-color:var(--orange); background:var(--orange-light); color:var(--orange-dark); }
+  .scan-type-btn.active-retorno { border-color:var(--success); background:var(--success-bg); color:var(--success); }
+  .scan-type-icon { font-size:22px; display:block; margin-bottom:4px; }
+
+  .camera-container {
+    background:var(--navy); border-radius:var(--radius); overflow:hidden;
+    border:2px solid var(--border); position:relative;
+    box-shadow:var(--shadow-md); margin-bottom:12px;
+  }
+  #reader { width:100% !important; }
+  #reader video { border-radius:var(--radius) !important; }
+
+  .camera-overlay {
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:200px; height:200px; pointer-events:none;
+  }
+  .camera-overlay::before,.camera-overlay::after,
+  .camera-overlay span::before,.camera-overlay span::after {
+    content:''; position:absolute; width:30px; height:30px;
+    border-color:var(--orange); border-style:solid;
+  }
+  .camera-overlay::before { top:0;left:0;border-width:3px 0 0 3px; }
+  .camera-overlay::after  { top:0;right:0;border-width:3px 3px 0 0; }
+  .camera-overlay span::before { bottom:0;left:0;border-width:0 0 3px 3px; }
+  .camera-overlay span::after  { bottom:0;right:0;border-width:0 3px 3px 0; }
+
+  .scan-status {
+    padding:14px 16px; border-radius:var(--radius);
+    font-weight:600; font-size:14px; display:none;
+    margin-bottom:12px; line-height:1.5;
+  }
+  .scan-status.show { display:block; }
+  .scan-status.success { background:var(--success-bg); border:1.5px solid var(--success); color:var(--success); }
+  .scan-status.error   { background:var(--danger-bg); border:1.5px solid var(--danger); color:var(--danger); }
+  .scan-status.warning { background:var(--warning-bg); border:1.5px solid var(--orange); color:var(--orange-dark); }
+
+  .card {
+    background:var(--surface); border-radius:var(--radius);
+    padding:16px; border:1px solid var(--border);
+    margin-bottom:12px; box-shadow:var(--shadow);
+  }
+  .card-title {
+    font-family:'Barlow Condensed',sans-serif; font-weight:700;
+    font-size:12px; color:var(--text-dim); text-transform:uppercase;
+    letter-spacing:0.8px; margin-bottom:12px;
+  }
+
+  .qr-manual { display:flex; gap:8px; }
+  .qr-manual .input-field { flex:1; }
+  .campos-extras { display:flex; flex-direction:column; gap:10px; }
+
+  .metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .metric-card {
+    background:var(--surface); border-radius:var(--radius);
+    padding:16px 14px; border:1px solid var(--border);
+    text-align:center; box-shadow:var(--shadow);
+  }
+  .metric-value {
+    font-family:'Barlow Condensed',sans-serif; font-weight:800;
+    font-size:40px; line-height:1; margin-bottom:4px;
+  }
+  .metric-label { font-size:12px; color:var(--text-dim); font-weight:500; }
+  .metric-orange { color:var(--orange); }
+  .metric-green  { color:var(--success); }
+  .metric-blue   { color:var(--blue); }
+  .metric-red    { color:var(--danger); }
+
+  .alerta-item {
+    background:var(--danger-bg); border:1.5px solid #F5C6C6;
+    border-radius:var(--radius); padding:14px; margin-bottom:10px;
+  }
+  .alerta-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .alerta-qr { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; color:var(--danger); }
+  .alerta-dias { background:var(--danger); color:white; border-radius:20px; padding:2px 10px; font-size:12px; font-weight:700; }
+  .alerta-info { font-size:13px; color:var(--text-mid); line-height:1.8; }
+
+  .registro-item {
+    background:var(--surface); border-radius:var(--radius);
+    padding:14px; margin-bottom:10px;
+    border-left:4px solid var(--border); box-shadow:var(--shadow);
+  }
+  .registro-item.saida   { border-left-color:var(--orange); }
+  .registro-item.retorno { border-left-color:var(--success); }
+  .registro-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .registro-qr { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; color:var(--text); }
+  .badge { border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .badge-saida   { background:var(--orange-light); color:var(--orange-dark); }
+  .badge-retorno { background:var(--success-bg); color:var(--success); }
+  .registro-info { font-size:12px; color:var(--text-dim); line-height:1.9; }
+
+  .filter-bar { display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+  .filter-btn {
+    padding:7px 14px; border-radius:20px; border:1.5px solid var(--border);
+    background:var(--surface); color:var(--text-dim);
+    font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;
+    transition:all 0.2s; box-shadow:var(--shadow);
+  }
+  .filter-btn.active { border-color:var(--orange); background:var(--orange-light); color:var(--orange-dark); }
+
+  .section-title {
+    font-family:'Barlow Condensed',sans-serif; font-weight:800;
+    font-size:20px; margin-bottom:16px; color:var(--navy);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .scan-count {
+    background:var(--surface); border-radius:var(--radius);
+    padding:12px 16px; display:flex; align-items:center;
+    justify-content:space-between; margin-top:8px;
+    border:1px solid var(--border); box-shadow:var(--shadow);
+  }
+  .scan-count-label { font-size:13px; color:var(--text-dim); }
+  .scan-count-value { font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:24px; color:var(--orange); }
+
+  .loading { display:flex; align-items:center; justify-content:center; padding:40px; color:var(--text-dim); font-size:14px; gap:10px; }
+  .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--orange); border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .empty-state { text-align:center; padding:40px 20px; color:var(--text-dim); }
+  .empty-icon { font-size:48px; margin-bottom:12px; }
+  .empty-text { font-size:14px; }
+
+  .refresh-btn { background:none; border:none; color:var(--orange); font-size:20px; cursor:pointer; padding:4px; transition:transform 0.3s; }
+  .refresh-btn.spinning { animation:spin 0.8s linear infinite; }
+
+  .scan-line { height:3px; background:linear-gradient(90deg,transparent,var(--orange),transparent); border-radius:2px; animation:scan-anim 1.5s ease-in-out infinite; display:none; margin-bottom:8px; }
+  .scan-line.active { display:block; }
+  @keyframes scan-anim { 0%{transform:scaleX(0.3);opacity:0;} 50%{transform:scaleX(1);opacity:1;} 100%{transform:scaleX(0.3);opacity:0;} }
+
+  .toast {
+    position:fixed; bottom:24px; left:50%;
+    transform:translateX(-50%) translateY(100px);
+    background:var(--navy); color:#fff;
+    border-radius:var(--radius); padding:14px 20px;
+    font-size:14px; font-weight:500; z-index:999;
+    transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    max-width:90vw; text-align:center;
+    box-shadow:0 8px 32px rgba(15,33,55,0.25);
+  }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+  .toast.success { background:var(--success); }
+  .toast.error   { background:var(--danger); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo-wrap">
+      <div class="login-logo">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 3 quadrantes QR -->
+          <rect x="6" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
+          <rect x="10" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
+          <rect x="30" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
+          <rect x="34" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
+          <rect x="6" y="30" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
+          <rect x="10" y="34" width="6" height="6" rx="1" fill="#FF9900"/>
+          <!-- pixels soltos -->
+          <rect x="30" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <rect x="37" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <rect x="30" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <rect x="37" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <!-- linha scan animada (estática no logo) -->
+          <line x1="6" y1="26" x2="46" y2="26" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.65"/>
+        </svg>
+      </div>
+      <div class="login-title">RAFIAS <span>SCAN</span></div>
+      <div class="login-sub">Controle de retorno de rafias · DSP2</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="input-group">
+        <label class="input-label">Seu nome / matrícula</label>
+        <input class="input-field" id="loginNome" placeholder="Ex: João Silva ou 12345" autocomplete="name">
+      </div>
+      <button class="btn btn-primary" onclick="fazerLogin()">ENTRAR →</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appContainer" style="display:none;">
+
+  <div class="header">
+    <div class="header-brand">
+      <div class="logo-wrap">
+        <svg width="28" height="28" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
+          <rect x="10" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
+          <rect x="30" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
+          <rect x="34" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
+          <rect x="6" y="30" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
+          <rect x="10" y="34" width="6" height="6" rx="1" fill="#FF9900"/>
+          <rect x="30" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <rect x="37" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <rect x="30" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <rect x="37" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          <line x1="6" y1="26" x2="46" y2="26" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.65"/>
+        </svg>
+      </div>
+      <div>
+        <div class="header-title">RAFIAS <span>SCAN</span></div>
+        <div class="header-subtitle">DSP2</div>
+      </div>
+    </div>
+    <div class="header-user" id="headerUser"></div>
+  </div>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('scan')" id="tab-scan"><span class="tab-icon">📷</span>SCANNER</div>
+    <div class="nav-tab" onclick="showPage('registros')" id="tab-registros"><span class="tab-icon">📋</span>REGISTROS</div>
+    <div class="nav-tab" onclick="showPage('dashboard')" id="tab-dashboard"><span class="tab-icon">📊</span>PAINEL</div>
+    <div class="nav-tab" onclick="showPage('alertas')" id="tab-alertas"><span class="tab-icon">⚠️</span>ALERTAS</div>
+  </div>
+
+  <!-- SCANNER -->
+  <div class="page active" id="page-scan">
+    <div class="scan-type-toggle">
+      <div class="scan-type-btn active-saida" id="btnSaida" onclick="setTipo('SAIDA')">
+        <span class="scan-type-icon">📤</span>SAÍDA
+      </div>
+      <div class="scan-type-btn" id="btnRetorno" onclick="setTipo('RETORNO')">
+        <span class="scan-type-icon">📥</span>RETORNO
+      </div>
+    </div>
+
+    <div class="camera-container">
+      <div id="reader"></div>
+      <div class="camera-overlay"><span></span></div>
+    </div>
+
+    <div class="scan-line" id="scanLine"></div>
+    <div class="scan-status" id="scanStatus"></div>
+
+    <div class="card">
+      <div class="card-title">OU INSERIR MANUALMENTE</div>
+      <div class="qr-manual">
+        <input class="input-field" id="qrManual" placeholder="Código da rafia..." style="text-transform:uppercase;">
+        <button class="btn btn-primary btn-sm" onclick="processarQR(document.getElementById('qrManual').value)">OK</button>
+      </div>
+    </div>
+
+    <div class="campos-extras" id="camposExtras" style="display:none;">
+      <div class="card">
+        <div class="card-title">DETALHES DO REGISTRO</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="input-group">
+            <label class="input-label">Rota</label>
+            <input class="input-field" id="campoRota" placeholder="Ex: RT-001 ou Rota Centro">
+          </div>
+          <div class="input-group">
+            <label class="input-label">HUB</label>
+            <select class="select-field" id="campoHub"><option value="">Selecione o HUB</option></select>
+          </div>
+          <div class="input-group">
+            <label class="input-label">Motorista</label>
+            <select class="select-field" id="campoMotorista"><option value="">Selecione o motorista</option></select>
+          </div>
+          <button class="btn btn-success" onclick="confirmarRegistro()">✅ CONFIRMAR REGISTRO</button>
+          <button class="btn btn-outline" onclick="cancelarRegistro()" style="font-size:14px;padding:12px;">CANCELAR</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scan-count">
+      <span class="scan-count-label">Seus scans hoje</span>
+      <span class="scan-count-value" id="countHoje">0</span>
+    </div>
+  </div>
+
+  <!-- REGISTROS -->
+  <div class="page" id="page-registros">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="section-title" style="margin:0;">REGISTROS</div>
+      <button class="refresh-btn" id="btnRefreshReg" onclick="carregarRegistros()">🔄</button>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filtrarRegistros('TODOS',this)">Todos</button>
+      <button class="filter-btn" onclick="filtrarRegistros('SAIDA',this)">Saída</button>
+      <button class="filter-btn" onclick="filtrarRegistros('RETORNO',this)">Retorno</button>
+      <button class="filter-btn" onclick="filtrarRegistros('HOJE',this)">Hoje</button>
+    </div>
+    <div id="listaRegistros"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page" id="page-dashboard">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="section-title" style="margin:0;">PAINEL</div>
+      <button class="refresh-btn" id="btnRefreshDash" onclick="carregarIndicadores()">🔄</button>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-value metric-orange" id="metEnviosHoje">—</div><div class="metric-label">Saídas hoje</div></div>
+      <div class="metric-card"><div class="metric-value metric-green" id="metRetornosHoje">—</div><div class="metric-label">Retornos hoje</div></div>
+      <div class="metric-card"><div class="metric-value metric-blue" id="metEmCampo">—</div><div class="metric-label">Em campo agora</div></div>
+      <div class="metric-card"><div class="metric-value metric-red" id="metAlertas">—</div><div class="metric-label">⚠️ Alertas</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">TAXA DE RETORNO HOJE</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+        <div style="flex:1;background:var(--surface3);border-radius:20px;height:12px;overflow:hidden;">
+          <div id="barRetorno" style="height:100%;background:var(--success);border-radius:20px;width:0%;transition:width 0.8s;"></div>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:var(--success);" id="pctRetorno">0%</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">RAFIAS EM CAMPO — RESUMO</div>
+      <div id="emCampoDetalhe"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- ALERTAS -->
+  <div class="page" id="page-alertas">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="section-title" style="margin:0;">⚠️ ALERTAS</div>
+      <button class="refresh-btn" id="btnRefreshAlt" onclick="carregarIndicadores()">🔄</button>
+    </div>
+    <div class="card" style="background:var(--danger-bg);border-color:#F5C6C6;">
+      <div style="font-size:13px;color:var(--text-mid);line-height:1.6;">
+        Rafias com <strong style="color:var(--danger);">2 ou mais dias</strong> em campo sem registro de retorno.
+      </div>
+    </div>
+    <div id="listaAlertas"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwjavTUsQDnnSgYAzYmPMd-EXxv5z74_SUZZ_25Vzo-ODJ2TNyt8kbTLpO868jQG2za/exec";
+
+let operador="", tipoAtual="SAIDA", qrPendente=null;
+let html5QrCode=null, scannerAtivo=false;
+let todosRegistros=[], countScanHoje=0;
+
+function fazerLogin() {
+  const nome = document.getElementById("loginNome").value.trim();
+  if (!nome) { showToast("Digite seu nome ou matrícula","error"); return; }
+  operador = nome;
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("appContainer").style.display = "block";
+  document.getElementById("headerUser").innerHTML = `<strong>${nome}</strong><span>operador</span>`;
+  iniciarScanner();
+  carregarListas();
+  carregarIndicadores();
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('tab-'+page).classList.add('active');
+  if (page==='registros') carregarRegistros();
+  if (page==='dashboard'||page==='alertas') carregarIndicadores();
+  if (page==='scan'&&!scannerAtivo) iniciarScanner();
+  if (page!=='scan'&&scannerAtivo) pararScanner();
+}
+
+function setTipo(tipo) {
+  tipoAtual = tipo;
+  document.getElementById('btnSaida').className = 'scan-type-btn'+(tipo==='SAIDA'?' active-saida':'');
+  document.getElementById('btnRetorno').className = 'scan-type-btn'+(tipo==='RETORNO'?' active-retorno':'');
+}
+
+function iniciarScanner() {
+  if (scannerAtivo) return;
+  html5QrCode = new Html5Qrcode("reader");
+  html5QrCode.start(
+    { facingMode:"environment" },
+    { fps:10, qrbox:{width:220,height:220}, aspectRatio:1.0 },
+    (decoded) => { if(qrPendente) return; vibrateDevice(); processarQR(decoded); },
+    () => {}
+  ).then(() => {
+    scannerAtivo=true;
+    document.getElementById('scanLine').classList.add('active');
+  }).catch(err => console.log("Camera:",err));
+}
+
+function pararScanner() {
+  if (html5QrCode&&scannerAtivo) {
+    html5QrCode.stop().then(() => {
+      scannerAtivo=false;
+      document.getElementById('scanLine').classList.remove('active');
+    });
+  }
+}
+
+function vibrateDevice() { if(navigator.vibrate) navigator.vibrate([100,50,100]); }
+
+function processarQR(codigo) {
+  if (!codigo||!codigo.trim()) return;
+  codigo = codigo.trim().toUpperCase();
+  qrPendente = codigo;
+  if (tipoAtual==="SAIDA") {
+    document.getElementById('camposExtras').style.display='block';
+    mostrarStatus(`📦 QR: ${codigo} — Preencha os detalhes abaixo`,'warning');
+  } else {
+    confirmarRegistro();
+  }
+}
+
+function cancelarRegistro() {
+  qrPendente=null;
+  document.getElementById('camposExtras').style.display='none';
+  document.getElementById('qrManual').value='';
+  esconderStatus();
+}
+
+async function confirmarRegistro() {
+  if (!qrPendente) return;
+  const payload = {
+    action:"registrar", qr_code:qrPendente, tipo:tipoAtual, operador,
+    rota: document.getElementById('campoRota').value,
+    hub: document.getElementById('campoHub').value,
+    motorista: document.getElementById('campoMotorista').value
+  };
+  mostrarStatus("Registrando...","warning");
+  try {
+    const res = await fetch(API_URL, { method:"POST", body:JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.status==="ok") {
+      mostrarStatus(`✅ ${data.mensagem} — ${data.id}`,"success");
+      countScanHoje++;
+      document.getElementById('countHoje').textContent=countScanHoje;
+      showToast(`✅ ${tipoAtual==='SAIDA'?'Saída':'Retorno'} registrado!`,"success");
+      document.getElementById('camposExtras').style.display='none';
+      document.getElementById('qrManual').value='';
+      document.getElementById('campoRota').value='';
+      document.getElementById('campoHub').selectedIndex=0;
+      document.getElementById('campoMotorista').selectedIndex=0;
+      setTimeout(()=>esconderStatus(),3000);
+    } else if (data.status==="duplicata") {
+      mostrarStatus(`⚠️ ${data.mensagem}`,"error");
+      showToast("⚠️ Duplicata detectada","error");
+      document.getElementById('camposExtras').style.display='none';
+      setTimeout(()=>esconderStatus(),5000);
+    } else {
+      mostrarStatus(`❌ ${data.mensagem}`,"error");
+    }
+  } catch(err) {
+    mostrarStatus("❌ Erro de conexão. Tente novamente.","error");
+  }
+  qrPendente=null;
+  document.getElementById('qrManual').value='';
+}
+
+function mostrarStatus(msg,tipo) {
+  const el=document.getElementById('scanStatus');
+  el.textContent=msg; el.className=`scan-status show ${tipo}`;
+}
+function esconderStatus() { document.getElementById('scanStatus').className='scan-status'; }
+
+async function carregarListas() {
+  try {
+    const res=await fetch(API_URL+"?action=listas");
+    const data=await res.json();
+    const sH=document.getElementById('campoHub'), sM=document.getElementById('campoMotorista');
+    (data.hubs||[]).forEach(h => {
+      const o=document.createElement('option'); o.value=h.nome;
+      o.textContent=h.nome+(h.contato?` — ${h.contato}`:''); sH.appendChild(o);
+    });
+    (data.motoristas||[]).forEach(m => {
+      const o=document.createElement('option'); o.value=m.nome;
+      o.textContent=m.nome+(m.rota?` (${m.rota})`:''); sM.appendChild(o);
+    });
+  } catch(err) { console.log("Listas:",err); }
+}
+
+async function carregarRegistros() {
+  document.getElementById('listaRegistros').innerHTML='<div class="loading"><div class="spinner"></div> Carregando...</div>';
+  const btn=document.getElementById('btnRefreshReg'); btn.classList.add('spinning');
+  try {
+    const res=await fetch(API_URL+"?action=listar");
+    const data=await res.json();
+    todosRegistros=data.registros||[];
+    renderRegistros(todosRegistros);
+  } catch(err) {
+    document.getElementById('listaRegistros').innerHTML='<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-text">Erro ao carregar</div></div>';
+  }
+  btn.classList.remove('spinning');
+}
+
+function filtrarRegistros(filtro,btnEl) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btnEl.classList.add('active');
+  const hoje=new Date().toLocaleDateString('pt-BR');
+  let lista=todosRegistros;
+  if (filtro==='SAIDA') lista=todosRegistros.filter(r=>r.Tipo==='SAIDA');
+  if (filtro==='RETORNO') lista=todosRegistros.filter(r=>r.Tipo==='RETORNO');
+  if (filtro==='HOJE') lista=todosRegistros.filter(r=>new Date(r.Data_Hora).toLocaleDateString('pt-BR')===hoje);
+  renderRegistros(lista);
+}
+
+function renderRegistros(lista) {
+  const el=document.getElementById('listaRegistros');
+  if (!lista||lista.length===0) {
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhum registro encontrado</div></div>';
+    return;
+  }
+  el.innerHTML=[...lista].reverse().map(r => {
+    const d=r.Data_Hora?new Date(r.Data_Hora):null;
+    const tipo=r.Tipo||'—';
+    return `<div class="registro-item ${tipo.toLowerCase()}">
+      <div class="registro-header">
+        <div class="registro-qr">${r.QR_Code||'—'}</div>
+        <div class="badge badge-${tipo.toLowerCase()}">${tipo}</div>
+      </div>
+      <div class="registro-info">
+        👤 ${r.Operador||'—'} &nbsp;|&nbsp; 📅 ${d?d.toLocaleString('pt-BR'):'—'}<br>
+        🛣️ ${r.Rota||'—'} &nbsp;|&nbsp; 🏠 ${r.Hub||'—'}<br>
+        🚗 ${r.Motorista||'—'} &nbsp;|&nbsp; 🔖 ${r.ID_Registro||'—'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function carregarIndicadores() {
+  ['btnRefreshDash','btnRefreshAlt'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('spinning');});
+  try {
+    const res=await fetch(API_URL+"?action=indicadores");
+    const data=await res.json();
+    document.getElementById('metEnviosHoje').textContent=data.enviosHoje??0;
+    document.getElementById('metRetornosHoje').textContent=data.retornosHoje??0;
+    document.getElementById('metEmCampo').textContent=data.emCampo??0;
+    document.getElementById('metAlertas').textContent=data.alertas?.length??0;
+    const pct=data.enviosHoje>0?Math.round((data.retornosHoje/data.enviosHoje)*100):0;
+    document.getElementById('barRetorno').style.width=pct+'%';
+    document.getElementById('pctRetorno').textContent=pct+'%';
+    renderAlertas(data.alertas||[]);
+    renderEmCampo(data.emCampo,data.alertas||[]);
+  } catch(err) { console.log("Indicadores:",err); }
+  ['btnRefreshDash','btnRefreshAlt'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('spinning');});
+}
+
+function renderAlertas(alertas) {
+  const el=document.getElementById('listaAlertas');
+  if (!alertas||alertas.length===0) {
+    el.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">Nenhum alerta no momento</div></div>';
+    return;
+  }
+  el.innerHTML=alertas.map(a=>`
+    <div class="alerta-item">
+      <div class="alerta-header">
+        <div class="alerta-qr">🔴 ${a.qr_code}</div>
+        <div class="alerta-dias">${a.dias} dia${a.dias>1?'s':''}</div>
+      </div>
+      <div class="alerta-info">
+        🛣️ Rota: ${a.rota||'—'}<br>
+        🏠 HUB: ${a.hub||'—'}<br>
+        🚗 Motorista: ${a.motorista||'—'}
+      </div>
+    </div>`).join('');
+}
+
+function renderEmCampo(total,alertas) {
+  const el=document.getElementById('emCampoDetalhe');
+  if (!total||total===0) {
+    el.innerHTML='<div style="font-size:13px;color:var(--text-dim);text-align:center;padding:16px;">Nenhuma rafia em campo</div>';
+    return;
+  }
+  el.innerHTML=`<div style="font-size:14px;color:var(--text-mid);line-height:2.2;">
+    📦 Total em campo: <strong style="color:var(--text)">${total}</strong><br>
+    ⚠️ Em alerta (2+ dias): <strong style="color:var(--danger)">${alertas.length}</strong><br>
+    ✅ Dentro do prazo: <strong style="color:var(--success)">${total-alertas.length}</strong>
+  </div>`;
+}
+
+function showToast(msg,tipo='') {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`toast ${tipo} show`;
+  setTimeout(()=>{el.className='toast';},3000);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('qrManual').addEventListener('keydown',e=>{if(e.key==='Enter')processarQR(document.getElementById('qrManual').value);});
+  document.getElementById('loginNome').addEventListener('keydown',e=>{if(e.key==='Enter')fazerLogin();});
+});
+</script>
+</body>
+</html>
