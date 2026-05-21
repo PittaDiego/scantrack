@@ -384,6 +384,7 @@
     <div class="nav-tab" onclick="showPage('registros')" id="tab-registros"><span class="tab-icon">📋</span>REGISTROS</div>
     <div class="nav-tab" onclick="showPage('dashboard')" id="tab-dashboard"><span class="tab-icon">📊</span>PAINEL</div>
     <div class="nav-tab" onclick="showPage('alertas')" id="tab-alertas"><span class="tab-icon">⚠️</span>ALERTAS</div>
+    <div class="nav-tab" onclick="abrirPlanilha()"><span class="tab-icon">📄</span>PLANILHA</div>
   </div>
 
   <!-- SCANNER -->
@@ -738,6 +739,10 @@ function renderEmCampo(total,alertas) {
     ⚠️ Em alerta (2+ dias): <strong style="color:var(--danger)">${alertas.length}</strong><br>
     ✅ Dentro do prazo: <strong style="color:var(--success)">${total-alertas.length}</strong>
   </div>`;
+}
+
+function abrirPlanilha() {
+  window.open('https://docs.google.com/spreadsheets/d/1J6F47dAuA4F7XlTkafkvo0FB0tQkQAZm3pKwrJqLcEg/edit','_blank');
 }
 
 function showToast(msg,tipo='') {
