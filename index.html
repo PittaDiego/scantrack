@@ -398,9 +398,15 @@
       </div>
     </div>
 
-    <div class="camera-container">
+    <div class="camera-container" id="camera-container">
       <div id="reader"></div>
       <div class="camera-overlay"><span></span></div>
+    </div>
+
+    <div id="aviso-usb" style="display:none; background:#FFF8E7; border:1.5px solid #FF9900; border-radius:14px; padding:18px; text-align:center; margin-bottom:12px;">
+      <div style="font-size:32px; margin-bottom:8px;">🔫</div>
+      <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:18px; color:#0F2137;">LEITOR USB ATIVO</div>
+      <div style="font-size:13px; color:#3D5166; margin-top:6px; line-height:1.6;">Bipe o QR Code com a pistola.<br>O registro será processado automaticamente.</div>
     </div>
 
     <div class="scan-line" id="scanLine"></div>
@@ -538,8 +544,18 @@ function setTipo(tipo) {
   document.getElementById('btnRetorno').className = 'scan-type-btn'+(tipo==='RETORNO'?' active-retorno':'');
 }
 
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
 function iniciarScanner() {
   if (scannerAtivo) return;
+  if (!isMobile()) {
+    // No PC: esconde o bloco de câmera e mostra aviso de leitor USB
+    document.getElementById('camera-container').style.display = 'none';
+    document.getElementById('aviso-usb').style.display = 'block';
+    return;
+  }
   html5QrCode = new Html5Qrcode("reader");
   html5QrCode.start(
     { facingMode:"environment" },
@@ -566,11 +582,21 @@ function vibrateDevice() { if(navigator.vibrate) navigator.vibrate([100,50,100])
 function processarQR(codigo) {
   if (!codigo||!codigo.trim()) return;
   codigo = codigo.trim().toUpperCase();
+  // Se já tem um QR pendente de confirmação, ignora novo scan
+  if (qrPendente) {
+    showToast('⚠️ Confirme ou cancele o registro atual primeiro','error');
+    return;
+  }
   qrPendente = codigo;
+  // Mostra o código no campo manual para referência
+  document.getElementById('qrManual').value = codigo;
   if (tipoAtual==="SAIDA") {
     document.getElementById('camposExtras').style.display='block';
-    mostrarStatus(`📦 QR: ${codigo} — Preencha os detalhes abaixo`,'warning');
+    mostrarStatus(`📦 QR: ${codigo} — Preencha os detalhes e confirme`,'warning');
+    // Scroll suave até os campos
+    setTimeout(()=>document.getElementById('camposExtras').scrollIntoView({behavior:'smooth', block:'start'}), 100);
   } else {
+    mostrarStatus(`📥 Registrando retorno: ${codigo}...`,'warning');
     confirmarRegistro();
   }
 }
@@ -628,7 +654,7 @@ function esconderStatus() { document.getElementById('scanStatus').className='sca
 
 async function carregarListas() {
   try {
-    const res=await fetch(API_URL+"?action=listas");
+    const res=await fetch(API_URL+"?action=listas", {redirect:'follow'});
     const data=await res.json();
     const sH=document.getElementById('campoHub'), sM=document.getElementById('campoMotorista');
     (data.hubs||[]).forEach(h => {
@@ -646,7 +672,7 @@ async function carregarRegistros() {
   document.getElementById('listaRegistros').innerHTML='<div class="loading"><div class="spinner"></div> Carregando...</div>';
   const btn=document.getElementById('btnRefreshReg'); btn.classList.add('spinning');
   try {
-    const res=await fetch(API_URL+"?action=listar");
+    const res=await fetch(API_URL+"?action=listar", {redirect:'follow'});
     const data=await res.json();
     todosRegistros=data.registros||[];
     renderRegistros(todosRegistros);
@@ -693,7 +719,7 @@ function renderRegistros(lista) {
 async function carregarIndicadores() {
   ['btnRefreshDash','btnRefreshAlt'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('spinning');});
   try {
-    const res=await fetch(API_URL+"?action=indicadores");
+    const res=await fetch(API_URL+"?action=indicadores", {redirect:'follow'});
     const data=await res.json();
     document.getElementById('metEnviosHoje').textContent=data.enviosHoje??0;
     document.getElementById('metRetornosHoje').textContent=data.retornosHoje??0;
