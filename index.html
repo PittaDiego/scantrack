@@ -749,6 +749,46 @@ function showToast(msg,tipo='') {
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('qrManual').addEventListener('keydown',e=>{if(e.key==='Enter')processarQR(document.getElementById('qrManual').value);});
   document.getElementById('loginNome').addEventListener('keydown',e=>{if(e.key==='Enter')fazerLogin();});
+
+  // ── LEITOR USB (pistola) ──────────────────────────────────────────
+  // O leitor age como teclado: digita o código e pressiona Enter.
+  // Capturamos globalmente: se o foco NÃO estiver num input, jogamos
+  // no campo qrManual e processamos automaticamente.
+  let bufferUSB = "";
+  let timerUSB = null;
+
+  document.addEventListener('keydown', e => {
+    // Ignora se o foco está num campo de texto normal
+    const tag = document.activeElement.tagName;
+    const isInput = (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA');
+
+    // Se estiver no campo qrManual, o listener acima já trata o Enter
+    if (document.activeElement.id === 'qrManual') return;
+    if (document.activeElement.id === 'loginNome') return;
+
+    if (e.key === 'Enter') {
+      // Enter = fim da leitura do leitor
+      if (bufferUSB.length > 2) {
+        const pageScan = document.getElementById('page-scan');
+        if (pageScan.classList.contains('active')) {
+          document.getElementById('qrManual').value = bufferUSB;
+          processarQR(bufferUSB);
+        }
+      }
+      bufferUSB = "";
+      clearTimeout(timerUSB);
+      return;
+    }
+
+    // Acumula caracteres (leitores USB são muito rápidos, < 50ms entre teclas)
+    if (e.key.length === 1) {
+      bufferUSB += e.key.toUpperCase();
+      clearTimeout(timerUSB);
+      // Se parar de digitar por 100ms sem Enter, limpa o buffer
+      timerUSB = setTimeout(() => { bufferUSB = ""; }, 100);
+    }
+  });
+  // ─────────────────────────────────────────────────────────────────
 });
 </script>
 </body>
