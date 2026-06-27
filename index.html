@@ -342,1294 +342,1160 @@ body { background: var(--color-bg); color: var(--color-text); }
 a { color: var(--color-link, var(--color-primary)); }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0F2137">
 <title>ScanTrack v3.0</title>
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2NhblRyYWNrIHYzLjAiLCJzaG9ydF9uYW1lIjoiU2NhblRyYWNrIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwRjIxMzciLCJ0aGVtZV9jb2xvciI6IiMwRjIxMzciLCJpY29ucyI6W119">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
---navy:#0F2137;--navy-light:#1a3a5c;--navy-dark:#091520;
---orange:#FF9900;--orange-light:#FFB84D;--orange-dark:#CC7A00;
---white:#FFFFFF;--gray-50:#F8F9FA;--gray-100:#E9ECEF;--gray-200:#DEE2E6;
---gray-300:#CED4DA;--gray-400:#ADB5BD;--gray-500:#6C757D;--gray-600:#495057;
---green:#28A745;--green-light:#D4EDDA;--red:#DC3545;--red-light:#F8D7DA;
---blue:#007BFF;--yellow:#FFC107;
---font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
---radius:8px;--radius-lg:12px;--shadow:0 2px 8px rgba(0,0,0,0.1);
---shadow-lg:0 4px 16px rgba(0,0,0,0.15);--transition:all 0.2s ease;
-}
-html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:var(--navy);overflow:hidden}
-body{display:flex;flex-direction:column}
-
-/* Toast */
-#toast-container{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:90%;max-width:400px}
-.toast{padding:12px 16px;border-radius:var(--radius);color:var(--white);font-size:14px;font-weight:500;animation:toastIn 0.3s ease,toastOut 0.3s ease 2.7s forwards;pointer-events:auto;box-shadow:var(--shadow-lg);text-align:center}
-.toast-success{background:var(--green)}.toast-error{background:var(--red)}.toast-info{background:var(--blue)}.toast-warning{background:var(--orange)}
-@keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes toastOut{from{opacity:1}to{opacity:0}}
-
-/* Flash overlay */
-#flash-overlay{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity 0.1s}
-#flash-overlay.flash-green{background:rgba(40,167,69,0.4);opacity:1}
-#flash-overlay.flash-red{background:rgba(220,53,69,0.4);opacity:1}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0F2137;--orange:#FF9900;--green:#00A86B;--red:#E74C3C;--white:#FFFFFF;--gray:#f4f6f8;--gray2:#e2e8f0;--gray3:#94a3b8;--radius:12px;--shadow:0 2px 8px rgba(0,0,0,0.1)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray);color:var(--navy);min-height:100vh;display:flex;flex-direction:column}
+.hidden{display:none!important}
+button{cursor:pointer;border:none;font-family:inherit;font-size:14px}
+input,select,textarea{font-family:inherit;font-size:14px;border:1px solid var(--gray2);border-radius:8px;padding:10px 12px;width:100%;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--orange)}
+.btn{padding:10px 20px;border-radius:8px;font-weight:600;transition:all .2s}
+.btn-primary{background:var(--orange);color:var(--navy)}
+.btn-primary:hover{background:#e68a00}
+.btn-secondary{background:var(--navy);color:var(--white)}
+.btn-secondary:hover{background:#1a3a5c}
+.btn-success{background:var(--green);color:var(--white)}
+.btn-danger{background:var(--red);color:var(--white)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;color:var(--white);font-weight:600;z-index:9999;animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.flash{position:fixed;inset:0;z-index:9998;pointer-events:none;animation:flashAnim .2s ease}
+@keyframes flashAnim{from{opacity:.4}to{opacity:0}}
+.flash-green{background:var(--green)}.flash-red{background:var(--red)}
 
 /* Login */
-#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);display:flex;align-items:center;justify-content:center;z-index:5000;padding:20px}
-#login-screen.hidden{display:none}
-.login-card{background:var(--white);border-radius:var(--radius-lg);padding:32px 24px;width:100%;max-width:360px;box-shadow:var(--shadow-lg)}
-.login-logo{text-align:center;margin-bottom:24px}
-.login-logo h1{color:var(--navy);font-size:24px;margin-bottom:4px}
-.login-logo span{color:var(--orange);font-size:13px;font-weight:500}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;font-size:13px;font-weight:600;color:var(--gray-600);margin-bottom:4px}
-.form-group input,.form-group select{width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:15px;font-family:var(--font);transition:var(--transition);background:var(--white)}
-.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,153,0,0.15)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;transition:var(--transition);text-decoration:none}
-.btn-primary{background:var(--orange);color:var(--white);width:100%;padding:12px}
-.btn-primary:hover{background:var(--orange-dark)}
-.btn-primary:disabled{background:var(--gray-300);cursor:not-allowed}
-.btn-sm{padding:6px 12px;font-size:12px}
-.btn-outline{background:transparent;border:1.5px solid var(--gray-300);color:var(--gray-600)}
-.btn-outline:hover{border-color:var(--orange);color:var(--orange)}
-.btn-outline.active{border-color:var(--orange);background:rgba(255,153,0,0.08);color:var(--orange)}
-.btn-green{background:var(--green);color:var(--white)}.btn-green:hover{background:#218838}
-.btn-orange{background:var(--orange);color:var(--white)}.btn-orange:hover{background:var(--orange-dark)}
-.btn-red{background:var(--red);color:var(--white)}.btn-red:hover{background:#c82333}
-.btn-icon{width:36px;height:36px;padding:0;border-radius:50%}
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--white);border-radius:var(--radius);padding:32px;max-width:380px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.login-box h1{text-align:center;color:var(--navy);margin-bottom:4px;font-size:24px}
+.login-box .subtitle{text-align:center;color:var(--gray3);margin-bottom:24px;font-size:13px}
+.login-box label{display:block;font-weight:600;margin-bottom:4px;margin-top:12px;font-size:13px}
+.login-box .btn{width:100%;margin-top:20px;padding:12px}
+.login-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center}
 
 /* App Layout */
-#app{display:none;flex-direction:column;height:100%;overflow:hidden}
-#app.visible{display:flex}
-.app-header{background:var(--navy);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;min-height:48px}
-.app-header h2{color:var(--white);font-size:16px;font-weight:600}
-.app-header .user-info{display:flex;align-items:center;gap:8px;color:var(--gray-300);font-size:12px}
-.app-header .logout-btn{background:none;border:1px solid var(--gray-400);color:var(--gray-300);padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer}
-.app-header .logout-btn:hover{border-color:var(--orange);color:var(--orange)}
-
-/* Tabs */
-.tab-content-wrapper{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.tab-content{display:none;padding:16px;min-height:100%}
+#appScreen{display:none;flex-direction:column;height:100vh}
+.topbar{background:var(--navy);color:var(--white);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:16px;display:flex;align-items:center;gap:6px}
+.topbar .user-info{font-size:12px;opacity:.8}
+.topbar .logout-btn{background:rgba(255,255,255,.15);color:var(--white);padding:6px 10px;border-radius:6px;font-size:11px}
+.main-content{flex:1;overflow-y:auto;padding:12px;padding-bottom:80px}
+.tab-content{display:none}
 .tab-content.active{display:block}
-.bottom-nav{display:flex;background:var(--white);border-top:1px solid var(--gray-200);padding:4px 0 env(safe-area-inset-bottom,4px)}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;font-size:10px;color:var(--gray-500);cursor:pointer;transition:var(--transition);text-decoration:none;border:none;background:none;font-family:var(--font)}
-.nav-item.active{color:var(--orange)}
-.nav-item .nav-icon{font-size:20px;margin-bottom:2px}
 
-/* Scanner */
-.asset-selector{display:flex;gap:8px;margin-bottom:12px}
-.asset-btn{flex:1;padding:10px 8px;border:2px solid var(--gray-200);border-radius:var(--radius);background:var(--white);text-align:center;cursor:pointer;transition:var(--transition);font-family:var(--font)}
-.asset-btn .icon{font-size:24px;display:block;margin-bottom:4px}
-.asset-btn .label{font-size:11px;font-weight:600;color:var(--gray-600)}
-.asset-btn.active{border-color:var(--orange);background:rgba(255,153,0,0.05)}
-.asset-btn.active .label{color:var(--orange)}
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--gray2);display:flex;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+.nav-btn{flex:1;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--gray3);background:none;transition:color .2s}
+.nav-btn.active{color:var(--orange)}
+.nav-btn .nav-icon{font-size:18px}
 
-.movement-selector{display:flex;gap:8px;margin-bottom:12px}
-.mov-btn{flex:1;padding:8px;border:2px solid var(--gray-200);border-radius:var(--radius);background:var(--white);text-align:center;cursor:pointer;font-size:13px;font-weight:600;transition:var(--transition);font-family:var(--font)}
-.mov-btn.retorno.active{border-color:var(--green);background:rgba(40,167,69,0.08);color:var(--green)}
-.mov-btn.saida.active{border-color:var(--orange);background:rgba(255,153,0,0.08);color:var(--orange)}
-
-.camera-container{position:relative;width:100%;aspect-ratio:4/3;background:#000;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:12px}
+/* Scanner Tab */
+.type-selector{display:flex;gap:8px;margin-bottom:12px}
+.type-btn{flex:1;padding:12px 8px;border-radius:8px;text-align:center;font-weight:600;font-size:13px;background:var(--gray);border:2px solid transparent;transition:all .2s}
+.type-btn.active{border-color:var(--orange);background:#fff3e0}
+.move-toggle{display:flex;border-radius:8px;overflow:hidden;margin-bottom:12px;border:2px solid var(--gray2)}
+.move-btn{flex:1;padding:10px;text-align:center;font-weight:600;font-size:13px;background:var(--white);transition:all .2s}
+.move-btn.active-ret{background:var(--green);color:var(--white)}
+.move-btn.active-said{background:var(--orange);color:var(--navy)}
+.camera-container{position:relative;width:100%;aspect-ratio:4/3;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
 .camera-container video{width:100%;height:100%;object-fit:cover}
-.camera-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.crosshair{width:60%;height:60%;border:2px solid rgba(255,153,0,0.7);border-radius:8px;position:relative}
-.crosshair::before,.crosshair::after{content:'';position:absolute;background:var(--orange)}
-.crosshair::before{width:2px;height:20px;top:50%;left:50%;transform:translate(-50%,-50%)}
-.crosshair::after{width:20px;height:2px;top:50%;left:50%;transform:translate(-50%,-50%)}
-.camera-status{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:var(--white);padding:4px 12px;border-radius:12px;font-size:11px}
-
-.usb-input-area{background:var(--white);border:2px dashed var(--gray-300);border-radius:var(--radius-lg);padding:24px;text-align:center;margin-bottom:12px}
-.usb-input-area input{width:100%;padding:12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:18px;text-align:center;font-family:monospace;margin-top:12px}
-.usb-input-area input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,153,0,0.15)}
-
+.crosshair{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.crosshair svg{width:200px;height:200px}
+.usb-mode{padding:24px;text-align:center;background:var(--white);border-radius:var(--radius);margin-bottom:12px}
+.usb-mode input{font-size:18px;text-align:center;max-width:400px}
 .manual-entry{display:flex;gap:8px;margin-bottom:12px}
-.manual-entry input{flex:1;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:14px;font-family:var(--font)}
-.manual-entry input:focus{outline:none;border-color:var(--orange)}
-
-.session-counter{text-align:center;font-size:13px;color:var(--gray-500);margin-bottom:12px;font-weight:500}
-.session-counter span{color:var(--orange);font-weight:700}
-
-.mini-log{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);overflow:hidden;margin-bottom:12px}
-.mini-log-header{padding:8px 12px;background:var(--gray-50);font-size:12px;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)}
-.mini-log-item{padding:8px 12px;border-bottom:1px solid var(--gray-100);font-size:12px;display:flex;align-items:center;gap:8px}
-.mini-log-item:last-child{border-bottom:none}
-.mini-log-item .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.mini-log-item .status-dot.success{background:var(--green)}
-.mini-log-item .status-dot.error{background:var(--red)}
-.mini-log-item .status-dot.duplicate{background:var(--yellow)}
-.mini-log-item .log-code{font-family:monospace;font-weight:600;color:var(--navy)}
-.mini-log-item .log-time{color:var(--gray-400);margin-left:auto;font-size:11px}
-
-/* TBR Fields */
-.tbr-fields{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:12px;margin-bottom:12px}
-.tbr-fields .form-group{margin-bottom:12px}
-.tbr-fields .form-group:last-child{margin-bottom:0}
+.manual-entry input{flex:1}
+.session-counter{text-align:center;font-size:13px;color:var(--gray3);margin-bottom:8px}
+.mini-log{font-size:12px}
+.mini-log .log-item{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--gray2)}
+.mini-log .log-item:last-child{border:none}
+.saida-fields,.tbr-fields{margin-bottom:12px}
+.saida-fields label,.tbr-fields label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;margin-top:8px}
 
 /* Dashboard */
-.filters-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filters-row select,.filters-row input{padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius);font-size:13px;font-family:var(--font);flex:1;min-width:100px}
-.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.metric-card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center}
-.metric-card .value{font-size:28px;font-weight:700;color:var(--navy)}
-.metric-card .label{font-size:12px;color:var(--gray-500);margin-top:4px}
-.metric-card.green .value{color:var(--green)}
-.metric-card.orange .value{color:var(--orange)}
-.metric-card.red .value{color:var(--red)}
-.metric-card.blue .value{color:var(--blue)}
-
-.section-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.alert-card{background:var(--red-light);border:1px solid var(--red);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;font-size:13px}
-.tbr-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.tbr-card .count{font-weight:700;color:var(--orange)}
+.filters-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters-row select,.filters-row input{flex:1;min-width:100px;font-size:12px;padding:8px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-card{background:var(--white);border-radius:var(--radius);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.metric-card .metric-value{font-size:28px;font-weight:700;color:var(--navy)}
+.metric-card .metric-label{font-size:11px;color:var(--gray3);margin-top:2px}
+.chart-section{margin-bottom:16px}
+.chart-section h3{font-size:14px;margin-bottom:8px;color:var(--navy)}
+.chart-container{background:var(--white);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow)}
+.chart-container svg{width:100%;height:auto}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:var(--navy);color:var(--white);padding:8px;text-align:left}
+.data-table td{padding:8px;border-bottom:1px solid var(--gray2)}
+.data-table tr:hover td{background:var(--gray)}
 
 /* Registros */
 .search-bar{margin-bottom:12px}
-.search-bar input{width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:14px;font-family:var(--font)}
-.search-bar input:focus{outline:none;border-color:var(--orange)}
-.records-table-wrapper{overflow-x:auto;background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);margin-bottom:12px}
-.records-table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
-.records-table th{background:var(--navy);color:var(--white);padding:8px 10px;text-align:left;font-weight:600;position:sticky;top:0}
-.records-table td{padding:8px 10px;border-bottom:1px solid var(--gray-100)}
-.records-table tr:hover td{background:var(--gray-50)}
-.pagination{display:flex;justify-content:center;align-items:center;gap:8px}
-.pagination button{padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius);background:var(--white);cursor:pointer;font-size:12px;font-family:var(--font)}
-.pagination button:hover{border-color:var(--orange)}
-.pagination button:disabled{opacity:0.5;cursor:not-allowed}
-.pagination span{font-size:12px;color:var(--gray-500)}
-.export-btn{margin-bottom:12px}
+.pagination{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.page-btn{padding:6px 12px;border-radius:6px;background:var(--gray);font-size:12px}
+.page-btn.active{background:var(--orange);color:var(--navy)}
+.detail-row{background:var(--gray);padding:10px;font-size:12px;border-bottom:1px solid var(--gray2)}
+
+/* Envios */
+.upload-zone{border:2px dashed var(--gray2);border-radius:var(--radius);padding:40px 20px;text-align:center;margin-bottom:16px;transition:all .2s;cursor:pointer}
+.upload-zone.dragover{border-color:var(--orange);background:#fff9f0}
+.upload-zone p{color:var(--gray3);margin-top:8px;font-size:13px}
+.paste-area textarea{min-height:120px;font-size:12px;font-family:monospace}
+.preview-section{margin-top:16px}
+.progress-bar{height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;margin:12px 0}
+.progress-bar .fill{height:100%;background:var(--green);transition:width .3s}
 
 /* Admin */
-.admin-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;border:1px solid var(--gray-200)}
-.admin-section h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--navy)}
-.admin-field{display:flex;gap:8px;margin-bottom:8px;align-items:center}
-.admin-field input{flex:1;padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius);font-size:13px;font-family:var(--font)}
-.admin-list{list-style:none;margin-bottom:8px}
-.admin-list li{padding:6px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--gray-100);font-size:13px}
-.admin-list li button{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px}
-.admin-note{font-size:12px;color:var(--gray-500);font-style:italic;margin-top:8px}
+.admin-section{margin-bottom:20px}
+.admin-section h3{font-size:14px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--gray2)}
+.admin-list{list-style:none}
+.admin-list li{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gray2);font-size:13px}
+.admin-list li button{background:var(--red);color:var(--white);border-radius:4px;padding:2px 8px;font-size:11px}
+.admin-add{display:flex;gap:8px;margin-top:8px}
+.admin-add input{flex:1}
 
 /* Como Usar */
 .help-section{margin-bottom:16px}
-.help-section h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.help-section p,.help-section li{font-size:13px;line-height:1.6;color:var(--gray-600);margin-bottom:6px}
-.help-section ul{padding-left:20px}
-.lang-toggle{display:flex;gap:8px;margin-bottom:16px;justify-content:center}
-.accordion{border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;margin-bottom:8px}
-.accordion-header{padding:12px;background:var(--gray-50);cursor:pointer;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
-.accordion-body{padding:0 12px;max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;font-size:13px;line-height:1.6}
-.accordion-body.open{max-height:500px;padding:12px}
+.help-section h3{font-size:15px;margin-bottom:8px;color:var(--navy)}
+.help-section p,.help-section li{font-size:13px;line-height:1.6;color:#4a5568}
+.help-section ul{padding-left:20px;margin-top:4px}
+.faq-item{border:1px solid var(--gray2);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.faq-q{padding:12px;font-weight:600;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.faq-a{padding:0 12px 12px;font-size:13px;color:#4a5568;display:none}
+.faq-item.open .faq-a{display:block}
+.lang-toggle{display:flex;gap:8px;margin-bottom:16px}
+.lang-btn{padding:6px 12px;border-radius:6px;font-size:12px;background:var(--gray)}
+.lang-btn.active{background:var(--orange);color:var(--navy);font-weight:600}
 
-/* Loading */
-.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:12px}
-.loading-overlay span{font-size:13px;color:var(--gray-500)}
-.hidden{display:none !important}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.modal{background:var(--white);border-radius:var(--radius);padding:24px;max-width:400px;width:100%}
+.modal h3{margin-bottom:12px}
+.modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+
+@media(max-width:480px){.metrics-grid{grid-template-columns:1fr 1fr}.filters-row{flex-direction:column}}
 </style>
 </head>
 <body>
-<div id="toast-container"></div>
-<div id="flash-overlay"></div>
 
-<div id="login-screen">
-<div class="login-card">
-<div class="login-logo">
-<h1>📦 ScanTrack</h1>
-<span>v3.0 — AMZL BR Delivery Stations</span>
-</div>
-<div class="form-group">
-<label>Alias</label>
-<input type="text" id="login-alias" placeholder="seu.alias" autocomplete="off" autocapitalize="none">
-</div>
-<div class="form-group">
+<!-- Login Screen -->
+<div id="loginScreen">
+<div class="login-box">
+<h1>📦 ScanTrack v3.0</h1>
+<p class="subtitle">Gestão de Bags, Ráfias e TBR — AMZL BR</p>
+<label>Alias (login Amazon)</label>
+<input type="text" id="loginAlias" placeholder="ex: jsilva" autocomplete="off">
 <label>Delivery Station</label>
-<select id="login-ds"><option value="">Carregando...</option></select>
-</div>
-<div class="form-group">
+<select id="loginDS"><option value="">Carregando...</option></select>
 <label>PIN (4 dígitos)</label>
-<input type="password" id="login-pin" maxlength="4" inputmode="numeric" placeholder="••••">
-</div>
-<button class="btn btn-primary" id="login-btn" onclick="doLogin()">Entrar</button>
+<input type="password" id="loginPin" maxlength="4" placeholder="••••" inputmode="numeric">
+<button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+<div id="loginErr" class="login-error hidden"></div>
 </div>
 </div>
 
-<div id="app">
-<header class="app-header">
+<!-- App Screen -->
+<div id="appScreen">
+<div class="topbar">
 <h2>📦 ScanTrack</h2>
-<div class="user-info">
-<span id="header-user"></span>
+<div style="text-align:right">
+<span class="user-info" id="topbarInfo">—</span><br>
 <button class="logout-btn" onclick="doLogout()">Sair</button>
 </div>
-</header>
-
-<div class="tab-content-wrapper">
-<!-- SCANNER TAB -->
-<div class="tab-content active" id="tab-scanner">
-<div class="asset-selector">
-<div class="asset-btn active" data-type="bag" onclick="selectAsset('bag')">
-<span class="icon">🛄</span><span class="label">Bag</span>
-</div>
-<div class="asset-btn" data-type="rafia" onclick="selectAsset('rafia')">
-<span class="icon">📦</span><span class="label">Ráfia</span>
-</div>
-<div class="asset-btn" data-type="tbr" onclick="selectAsset('tbr')">
-<span class="icon">📋</span><span class="label">Pacote (TBR)</span>
-</div>
 </div>
 
-<div class="movement-selector">
-<div class="mov-btn retorno active" data-mov="RETORNO" onclick="selectMovement('RETORNO')">🟢 RETORNO</div>
-<div class="mov-btn saida" data-mov="SAÍDA" onclick="selectMovement('SAÍDA')">🟠 SAÍDA (Exceção)</div>
+<div class="main-content">
+<!-- Tab: Scanner -->
+<div class="tab-content active" id="tabScanner">
+<div class="type-selector">
+<button class="type-btn active" data-type="Bag" onclick="setType('Bag',this)">🛍️ Bag</button>
+<button class="type-btn" data-type="Rafia" onclick="setType('Rafia',this)">🧵 Ráfia</button>
+<button class="type-btn" data-type="Pacote" onclick="setType('Pacote',this)">📋 Pacote</button>
+</div>
+<div id="moveToggleWrap" class="move-toggle">
+<button class="move-btn active-ret" id="btnRetorno" onclick="setMove('retorno')">🟢 RETORNO</button>
+<button class="move-btn" id="btnSaida" onclick="setMove('saida')">🟠 SAÍDA (Exceção)</button>
 </div>
 
-<!-- Camera (mobile) -->
-<div class="camera-container" id="camera-container">
-<video id="camera-video" autoplay="" playsinline="" muted=""></video>
-<div class="camera-overlay"><div class="crosshair"></div></div>
-<div class="camera-status" id="camera-status">Iniciando câmera...</div>
+<!-- Saída extra fields -->
+<div id="saidaFields" class="saida-fields hidden card">
+<label>Rota</label>
+<input type="text" id="saidaRota" placeholder="Ex: R001">
+<label>Motorista</label>
+<input type="text" id="saidaMotorista" placeholder="Nome do motorista">
 </div>
 
-<!-- USB Scanner (desktop) -->
-<div class="usb-input-area hidden" id="usb-area">
-<div style="font-size:32px">🔌</div>
-<div style="font-size:14px;font-weight:600;margin-top:8px;color:var(--gray-600)">Modo Scanner USB</div>
-<div style="font-size:12px;color:var(--gray-400);margin-top:4px">Foco automático — leia o código com o scanner</div>
-<input type="text" id="usb-input" placeholder="Aguardando leitura..." autocomplete="off">
+<!-- TBR fields -->
+<div id="tbrFields" class="tbr-fields hidden card">
+<label>Classificação</label>
+<select id="tbrClass"><option value="">Selecione...</option></select>
+<label>Observação</label>
+<textarea id="tbrObs" rows="2" placeholder="Detalhes do problema..."></textarea>
+<label style="margin-top:8px">Foto (opcional)</label>
+<button class="btn btn-sm btn-secondary" onclick="capturePhoto()" id="photoBtn">📸 Tirar Foto</button>
+<span id="photoStatus" style="font-size:11px;margin-left:8px"></span>
+<input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
+</div>
+
+<!-- Camera / USB -->
+<div id="cameraArea" class="camera-container">
+<video id="camVideo" autoplay="" playsinline="" muted=""></video>
+<div class="crosshair"><svg viewBox="0 0 200 200"><rect x="30" y="30" width="140" height="140" fill="none" stroke="#FF9900" stroke-width="3" rx="10"></rect><line x1="100" y1="50" x2="100" y2="80" stroke="#FF9900" stroke-width="2"></line><line x1="100" y1="120" x2="100" y2="150" stroke="#FF9900" stroke-width="2"></line><line x1="50" y1="100" x2="80" y2="100" stroke="#FF9900" stroke-width="2"></line><line x1="120" y1="100" x2="150" y2="100" stroke="#FF9900" stroke-width="2"></line></svg></div>
+</div>
+<div id="usbArea" class="usb-mode hidden card">
+<p style="font-size:13px;color:var(--gray3);margin-bottom:12px">🔌 Modo Scanner USB — Aponte o leitor para o código</p>
+<input type="text" id="usbInput" placeholder="Aguardando leitura..." autofocus="">
 </div>
 
 <!-- Manual entry -->
 <div class="manual-entry">
-<input type="text" id="manual-code" placeholder="Código manual..." autocomplete="off">
-<button class="btn btn-orange btn-sm" onclick="processManualEntry()">OK</button>
+<input type="text" id="manualCode" placeholder="Digitar código manualmente...">
+<button class="btn btn-primary btn-sm" onclick="manualSubmit()">OK</button>
 </div>
 
-<!-- TBR extra fields -->
-<div class="tbr-fields hidden" id="tbr-fields">
-<div class="form-group">
-<label>Classificação</label>
-<select id="tbr-class"><option value="">Selecione...</option></select>
-</div>
-<div class="form-group hidden" id="tbr-obs-group">
-<label>Observação</label>
-<input type="text" id="tbr-obs" placeholder="Detalhe...">
-</div>
-<div class="form-group">
-<button class="btn btn-sm btn-outline" onclick="capturePhoto()">📷 Foto (opcional)</button>
-<span id="photo-status" style="font-size:11px;color:var(--gray-400);margin-left:8px"></span>
-</div>
-<button class="btn btn-primary" onclick="submitTBR()">Registrar Pacote</button>
+<!-- Confirm button for saída/TBR -->
+<div id="confirmArea" class="hidden" style="margin-bottom:12px">
+<button class="btn btn-success" style="width:100%;padding:14px;font-size:16px" onclick="confirmScan()" id="confirmBtn">✅ Registrar</button>
 </div>
 
-<!-- SAÍDA extra fields -->
-<div class="tbr-fields hidden" id="saida-fields">
-<div class="form-group">
-<label>Rota</label>
-<input type="text" id="saida-rota" placeholder="Ex: R01">
-</div>
-<div class="form-group">
-<label>Motorista</label>
-<input type="text" id="saida-motorista" placeholder="Nome do motorista">
-</div>
+<div class="session-counter">Scans desta sessão: <strong id="sessionCount">0</strong></div>
+<div class="card mini-log" id="miniLog"><p style="color:var(--gray3);text-align:center;font-size:12px">Nenhum scan ainda</p></div>
 </div>
 
-<div class="session-counter">Scans desta sessão: <span id="session-count">0</span></div>
-
-<div class="mini-log">
-<div class="mini-log-header">Últimos registros</div>
-<div id="mini-log-list"><div class="mini-log-item" style="color:var(--gray-400);justify-content:center">Nenhum scan ainda</div></div>
-</div>
-</div>
-
-<!-- DASHBOARD TAB -->
-<div class="tab-content" id="tab-dashboard">
+<!-- Tab: Dashboard -->
+<div class="tab-content" id="tabDashboard">
 <div class="filters-row">
-<select id="dash-ds"><option value="">Todos DS</option></select>
-<select id="dash-type"><option value="">Todos Tipos</option><option value="bag">Bag</option><option value="rafia">Ráfia</option><option value="tbr">TBR</option></select>
-<input type="date" id="dash-from" title="De">
-<input type="date" id="dash-to" title="Até">
+<select id="dashDS"><option value="">Todas DS</option></select>
+<select id="dashRegional"><option value="">Todas Regionais</option></select>
+<select id="dashTipo"><option value="">Todos</option><option value="Bag">Bag</option><option value="Rafia">Ráfia</option><option value="Pacote">Pacote</option></select>
+<input type="date" id="dashFrom">
+<input type="date" id="dashTo">
+<button class="btn btn-sm btn-primary" onclick="loadDashboard()">🔄</button>
 </div>
-<button class="btn btn-sm btn-outline" onclick="loadDashboard()" style="margin-bottom:12px">🔄 Atualizar</button>
-
 <div class="metrics-grid">
-<div class="metric-card orange"><div class="value" id="dash-saidas">-</div><div class="label">Total Saídas</div></div>
-<div class="metric-card green"><div class="value" id="dash-retornos">-</div><div class="label">Total Retornos</div></div>
-<div class="metric-card red"><div class="value" id="dash-pendentes">-</div><div class="label">Pendentes</div></div>
-<div class="metric-card blue"><div class="value" id="dash-percent">-</div><div class="label">% Retorno</div></div>
+<div class="metric-card"><div class="metric-value" id="mSaidas">0</div><div class="metric-label">Total Saídas</div></div>
+<div class="metric-card"><div class="metric-value" id="mRetornos">0</div><div class="metric-label">Total Retornos</div></div>
+<div class="metric-card"><div class="metric-value" id="mPendentes">0</div><div class="metric-label">Pendentes</div></div>
+<div class="metric-card"><div class="metric-value" id="mPctRetorno">0%</div><div class="metric-label">% Retorno</div></div>
+</div>
+<div class="card" style="margin-bottom:12px">
+<h4 style="font-size:13px;margin-bottom:6px">📋 TBR (Pacotes)</h4>
+<div style="display:flex;gap:16px;flex-wrap:wrap">
+<div><span style="font-size:22px;font-weight:700" id="mTbrHoje">0</span><br><span style="font-size:11px;color:var(--gray3)">Hoje</span></div>
+<div><span style="font-size:22px;font-weight:700" id="mTbrSemana">0</span><br><span style="font-size:11px;color:var(--gray3)">Esta semana</span></div>
+</div>
+</div>
+<div class="chart-section"><h3>📊 Envios vs Retornos (7 dias)</h3><div class="chart-container" id="chartBar"></div></div>
+<div class="chart-section"><h3>🏆 Top 10 Rotas</h3><div class="chart-container" id="chartRoutes"></div></div>
+<div class="chart-section"><h3>🍩 TBR por Classificação</h3><div class="chart-container" id="chartDonut"></div></div>
+<div class="chart-section"><h3>📋 Hubs com mais Pendências</h3><div class="chart-container" id="chartTable"></div></div>
+<button class="btn btn-secondary" onclick="exportReport()" style="width:100%">📄 Exportar Relatório</button>
 </div>
 
-<div class="section-title">📋 TBR por Classificação</div>
-<div id="tbr-breakdown"></div>
-
-<div class="section-title" style="margin-top:16px">🚨 Alertas (2+ dias sem retorno)</div>
-<div id="dash-alerts"><div style="font-size:13px;color:var(--gray-400)">Carregue dados para ver alertas</div></div>
+<!-- Tab: Registros -->
+<div class="tab-content" id="tabRegistros">
+<div class="search-bar"><input type="text" id="regSearch" placeholder="🔍 Buscar código, operador, DS..." oninput="filterRegistros()"></div>
+<div style="overflow-x:auto"><table class="data-table" id="regTable"><thead><tr><th>Código</th><th>Tipo</th><th>Mov.</th><th>DS</th><th>Data</th></tr></thead><tbody id="regBody"></tbody></table></div>
+<div class="pagination" id="regPagination"></div>
+<button class="btn btn-sm btn-secondary" onclick="exportCSV()" style="margin-top:12px">📥 Exportar CSV</button>
 </div>
 
-<!-- REGISTROS TAB -->
-<div class="tab-content" id="tab-registros">
-<div class="search-bar">
-<input type="text" id="reg-search" placeholder="Buscar por código, operador, DS..." oninput="filterRecords()">
+<!-- Tab: Envios -->
+<div class="tab-content" id="tabEnvios">
+<h3 style="margin-bottom:4px">📤 Carregar Dispatch</h3>
+<p style="font-size:12px;color:var(--gray3);margin-bottom:12px">Importe as saídas do dia a partir do arquivo de Dispatch</p>
+
+<div class="card">
+<h4 style="font-size:13px;margin-bottom:8px">Modo Rápido (CSV)</h4>
+<p style="font-size:11px;color:var(--gray3);margin-bottom:8px">No Excel: aba "All Dispatch Sheet" → Arquivo → Salvar Como → CSV (UTF-8)</p>
+<div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+<div style="font-size:32px">📁</div>
+<p>Arraste o arquivo CSV aqui ou clique para selecionar</p>
 </div>
-<button class="btn btn-sm btn-outline export-btn" onclick="exportCSV()">📥 Exportar CSV</button>
-<div class="records-table-wrapper">
-<table class="records-table">
-<thead><tr><th>Código</th><th>Tipo</th><th>Mov.</th><th>Class.</th><th>DS</th><th>Operador</th><th>Data/Hora</th></tr></thead>
-<tbody id="records-body"></tbody>
-</table>
+<input type="file" id="fileInput" accept=".csv,.txt" class="hidden">
 </div>
-<div class="pagination">
-<button onclick="changePage(-1)" id="prev-page">← Anterior</button>
-<span id="page-info">1/1</span>
-<button onclick="changePage(1)" id="next-page">Próxima →</button>
+
+<div class="card">
+<h4 style="font-size:13px;margin-bottom:8px">Modo Colar (Tab-separated)</h4>
+<p style="font-size:11px;color:var(--gray3);margin-bottom:8px">Copie as linhas do Excel e cole abaixo</p>
+<div class="paste-area"><textarea id="pasteArea" placeholder="Cole os dados aqui..."></textarea></div>
+<button class="btn btn-sm btn-primary" onclick="parsePaste()" style="margin-top:8px">Processar</button>
+</div>
+
+<div id="uploadPreview" class="preview-section hidden"></div>
+<div id="uploadProgress" class="hidden"><div class="progress-bar"><div class="fill" id="progFill" style="width:0%"></div></div><p style="font-size:12px;text-align:center" id="progText">Enviando...</p></div>
+
+<div class="card" style="margin-top:16px">
+<h4 style="font-size:13px;margin-bottom:8px">📜 Últimos Uploads</h4>
+<div id="recentUploads" style="font-size:12px;color:var(--gray3)">Nenhum upload registrado</div>
 </div>
 </div>
 
-<!-- ADMIN TAB -->
-<div class="tab-content" id="tab-admin">
-<div class="admin-section">
+<!-- Tab: Admin -->
+<div class="tab-content" id="tabAdmin">
+<div id="adminLocked" class="card" style="text-align:center;padding:40px">
+<p style="font-size:14px">🔒 Acesso restrito a administradores</p>
+</div>
+<div id="adminContent" class="hidden">
+<div class="admin-section card">
 <h3>🔗 Conexão API</h3>
-<div class="admin-field">
-<input type="text" id="admin-api-url" placeholder="URL do Google Apps Script">
-<button class="btn btn-sm btn-green" onclick="saveApiUrl()">Salvar</button>
+<input type="text" id="adminApiUrl" placeholder="URL da API (Google Apps Script)">
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn btn-sm btn-primary" onclick="saveApiUrl()">Salvar</button>
+<button class="btn btn-sm btn-secondary" onclick="testApi()">Testar Conexão</button>
 </div>
-<button class="btn btn-sm btn-outline" onclick="testConnection()" style="margin-top:8px">🧪 Testar Conexão</button>
-<div id="api-test-result" style="margin-top:8px;font-size:12px"></div>
+<p id="apiTestResult" style="font-size:11px;margin-top:6px"></p>
 </div>
-
-<div class="admin-section">
+<div class="admin-section card">
 <h3>🏢 Delivery Stations</h3>
-<ul class="admin-list" id="admin-ds-list"></ul>
-<div class="admin-field">
-<input type="text" id="admin-new-ds" placeholder="Novo DS (ex: DSP9)">
-<input type="text" id="admin-new-regional" placeholder="Regional">
-<button class="btn btn-sm btn-green" onclick="addDS()">+</button>
+<ul class="admin-list" id="adminDsList"></ul>
+<div class="admin-add"><input type="text" id="addDsInput" placeholder="DS:Regional (ex: DSP2:SP)"><button class="btn btn-sm btn-primary" onclick="addDS()">+</button></div>
 </div>
+<div class="admin-section card">
+<h3>🔑 PIN</h3>
+<p style="font-size:12px;color:var(--gray3);margin-bottom:8px">PIN atual: <strong id="currentPin">****</strong></p>
+<div class="admin-add"><input type="text" id="newPinInput" placeholder="Novo PIN (4 dígitos)" maxlength="4"><button class="btn btn-sm btn-primary" onclick="changePin()">Alterar</button></div>
 </div>
-
-<div class="admin-section">
-<h3>🔑 PIN de Acesso</h3>
-<div class="admin-field">
-<input type="text" id="admin-pin" placeholder="Novo PIN (4 dígitos)" maxlength="4">
-<button class="btn btn-sm btn-green" onclick="updatePIN()">Alterar</button>
+<div class="admin-section card">
+<h3>📋 Classificações TBR</h3>
+<ul class="admin-list" id="adminClassList"></ul>
+<div class="admin-add"><input type="text" id="addClassInput" placeholder="Nova classificação"><button class="btn btn-sm btn-primary" onclick="addClass()">+</button></div>
 </div>
-</div>
-
-<div class="admin-section">
-<h3>🏷️ Classificações TBR</h3>
-<ul class="admin-list" id="admin-class-list"></ul>
-<div class="admin-field">
-<input type="text" id="admin-new-class" placeholder="Nova classificação">
-<button class="btn btn-sm btn-green" onclick="addClass()">+</button>
-</div>
-</div>
-
-<div class="admin-section">
+<div class="admin-section card">
 <h3>👤 Administradores</h3>
-<ul class="admin-list" id="admin-admins-list"></ul>
-<div class="admin-field">
-<input type="text" id="admin-new-admin" placeholder="Alias do novo admin">
-<button class="btn btn-sm btn-green" onclick="addAdmin()">+</button>
+<ul class="admin-list" id="adminAdminsList"></ul>
+<div class="admin-add"><input type="text" id="addAdminInput" placeholder="Alias do admin"><button class="btn btn-sm btn-primary" onclick="addAdmin()">+</button></div>
+</div>
+<p style="font-size:11px;color:var(--gray3);text-align:center">Alterações são salvas diretamente na planilha Config via API</p>
 </div>
 </div>
 
-<div class="admin-note">💡 Alterações são salvas via API. Se a API não estiver configurada, edite diretamente a planilha Config no Google Sheets.</div>
-</div>
-
-<!-- COMO USAR TAB -->
-<div class="tab-content" id="tab-help">
+<!-- Tab: Como Usar -->
+<div class="tab-content" id="tabHelp">
 <div class="lang-toggle">
-<button class="btn btn-sm btn-outline active" id="lang-pt" onclick="setHelpLang('pt')">🇧🇷 PT-BR</button>
-<button class="btn btn-sm btn-outline" id="lang-en" onclick="setHelpLang('en')">🇺🇸 EN</button>
+<button class="lang-btn active" onclick="setLang('pt',this)">🇧🇷 PT-BR</button>
+<button class="lang-btn" onclick="setLang('en',this)">🇺🇸 EN</button>
 </div>
-<div id="help-content-pt">
-<div class="help-section"><h3>🔐 Login</h3><p>Insira seu alias Amazon (sem espaços, minúsculo), selecione sua DS e digite o PIN de 4 dígitos configurado pelo admin.</p></div>
-<div class="help-section"><h3>📱 Escaneamento (Mobile)</h3><p>A câmera traseira abre automaticamente. Posicione o QR/código de barras dentro da mira. O registro é automático para Bags e Ráfias no modo RETORNO.</p></div>
-<div class="help-section"><h3>🖥️ Escaneamento (Desktop/USB)</h3><p>Em telas maiores que 768px sem touch, o modo USB é ativado. O campo de texto recebe foco automático. Basta ler o código com o scanner USB.</p></div>
-<div class="help-section"><h3>📦 Tipos de Ativos</h3><ul><li><b>Bag:</b> Sacolas de entrega. Scan rápido contínuo.</li><li><b>Ráfia:</b> Sacos grandes de transporte. Scan rápido contínuo.</li><li><b>Pacote (TBR):</b> Pacotes com problema. Requer classificação e permite foto.</li></ul></div>
-<div class="help-section"><h3>📊 Dashboard</h3><p>Visualize métricas de saídas, retornos e pendências. Filtre por DS, tipo e data.</p></div>
-<div class="help-section"><h3>⚙️ Admin</h3><p>Configure a URL da API, gerencie DS, PIN, classificações e administradores.</p></div>
-<div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)">🔧 Troubleshooting <span>▼</span></div><div class="accordion-body"><p>• <b>Câmera não abre:</b> Verifique permissões do navegador.<br>• <b>API não conecta:</b> Verifique a URL no Admin e se o script está publicado como webapp.<br>• <b>Scan não registra:</b> Código pode estar no cooldown de 5s (anti-duplicata).<br>• <b>Dados offline:</b> Registros ficam em fila local e são enviados quando a conexão voltar.</p></div></div>
-</div>
-<div id="help-content-en" class="hidden">
-<div class="help-section"><h3>🔐 Login</h3><p>Enter your Amazon alias (no spaces, lowercase), select your DS and enter the 4-digit PIN configured by admin.</p></div>
-<div class="help-section"><h3>📱 Scanning (Mobile)</h3><p>The rear camera opens automatically. Position the QR/barcode within the crosshairs. Registration is automatic for Bags and Ráfias in RETORNO mode.</p></div>
-<div class="help-section"><h3>🖥️ Scanning (Desktop/USB)</h3><p>On screens larger than 768px without touch, USB mode is activated. The text field auto-focuses. Just scan with your USB scanner.</p></div>
-<div class="help-section"><h3>📦 Asset Types</h3><ul><li><b>Bag:</b> Delivery bags. Continuous rapid scan.</li><li><b>Ráfia:</b> Large transport sacks. Continuous rapid scan.</li><li><b>Package (TBR):</b> Problem packages. Requires classification and allows photo.</li></ul></div>
-<div class="help-section"><h3>📊 Dashboard</h3><p>View metrics for outputs, returns and pending items. Filter by DS, type and date.</p></div>
-<div class="help-section"><h3>⚙️ Admin</h3><p>Configure API URL, manage DS, PIN, classifications and administrators.</p></div>
-<div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)">🔧 Troubleshooting <span>▼</span></div><div class="accordion-body"><p>• <b>Camera won't open:</b> Check browser permissions.<br>• <b>API won't connect:</b> Check the URL in Admin and that the script is published as webapp.<br>• <b>Scan won't register:</b> Code might be in 5s cooldown (anti-duplicate).<br>• <b>Offline data:</b> Records are queued locally and sent when connection returns.</p></div></div>
-</div>
+<div id="helpContent"></div>
 </div>
 </div>
 
-<nav class="bottom-nav" id="bottom-nav">
-<button class="nav-item active" data-tab="scanner" onclick="switchTab('scanner')"><span class="nav-icon">📷</span>Scanner</button>
-<button class="nav-item" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span>Dashboard</button>
-<button class="nav-item" data-tab="registros" onclick="switchTab('registros')"><span class="nav-icon">📋</span>Registros</button>
-<button class="nav-item hidden" data-tab="admin" id="nav-admin" onclick="switchTab('admin')"><span class="nav-icon">⚙️</span>Admin</button>
-<button class="nav-item" data-tab="help" onclick="switchTab('help')"><span class="nav-icon">❓</span>Como Usar</button>
-</nav>
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+<button class="nav-btn active" data-tab="tabScanner" onclick="switchTab('tabScanner',this)"><span class="nav-icon">📷</span>Scanner</button>
+<button class="nav-btn" data-tab="tabDashboard" onclick="switchTab('tabDashboard',this)"><span class="nav-icon">📊</span>Dashboard</button>
+<button class="nav-btn" data-tab="tabRegistros" onclick="switchTab('tabRegistros',this)"><span class="nav-icon">📋</span>Registros</button>
+<button class="nav-btn" data-tab="tabEnvios" onclick="switchTab('tabEnvios',this)"><span class="nav-icon">📤</span>Envios</button>
+<button class="nav-btn" data-tab="tabAdmin" onclick="switchTab('tabAdmin',this)"><span class="nav-icon">⚙️</span>Admin</button>
+<button class="nav-btn" data-tab="tabHelp" onclick="switchTab('tabHelp',this)"><span class="nav-icon">❓</span>Como Usar</button>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modalOverlay">
+<div class="modal" id="modalContent"></div>
 </div>
 
 <script>
-// GLOBAL ERROR HANDLER — must be first
-window.onerror = function(msg, url, line, col, error) {
-try { console.error('ScanTrack Error:', msg, line, col, error); } catch(e) {}
-return true;
-};
-window.addEventListener('unhandledrejection', function(e) { e.preventDefault(); });
+window.onerror=function(){return true};
+window.onunhandledrejection=function(e){try{e.preventDefault()}catch(x){}};
 
+try{(function(){
 // ===== STATE =====
-var STATE = {
-user: null,
-ds: null,
-regional: null,
-isDesktop: false,
-config: null,
-sessionCount: 0,
-scanQueue: [],
-recentScans: [],
-currentAsset: 'bag',
-currentMovement: 'RETORNO',
-currentPage: 1,
-records: [],
-filteredRecords: [],
-tbrPendingCode: null,
-photoData: null,
-cameraStream: null,
-barcodeDetector: null,
-scanInterval: null,
-recentCodes: {},
-audioCtx: null
-};
-
-var FALLBACK_DS = ['DSP2','HSP2','DSP4','DBS5','DBS7','DGO2','DRJ3','HRJ3','DRJ5','DES2','HVI2','DSA8','HSV8','DBR9'];
-var FALLBACK_CLASSIFICATIONS = ['Danificado','Endereço incorreto','Recusado','Extravio','Outro'];
-var FALLBACK_PIN = '1234';
-var FALLBACK_ADMINS = [];
-var CONFIG_TTL = 300000; // 5 min
+const LS_PREFIX='scantrack_';
+const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt'};
+const DEFAULT_DS=['DSP2:SP','HSP2:SP','DSP4:SP','DBS5:BA','DBS7:BA','DGO2:GO','DRJ3:RJ','HRJ3:RJ','DRJ5:RJ','DES2:ES','HVI2:ES','DSA8:SA','HSV8:SA','DBR9:BR'];
+const DEFAULT_CLASS=['Avariado','Etiqueta ilegível','Endereço incorreto','Recusado pelo cliente','Tentativa frustrada','Extravio parcial','Outro'];
+const COOLDOWN_MS=5000;
+let lastScans={};
+let audioCtx=null;
+let scanInterval=null;
+let barcodeDetector=null;
+let usbTimeout=null;
 
 // ===== HELPERS =====
-function $(id){try{return document.getElementById(id)}catch(e){return null}}
-function qs(sel){try{return document.querySelector(sel)}catch(e){return null}}
-function qsa(sel){try{return document.querySelectorAll(sel)}catch(e){return []}}
+function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(LS_PREFIX+k));localStorage.setItem(LS_PREFIX+k,JSON.stringify(v))}catch(e){return null}}
+function lsDel(k){try{localStorage.removeItem(LS_PREFIX+k)}catch(e){}}
+function $(id){return document.getElementById(id)}
+function show(el){if(el)el.classList.remove('hidden')}
+function hide(el){if(el)el.classList.add('hidden')}
+function toast(msg,type){try{let t=document.createElement('div');t.className='toast';t.style.background=type==='error'?'var(--red)':type==='warn'?'var(--orange)':'var(--green)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{try{t.remove()}catch(e){}},2500)}catch(e){}}
+function flash(color){try{let f=document.createElement('div');f.className='flash flash-'+color;document.body.appendChild(f);setTimeout(()=>{try{f.remove()}catch(e){}},250)}catch(e){}}
+function beep(freq,dur){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.value=0.3;o.start();setTimeout(()=>{try{o.stop()}catch(e){}},dur)}catch(e){}}
+function fmtDate(d){try{let dt=new Date(d);return dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return d||''}}
+function today(){return new Date().toISOString().split('T')[0]}
+function getApiUrl(){return ls('api_url')||''}
 
-function lsGet(key){try{return JSON.parse(localStorage.getItem('scantrack_'+key))}catch(e){return null}}
-function lsSet(key,val){try{localStorage.setItem('scantrack_'+key,JSON.stringify(val))}catch(e){}}
-function lsRemove(key){try{localStorage.removeItem('scantrack_'+key)}catch(e){}}
+// ===== DETECT DESKTOP =====
+function detectDesktop(){let w=window.innerWidth>768;let noTouch=!('ontouchstart' in window)&&!navigator.maxTouchPoints;state.isDesktop=w&&noTouch}
 
-function toast(msg,type){
+// ===== API =====
+async function apiCall(action,params){
+let url=getApiUrl();
+if(!url){toast('Configure a API na aba Admin','error');return null}
+let body=Object.assign({action},params||{});
 try{
-var c=$('toast-container');if(!c)return;
-var t=document.createElement('div');
-t.className='toast toast-'+(type||'info');
-t.textContent=msg;
-c.appendChild(t);
-setTimeout(function(){try{c.removeChild(t)}catch(e){}},3000);
-}catch(e){}
+let r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),redirect:'follow'});
+let data=await r.json();
+return data;
+}catch(e){
+state.offlineQueue.push({action,params,ts:Date.now()});
+ls('offlineQueue',state.offlineQueue);
+return null;
+}}
+
+async function flushQueue(){
+if(!state.offlineQueue.length)return;
+let queue=[...state.offlineQueue];
+state.offlineQueue=[];
+for(let item of queue){
+try{await apiCall(item.action,item.params)}catch(e){state.offlineQueue.push(item)}
 }
-
-function flash(color){
-try{
-var el=$('flash-overlay');if(!el)return;
-el.className='flash-'+color;
-setTimeout(function(){el.className='';},200);
-}catch(e){}
-}
-
-function playSound(type){
-try{
-if(!STATE.audioCtx){STATE.audioCtx=new(window.AudioContext||window.webkitAudioContext)()}
-var ctx=STATE.audioCtx;
-if(ctx.state==='suspended')ctx.resume();
-var osc=ctx.createOscillator();
-var gain=ctx.createGain();
-osc.connect(gain);gain.connect(ctx.destination);
-if(type==='success'){osc.frequency.value=800;gain.gain.value=0.3;osc.start();osc.stop(ctx.currentTime+0.1)}
-else{osc.frequency.value=200;gain.gain.value=0.3;osc.start();osc.stop(ctx.currentTime+0.3)}
-}catch(e){}
-}
-
-function getApiUrl(){return lsGet('api_url')||''}
-
-function apiCall(action,params,timeout){
-return new Promise(function(resolve,reject){
-var url=getApiUrl();
-if(!url){reject(new Error('API não configurada'));return}
-var controller=null;var signal=null;
-try{controller=new AbortController();signal=controller.signal}catch(e){}
-var timer=setTimeout(function(){
-if(controller)try{controller.abort()}catch(e){}
-reject(new Error('Timeout'));
-},(timeout||10000));
-
-var body=Object.assign({action:action,ds:STATE.ds,user:STATE.user},params||{});
-fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),signal:signal})
-.then(function(r){return r.json()})
-.then(function(data){clearTimeout(timer);resolve(data)})
-.catch(function(e){clearTimeout(timer);reject(e)});
-});
-}
-
-function detectDesktop(){
-var wide=window.innerWidth>768;
-var noTouch=!('ontouchstart' in window)&&!(navigator.maxTouchPoints>0);
-return wide&&noTouch;
-}
-
-function formatTime(d){
-if(!d)d=new Date();
-return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-}
-function formatDateTime(d){
-if(!d)d=new Date();
-return d.toLocaleDateString('pt-BR')+' '+formatTime(d);
+ls('offlineQueue',state.offlineQueue);
 }
 
 // ===== CONFIG =====
-function getConfig(){
-var cached=lsGet('config');
-var ts=lsGet('config_ts');
-if(cached&&ts&&(Date.now()-ts<CONFIG_TTL)){return Promise.resolve(cached)}
-return apiCall('getConfig').then(function(data){
-if(data&&data.success!==false){
-lsSet('config',data);lsSet('config_ts',Date.now());
-STATE.config=data;return data;
-}
-return getCachedOrFallbackConfig();
-}).catch(function(){return getCachedOrFallbackConfig()});
+async function loadConfig(force){
+let cached=ls('config');
+let ts=ls('configTimestamp')||0;
+if(!force&&cached&&(Date.now()-ts<300000)){state.config=cached;state.configTimestamp=ts;return cached}
+let r=await apiCall('lerConfig');
+if(r&&r.success!==false){state.config=r;state.configTimestamp=Date.now();ls('config',r);ls('configTimestamp',state.configTimestamp);return r}
+return cached||null;
 }
 
-function getCachedOrFallbackConfig(){
-var c=lsGet('config');
-if(c){STATE.config=c;return c}
-var fb={ds:FALLBACK_DS.map(function(d){return{code:d,regional:''}}),pin:FALLBACK_PIN,classifications:FALLBACK_CLASSIFICATIONS,admins:FALLBACK_ADMINS};
-STATE.config=fb;return fb;
-}
+function getDS(){if(state.config&&state.config.ds)return state.config.ds;return DEFAULT_DS.map(d=>{let p=d.split(':');return{ds:p[0],regional:p[1]}})}
+function getClassifications(){if(state.config&&state.config.classifications)return state.config.classifications;return DEFAULT_CLASS}
+function getAdmins(){if(state.config&&state.config.admins)return state.config.admins;return['admin']}
+function getPin(){if(state.config&&state.config.pin)return state.config.pin;return'1234'}
+function isAdmin(){return getAdmins().includes(state.user)}
 
 // ===== LOGIN =====
-function initLogin(){
-try{
-var session=lsGet('session');
-if(session&&session.user&&session.ds){
-STATE.user=session.user;STATE.ds=session.ds;STATE.regional=session.regional||'';
-getConfig().then(function(){showApp()}).catch(function(){showApp()});
-return;
-}
-getConfig().then(populateLoginDS).catch(function(){populateLoginDS(getCachedOrFallbackConfig())});
-}catch(e){populateLoginDS(getCachedOrFallbackConfig())}
-}
-
-function populateLoginDS(config){
-try{
-var sel=$('login-ds');if(!sel)return;
-sel.innerHTML='<option value="">Selecione DS...</option>';
-var list=(config&&config.ds)||FALLBACK_DS.map(function(d){return{code:d,regional:''}});
-list.forEach(function(item){
-var code=typeof item==='string'?item:item.code;
-var opt=document.createElement('option');opt.value=code;opt.textContent=code;
-sel.appendChild(opt);
-});
-}catch(e){}
+function populateLoginDS(){
+let sel=$('loginDS');if(!sel)return;
+sel.innerHTML='';
+let dsList=getDS();
+dsList.forEach(d=>{let o=document.createElement('option');o.value=typeof d==='string'?d.split(':')[0]:d.ds;o.textContent=o.value;sel.appendChild(o)});
 }
 
 function doLogin(){
 try{
-var alias=($('login-alias')||{}).value||'';
-alias=alias.toLowerCase().replace(/\s/g,'').trim();
-if(!alias||alias.length<2){toast('Alias inválido','error');return}
-var ds=($('login-ds')||{}).value;
-if(!ds){toast('Selecione uma DS','error');return}
-var pin=($('login-pin')||{}).value;
-if(!pin||pin.length!==4||!/^\d{4}$/.test(pin)){toast('PIN deve ter 4 dígitos','error');return}
+let alias=($('loginAlias')||{}).value||'';
+alias=alias.toLowerCase().replace(/[^a-z0-9]/g,'');
+let ds=($('loginDS')||{}).value;
+let pin=($('loginPin')||{}).value;
+let err=$('loginErr');
 
-var config=STATE.config||getCachedOrFallbackConfig();
-var validPin=(config&&config.pin)||FALLBACK_PIN;
-if(pin!==validPin&&pin!=='0000'){toast('PIN incorreto','error');return}
+if(!alias){show(err);err.textContent='Informe seu alias';return}
+if(!ds){show(err);err.textContent='Selecione a DS';return}
+if(pin!==getPin()){show(err);err.textContent='PIN incorreto';return}
 
-var regional='';
-if(config&&config.ds){
-var found=config.ds.find(function(d){return(typeof d==='string'?d:d.code)===ds});
-if(found&&typeof found==='object')regional=found.regional||'';
-}
+let dsList=getDS();
+let found=dsList.find(d=>(typeof d==='string'?d.split(':')[0]:d.ds)===ds);
+let regional=found?(typeof found==='string'?found.split(':')[1]:found.regional):'';
 
-STATE.user=alias;STATE.ds=ds;STATE.regional=regional;
-lsSet('session',{user:alias,ds:ds,regional:regional});
-toast('Bem-vindo, '+alias+'!','success');
+state.user=alias;state.ds=ds;state.regional=regional;
+ls('user',alias);ls('ds',ds);ls('regional',regional);
+hide(err);
 showApp();
 }catch(e){toast('Erro no login','error')}
 }
 
-function doLogout(){
-try{
-stopCamera();
-STATE.user=null;STATE.ds=null;STATE.sessionCount=0;STATE.recentScans=[];
-lsRemove('session');
-$('login-screen').classList.remove('hidden');
-$('app').classList.remove('visible');$('app').style.display='none';
-}catch(e){}
-}
+function doLogout(){state.user=null;ls('user',null);lsDel('user');lsDel('ds');lsDel('regional');location.reload()}
 
+// ===== APP INIT =====
 function showApp(){
 try{
-$('login-screen').classList.add('hidden');
-$('app').classList.add('visible');$('app').style.display='flex';
-$('header-user').textContent=STATE.user+'@'+STATE.ds;
-
-// Show admin tab if admin
-var config=STATE.config||getCachedOrFallbackConfig();
-var admins=(config&&config.admins)||FALLBACK_ADMINS;
-var navAdmin=$('nav-admin');
-if(navAdmin){
-if(admins.indexOf(STATE.user)>=0||admins.length===0){navAdmin.classList.remove('hidden')}
-else{navAdmin.classList.add('hidden')}
-}
-
-STATE.isDesktop=detectDesktop();
-initScanner();
-populateTBRClassifications();
+hide($('loginScreen'));
+let app=$('appScreen');if(app){app.style.display='flex';show(app)}
+let info=$('topbarInfo');if(info)info.textContent=state.user+' • '+state.ds+' ('+state.regional+')';
+detectDesktop();
+setupScanner();
+populateDashFilters();
+loadHelp();
+checkAdmin();
+loadRecentUploads();
+flushQueue();
 }catch(e){}
 }
 
-// ===== TABS =====
-function switchTab(tab){
+// ===== TAB SWITCHING =====
+function switchTab(tabId,btn){
 try{
-qsa('.tab-content').forEach(function(el){el.classList.remove('active')});
-qsa('.nav-item').forEach(function(el){el.classList.remove('active')});
-var target=$('tab-'+tab);if(target)target.classList.add('active');
-var navBtn=qs('[data-tab="'+tab+'"]');if(navBtn)navBtn.classList.add('active');
-
-if(tab==='dashboard')loadDashboard();
-if(tab==='registros')loadRecords();
-if(tab==='admin')loadAdminPanel();
-if(tab==='scanner'){initScanner()}
+document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+let tab=$(tabId);if(tab)tab.classList.add('active');
+if(btn)btn.classList.add('active');
+state.currentTab=tabId;
+if(tabId==='tabDashboard')loadDashboard();
+if(tabId==='tabRegistros')loadRegistros();
+if(tabId==='tabAdmin')checkAdmin();
 }catch(e){}
 }
+window.switchTab=switchTab;
 
 // ===== SCANNER =====
-function selectAsset(type){
+function setType(type,btn){
 try{
-STATE.currentAsset=type;
-qsa('.asset-btn').forEach(function(el){el.classList.remove('active')});
-qs('[data-type="'+type+'"]').classList.add('active');
-var tbr=$('tbr-fields');
-if(tbr){tbr.classList.toggle('hidden',type!=='tbr'||STATE.currentMovement!=='RETORNO')}
-updateSaidaFields();
+state.scanType=type;
+document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+let mtw=$('moveToggleWrap');
+if(type==='Pacote'){hide(mtw);hide($('saidaFields'));show($('tbrFields'));updateTbrClassOptions();state.moveType='retorno';updateConfirmBtn()}
+else{show(mtw);hide($('tbrFields'));updateSaidaVis();updateConfirmBtn()}
 }catch(e){}
 }
+window.setType=setType;
 
-function selectMovement(mov){
+function setMove(m){
 try{
-STATE.currentMovement=mov;
-qsa('.mov-btn').forEach(function(el){el.classList.remove('active')});
-qs('[data-mov="'+mov+'"]').classList.add('active');
-var sf=$('saida-fields');
-if(sf){sf.classList.toggle('hidden',mov!=='SAÍDA')}
-var tbr=$('tbr-fields');
-if(tbr){tbr.classList.toggle('hidden',STATE.currentAsset!=='tbr'||mov!=='RETORNO')}
+state.moveType=m;
+let br=$('btnRetorno'),bs=$('btnSaida');
+if(m==='retorno'){if(br){br.className='move-btn active-ret'}if(bs){bs.className='move-btn'}}
+else{if(br){br.className='move-btn'}if(bs){bs.className='move-btn active-said'}}
+updateSaidaVis();updateConfirmBtn();
 }catch(e){}
 }
+window.setMove=setMove;
 
-function updateSaidaFields(){
-var sf=$('saida-fields');
-if(sf)sf.classList.toggle('hidden',STATE.currentMovement!=='SAÍDA');
+function updateSaidaVis(){
+let sf=$('saidaFields');
+if(state.moveType==='saida'&&state.scanType!=='Pacote')show(sf);else hide(sf);
 }
 
-function populateTBRClassifications(){
-try{
-var config=STATE.config||getCachedOrFallbackConfig();
-var cls=(config&&config.classifications)||FALLBACK_CLASSIFICATIONS;
-var sel=$('tbr-class');if(!sel)return;
+function updateConfirmBtn(){
+let ca=$('confirmArea'),cb=$('confirmBtn');
+if(state.scanType==='Pacote'){show(ca);if(cb)cb.textContent='✅ Registrar Pacote'}
+else if(state.moveType==='saida'){show(ca);if(cb)cb.textContent='✅ Registrar Saída'}
+else{hide(ca)}
+}
+
+function updateTbrClassOptions(){
+let sel=$('tbrClass');if(!sel)return;
 sel.innerHTML='<option value="">Selecione...</option>';
-cls.forEach(function(c){
-var opt=document.createElement('option');opt.value=c;opt.textContent=c;
-sel.appendChild(opt);
-});
-sel.onchange=function(){
-var og=$('tbr-obs-group');
-if(og)og.classList.toggle('hidden',sel.value!=='Outro');
-};
-}catch(e){}
+getClassifications().forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
 }
 
-function initScanner(){
+function setupScanner(){
 try{
-STATE.isDesktop=detectDesktop();
-var cam=$('camera-container');
-var usb=$('usb-area');
-if(STATE.isDesktop){
-if(cam)cam.classList.add('hidden');
-if(usb)usb.classList.remove('hidden');
-stopCamera();
-initUSBScanner();
+if(state.isDesktop){
+hide($('cameraArea'));show($('usbArea'));
+let ui=$('usbInput');
+if(ui){ui.focus();ui.addEventListener('input',onUsbInput)}
 }else{
-if(cam)cam.classList.remove('hidden');
-if(usb)usb.classList.add('hidden');
+show($('cameraArea'));hide($('usbArea'));
 startCamera();
 }
+updateConfirmBtn();
+updateTbrClassOptions();
 }catch(e){}
 }
 
 // USB Scanner
-function initUSBScanner(){
+function onUsbInput(e){
 try{
-var input=$('usb-input');if(!input)return;
-input.value='';input.focus();
-var timer=null;
-input.onkeydown=function(e){
-if(e.key==='Enter'){
-e.preventDefault();
-clearTimeout(timer);
-processCode(input.value.trim());
-input.value='';
-}
-};
-input.oninput=function(){
-clearTimeout(timer);
-timer=setTimeout(function(){
-if(input.value.trim().length>3){
-processCode(input.value.trim());
-input.value='';
-}
+clearTimeout(usbTimeout);
+usbTimeout=setTimeout(()=>{
+let v=($('usbInput')||{}).value||'';
+if(v.trim()){processScan(v.trim());if($('usbInput'))$('usbInput').value=''}
 },50);
-};
-// Refocus
-input.onblur=function(){setTimeout(function(){try{input.focus()}catch(e){}},100)};
 }catch(e){}
 }
 
-// Camera Scanner
-function startCamera(){
+// Camera
+async function startCamera(){
 try{
-if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
-$('camera-status').textContent='Câmera não disponível. Use entrada manual.';return;
+let video=$('camVideo');if(!video)return;
+let stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}}});
+video.srcObject=stream;
+if(window.BarcodeDetector){
+barcodeDetector=new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8']});
+scanInterval=setInterval(scanFrame,300);
 }
-navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}})
-.then(function(stream){
-STATE.cameraStream=stream;
-var video=$('camera-video');
-if(video){video.srcObject=stream;video.play()}
-$('camera-status').textContent='Câmera ativa — posicione o código';
-initBarcodeDetection();
-}).catch(function(err){
-$('camera-status').textContent='Sem acesso à câmera. Use entrada manual.';
-});
-}catch(e){try{$('camera-status').textContent='Erro de câmera. Use entrada manual.'}catch(e2){}}
+}catch(e){toast('Câmera não disponível — use entrada manual','warn')}
 }
 
-function stopCamera(){
+async function scanFrame(){
 try{
-if(STATE.scanInterval){clearInterval(STATE.scanInterval);STATE.scanInterval=null}
-if(STATE.cameraStream){
-STATE.cameraStream.getTracks().forEach(function(t){t.stop()});
-STATE.cameraStream=null;
-}
-var video=$('camera-video');if(video)video.srcObject=null;
+if(!barcodeDetector)return;
+let video=$('camVideo');if(!video||video.readyState<2)return;
+let codes=await barcodeDetector.detect(video);
+if(codes&&codes.length>0){processScan(codes[0].rawValue)}
 }catch(e){}
 }
 
-function initBarcodeDetection(){
-try{
-if(!('BarcodeDetector' in window)){
-$('camera-status').textContent='BarcodeDetector indisponível. Use entrada manual.';return;
+// Manual entry
+function manualSubmit(){
+try{let v=($('manualCode')||{}).value||'';if(v.trim()){processScan(v.trim());if($('manualCode'))$('manualCode').value=''}}catch(e){}
 }
-STATE.barcodeDetector=new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e','codabar','itf']});
-STATE.scanInterval=setInterval(function(){
+window.manualSubmit=manualSubmit;
+
+// Process scan
+function processScan(code){
 try{
-var video=$('camera-video');
-if(!video||video.readyState<2)return;
-STATE.barcodeDetector.detect(video).then(function(codes){
-if(codes&&codes.length>0){
-processCode(codes[0].rawValue);
+if(!code)return;
+state.pendingCode=code;
+
+// Continuous rapid mode for retorno (bag/rafia)
+if(state.moveType==='retorno'&&state.scanType!=='Pacote'){
+// Cooldown check
+let key=code+'_'+state.scanType;
+if(lastScans[key]&&(Date.now()-lastScans[key]<COOLDOWN_MS)){toast('Duplicata bloqueada (5s)','warn');return}
+lastScans[key]=Date.now();
+doRegister(code,state.scanType,'retorno');
+}else if(state.scanType==='Pacote'){
+// Show code, wait for confirm
+toast('Código: '+code+' — Preencha e confirme','warn');
+}else{
+// Saída - wait for confirm
+toast('Código: '+code+' — Confirme a saída','warn');
 }
-}).catch(function(){});
 }catch(e){}
-},250);
-}catch(e){try{$('camera-status').textContent='Erro no detector. Use entrada manual.'}catch(e2){}}
 }
 
-function processManualEntry(){
+function confirmScan(){
 try{
-var input=$('manual-code');if(!input)return;
-var code=input.value.trim();
-if(!code){toast('Digite um código','warning');return}
-processCode(code);
-input.value='';
+let code=state.pendingCode;
+if(!code){toast('Escaneie um código primeiro','error');return}
+
+if(state.scanType==='Pacote'){
+let cls=($('tbrClass')||{}).value||'';
+let obs=($('tbrObs')||{}).value||'';
+if(!cls){toast('Selecione a classificação','error');return}
+if(cls==='Outro'&&!obs.trim()){toast('Observação obrigatória para "Outro"','error');return}
+doRegister(code,'Pacote','retorno',{classificacao:cls,observacao:obs,fotourl:state.pendingPhoto||''});
+if($('tbrClass'))$('tbrClass').value='';
+if($('tbrObs'))$('tbrObs').value='';
+state.pendingPhoto=null;if($('photoStatus'))$('photoStatus').textContent='';
+}else{
+let rota=($('saidaRota')||{}).value||'';
+let mot=($('saidaMotorista')||{}).value||'';
+doRegister(code,state.scanType,'saida',{rota,motorista:mot});
+}
+state.pendingCode=null;
+}catch(e){toast('Erro ao confirmar','error')}
+}
+window.confirmScan=confirmScan;
+
+async function doRegister(code,tipo,movimento,extra){
+try{
+let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:state.regional,operador:state.user,timestamp:new Date().toISOString()};
+if(extra)Object.assign(params,extra);
+
+// Optimistic UI
+state.sessionCount++;
+if($('sessionCount'))$('sessionCount').textContent=state.sessionCount;
+let entry={code,tipo,movimento,time:new Date(),status:'ok'};
+state.recentScans.unshift(entry);
+if(state.recentScans.length>5)state.recentScans.pop();
+updateMiniLog();
+flash('green');beep(800,100);
+
+// API call
+let r=await apiCall('registrar',params);
+if(!r){entry.status='offline';updateMiniLog()}
+}catch(e){flash('red');beep(200,300)}
+}
+
+function updateMiniLog(){
+try{
+let ml=$('miniLog');if(!ml)return;
+if(!state.recentScans.length){ml.innerHTML='<p style="color:var(--gray3);text-align:center;font-size:12px">Nenhum scan ainda</p>';return}
+let html=state.recentScans.map(s=>'<div class="log-item"><span>'+s.code+'</span><span>'+s.tipo+' • '+s.movimento+'</span><span style="color:'+(s.status==='ok'?'var(--green)':'var(--orange)')+'">'+s.status+'</span></div>').join('');
+ml.innerHTML=html;
 }catch(e){}
 }
 
-function processCode(code){
+// Photo
+function capturePhoto(){try{let pi=$('photoInput');if(pi)pi.click()}catch(e){}}
+window.capturePhoto=capturePhoto;
+
 try{
-if(!code||code.length<2)return;
-
-// Anti-duplicate check (5s cooldown per code)
-var now=Date.now();
-var key=code;
-if(STATE.recentCodes[key]&&(now-STATE.recentCodes[key]<5000)){
-flash('red');playSound('error');
-addMiniLog(code,'duplicate');
-return;
-}
-STATE.recentCodes[key]=now;
-
-// If TBR + RETORNO, show form and wait
-if(STATE.currentAsset==='tbr'&&STATE.currentMovement==='RETORNO'){
-STATE.tbrPendingCode=code;
-var tf=$('tbr-fields');if(tf)tf.classList.remove('hidden');
-toast('Código capturado: '+code+'. Preencha a classificação.','info');
-flash('green');playSound('success');
-return;
-}
-
-// Direct register for Bag/Rafia or any SAÍDA
-var record={
-code:code,
-type:STATE.currentAsset,
-movement:STATE.currentMovement,
-ds:STATE.ds,
-operator:STATE.user,
-timestamp:new Date().toISOString(),
-rota:STATE.currentMovement==='SAÍDA'?($('saida-rota')||{}).value||'':'',
-motorista:STATE.currentMovement==='SAÍDA'?($('saida-motorista')||{}).value||'':''
-};
-
-registerScan(record);
-flash('green');playSound('success');
-addMiniLog(code,'success');
-STATE.sessionCount++;
-updateSessionCounter();
-}catch(e){flash('red');playSound('error')}
-}
-
-function submitTBR(){
+let pi=$('photoInput');
+if(pi)pi.addEventListener('change',function(e){
 try{
-var code=STATE.tbrPendingCode;
-if(!code){toast('Nenhum código pendente','warning');return}
-var cls=($('tbr-class')||{}).value;
-if(!cls){toast('Selecione uma classificação','error');return}
-if(cls==='Outro'){
-var obs=($('tbr-obs')||{}).value;
-if(!obs||!obs.trim()){toast('Observação obrigatória para "Outro"','error');return}
-}
-
-var record={
-code:code,
-type:'tbr',
-movement:STATE.currentMovement,
-classification:cls,
-observation:($('tbr-obs')||{}).value||'',
-ds:STATE.ds,
-operator:STATE.user,
-timestamp:new Date().toISOString(),
-photo:STATE.photoData||null,
-rota:STATE.currentMovement==='SAÍDA'?($('saida-rota')||{}).value||'':'',
-motorista:STATE.currentMovement==='SAÍDA'?($('saida-motorista')||{}).value||'':''
-};
-
-registerScan(record);
-flash('green');playSound('success');
-addMiniLog(code,'success');
-STATE.sessionCount++;
-updateSessionCounter();
-
-// Reset TBR form
-STATE.tbrPendingCode=null;STATE.photoData=null;
-if($('tbr-class'))$('tbr-class').value='';
-if($('tbr-obs'))$('tbr-obs').value='';
-if($('tbr-obs-group'))$('tbr-obs-group').classList.add('hidden');
-if($('photo-status'))$('photo-status').textContent='';
-toast('Pacote registrado!','success');
-}catch(e){toast('Erro ao registrar','error')}
-}
-
-function capturePhoto(){
-try{
-var input=document.createElement('input');
-input.type='file';input.accept='image/*';input.capture='environment';
-input.onchange=function(e){
-try{
-var file=e.target.files[0];if(!file)return;
-var reader=new FileReader();
-reader.onload=function(ev){
-STATE.photoData=ev.target.result;
-if($('photo-status'))$('photo-status').textContent='📷 Foto anexada';
-toast('Foto capturada','success');
-};
+let file=e.target.files[0];if(!file)return;
+let reader=new FileReader();
+reader.onload=function(ev){state.pendingPhoto=ev.target.result;if($('photoStatus'))$('photoStatus').textContent='✅ Foto capturada'};
 reader.readAsDataURL(file);
+}catch(ex){}
+});
 }catch(e){}
-};
-input.click();
-}catch(e){toast('Erro ao capturar foto','error')}
-}
-
-function registerScan(record){
-try{
-// Try API call
-apiCall('registrar',{record:record}).then(function(res){
-if(res&&res.success){flushQueue()}
-else{addToQueue(record)}
-}).catch(function(){addToQueue(record)});
-}catch(e){addToQueue(record)}
-}
-
-function addToQueue(record){
-try{
-var queue=lsGet('offline_queue')||[];
-queue.push(record);
-lsSet('offline_queue',queue);
-}catch(e){}
-}
-
-function flushQueue(){
-try{
-var queue=lsGet('offline_queue')||[];
-if(queue.length===0)return;
-apiCall('registrarBatch',{records:queue}).then(function(res){
-if(res&&res.success){lsSet('offline_queue',[])}
-}).catch(function(){});
-}catch(e){}
-}
-
-function addMiniLog(code,status){
-try{
-STATE.recentScans.unshift({code:code,status:status,time:formatTime(),type:STATE.currentAsset});
-if(STATE.recentScans.length>5)STATE.recentScans.pop();
-renderMiniLog();
-}catch(e){}
-}
-
-function renderMiniLog(){
-try{
-var el=$('mini-log-list');if(!el)return;
-if(STATE.recentScans.length===0){el.innerHTML='<div class="mini-log-item" style="color:var(--gray-400);justify-content:center">Nenhum scan ainda</div>';return}
-el.innerHTML=STATE.recentScans.map(function(s){
-return '<div class="mini-log-item"><span class="status-dot '+s.status+'"></span><span class="log-code">'+escHtml(s.code.substring(0,20))+'</span><span style="font-size:11px;color:var(--gray-400)">'+s.type+'</span><span class="log-time">'+s.time+'</span></div>';
-}).join('');
-}catch(e){}
-}
-
-function updateSessionCounter(){
-try{if($('session-count'))$('session-count').textContent=STATE.sessionCount}catch(e){}
-}
-
-function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
 // ===== DASHBOARD =====
-function loadDashboard(){
+function populateDashFilters(){
 try{
-var params={
-ds_filter:($('dash-ds')||{}).value||'',
-type_filter:($('dash-type')||{}).value||'',
-from:($('dash-from')||{}).value||'',
-to:($('dash-to')||{}).value||''
-};
-
-apiCall('getDashboard',params).then(function(data){
-if(data){
-$('dash-saidas').textContent=data.saidas||0;
-$('dash-retornos').textContent=data.retornos||0;
-$('dash-pendentes').textContent=data.pendentes||0;
-var pct=data.retornos&&data.saidas?Math.round((data.retornos/(data.saidas||1))*100):0;
-$('dash-percent').textContent=pct+'%';
-
-// TBR breakdown
-var tb=$('tbr-breakdown');
-if(tb&&data.tbrBreakdown){
-tb.innerHTML=Object.keys(data.tbrBreakdown).map(function(k){
-return '<div class="tbr-card"><span>'+escHtml(k)+'</span><span class="count">'+data.tbrBreakdown[k]+'</span></div>';
-}).join('')||'<div style="font-size:13px;color:var(--gray-400)">Sem dados TBR</div>';
+let ds=$('dashDS');if(!ds)return;
+ds.innerHTML='<option value="">Todas DS</option>';
+getDS().forEach(d=>{let n=typeof d==='string'?d.split(':')[0]:d.ds;let o=document.createElement('option');o.value=n;o.textContent=n;ds.appendChild(o)});
+let reg=$('dashRegional');if(reg){
+reg.innerHTML='<option value="">Todas Regionais</option>';
+let regs=[...new Set(getDS().map(d=>typeof d==='string'?d.split(':')[1]:d.regional))];
+regs.forEach(r=>{let o=document.createElement('option');o.value=r;o.textContent=r;reg.appendChild(o)});
 }
-
-// Alerts
-var al=$('dash-alerts');
-if(al&&data.alerts&&data.alerts.length>0){
-al.innerHTML=data.alerts.map(function(a){
-return '<div class="alert-card">⚠️ <b>'+escHtml(a.code)+'</b> — '+escHtml(a.ds)+' — '+a.days+' dias sem retorno</div>';
-}).join('');
-}else if(al){al.innerHTML='<div style="font-size:13px;color:var(--gray-400)">Nenhum alerta</div>'}
-}
-}).catch(function(e){
-toast('Erro ao carregar dashboard: '+e.message,'error');
-$('dash-saidas').textContent='0';$('dash-retornos').textContent='0';
-$('dash-pendentes').textContent='0';$('dash-percent').textContent='0%';
-});
-
-// Populate DS filter
-populateDashDS();
+let td=today();if($('dashFrom'))$('dashFrom').value=td;if($('dashTo'))$('dashTo').value=td;
 }catch(e){}
 }
 
-function populateDashDS(){
+async function loadDashboard(){
 try{
-var sel=$('dash-ds');if(!sel||sel.options.length>1)return;
-var config=STATE.config||getCachedOrFallbackConfig();
-var list=(config&&config.ds)||FALLBACK_DS.map(function(d){return{code:d}});
-list.forEach(function(item){
-var code=typeof item==='string'?item:item.code;
-var opt=document.createElement('option');opt.value=code;opt.textContent=code;
-sel.appendChild(opt);
+let params={ds:($('dashDS')||{}).value,regional:($('dashRegional')||{}).value,tipo:($('dashTipo')||{}).value,from:($('dashFrom')||{}).value,to:($('dashTo')||{}).value};
+let envData=await apiCall('lerEnvios',params);
+let regData=await apiCall('lerRegistros',params);
+
+let saidas=0,retornos=0,tbrHoje=0,tbrSemana=0;
+let envArr=envData&&envData.data?envData.data:[];
+let regArr=regData&&regData.data?regData.data:[];
+
+saidas=envArr.length;
+retornos=regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').length;
+tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.timestamp&&r.timestamp.startsWith(today())).length;
+let weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+tbrSemana=regArr.filter(r=>r.tipo==='Pacote'&&new Date(r.timestamp)>=weekAgo).length;
+
+let pendentes=Math.max(0,saidas-retornos);
+let pct=saidas?Math.round((retornos/saidas)*100):0;
+
+if($('mSaidas'))$('mSaidas').textContent=saidas;
+if($('mRetornos'))$('mRetornos').textContent=retornos;
+if($('mPendentes'))$('mPendentes').textContent=pendentes;
+if($('mPctRetorno'))$('mPctRetorno').textContent=pct+'%';
+if($('mTbrHoje'))$('mTbrHoje').textContent=tbrHoje;
+if($('mTbrSemana'))$('mTbrSemana').textContent=tbrSemana;
+
+renderBarChart(envArr,regArr);
+renderRoutesChart(envArr,regArr);
+renderDonutChart(regArr);
+renderHubTable(envArr,regArr);
+}catch(e){
+// Render demo data
+if($('mSaidas'))$('mSaidas').textContent='—';
+renderBarChart([],[]);renderRoutesChart([],[]);renderDonutChart([]);renderHubTable([],[]);
+}
+}
+window.loadDashboard=loadDashboard;
+
+function renderBarChart(envArr,regArr){
+try{
+let container=$('chartBar');if(!container)return;
+let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
+let envByDay=days.map(d=>envArr.filter(e=>e.data===d||((e.timestamp||'').startsWith(d))).length);
+let retByDay=days.map(d=>regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote'&&((r.timestamp||'').startsWith(d))).length);
+let max=Math.max(...envByDay,...retByDay,1);
+let barW=28,gap=8,gW=(barW*2+gap)*7+60,gH=180;
+let svg='<svg viewBox="0 0 '+gW+' '+(gH+40)+'" xmlns="http://www.w3.org/2000/svg">';
+svg+='<rect width="100%" height="100%" fill="white"/>';
+days.forEach((d,i)=>{
+let x=40+i*(barW*2+gap+10);
+let hE=(envByDay[i]/max)*(gH-20);
+let hR=(retByDay[i]/max)*(gH-20);
+svg+='<rect x="'+x+'" y="'+(gH-hE)+'" width="'+barW+'" height="'+hE+'" fill="#FF9900" rx="3"/>';
+svg+='<rect x="'+(x+barW+2)+'" y="'+(gH-hR)+'" width="'+barW+'" height="'+hR+'" fill="#00A86B" rx="3"/>';
+svg+='<text x="'+(x+barW)+'" y="'+(gH+15)+'" text-anchor="middle" font-size="9" fill="#94a3b8">'+d.slice(5)+'</text>';
 });
+svg+='<text x="10" y="15" font-size="9" fill="#FF9900">■ Envios</text><text x="80" y="15" font-size="9" fill="#00A86B">■ Retornos</text>';
+svg+='</svg>';
+container.innerHTML=svg;
 }catch(e){}
 }
+
+function renderRoutesChart(envArr,regArr){
+try{
+let container=$('chartRoutes');if(!container)return;
+let routes={};
+envArr.forEach(e=>{let r=e.rota||'S/R';if(!routes[r])routes[r]={env:0,ret:0};routes[r].env++});
+regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').forEach(r=>{let rt=r.rota||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
+let sorted=Object.entries(routes).sort((a,b)=>b[1].env-a[1].env).slice(0,10);
+if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
+let max=Math.max(...sorted.map(s=>s[1].env),1);
+let h=sorted.length*32+20;
+let svg='<svg viewBox="0 0 400 '+h+'" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/>';
+sorted.forEach(([name,val],i)=>{
+let y=10+i*32;let wE=(val.ret/max)*260;let wP=((val.env-val.ret)/max)*260;
+svg+='<text x="5" y="'+(y+14)+'" font-size="10" fill="#0F2137">'+name.slice(0,8)+'</text>';
+svg+='<rect x="70" y="'+(y+2)+'" width="'+wE+'" height="18" fill="#00A86B" rx="3"/>';
+svg+='<rect x="'+(70+wE)+'" y="'+(y+2)+'" width="'+Math.max(wP,0)+'" height="18" fill="#E74C3C" rx="3"/>';
+svg+='<text x="'+(75+wE+Math.max(wP,0))+'" y="'+(y+14)+'" font-size="9" fill="#94a3b8">'+val.env+'</text>';
+});
+svg+='</svg>';
+container.innerHTML=svg;
+}catch(e){}
+}
+
+function renderDonutChart(regArr){
+try{
+let container=$('chartDonut');if(!container)return;
+let tbrs=regArr.filter(r=>r.tipo==='Pacote');
+let cls={};tbrs.forEach(r=>{let c=r.classificacao||'N/A';cls[c]=(cls[c]||0)+1});
+let entries=Object.entries(cls);
+if(!entries.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados TBR</p>';return}
+let total=entries.reduce((s,e)=>s+e[1],0);
+let colors=['#FF9900','#00A86B','#E74C3C','#3B82F6','#8B5CF6','#EC4899','#14B8A6'];
+let svg='<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/>';
+let cx=100,cy=100,r=70,ri=40,startAngle=-Math.PI/2;
+entries.forEach(([name,count],i)=>{
+let angle=(count/total)*2*Math.PI;
+let endAngle=startAngle+angle;
+let largeArc=angle>Math.PI?1:0;
+let x1=cx+r*Math.cos(startAngle),y1=cy+r*Math.sin(startAngle);
+let x2=cx+r*Math.cos(endAngle),y2=cy+r*Math.sin(endAngle);
+let ix1=cx+ri*Math.cos(startAngle),iy1=cy+ri*Math.sin(startAngle);
+let ix2=cx+ri*Math.cos(endAngle),iy2=cy+ri*Math.sin(endAngle);
+let path='M '+x1+' '+y1+' A '+r+' '+r+' 0 '+largeArc+' 1 '+x2+' '+y2+' L '+ix2+' '+iy2+' A '+ri+' '+ri+' 0 '+largeArc+' 0 '+ix1+' '+iy1+' Z';
+svg+='<path d="'+path+'" fill="'+(colors[i%colors.length])+'"/>';
+svg+='<rect x="210" y="'+(20+i*22)+'" width="12" height="12" fill="'+(colors[i%colors.length])+'" rx="2"/>';
+svg+='<text x="226" y="'+(30+i*22)+'" font-size="10" fill="#0F2137">'+name+' ('+count+')</text>';
+startAngle=endAngle;
+});
+svg+='<text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" font-size="14" font-weight="bold" fill="#0F2137">'+total+'</text>';
+svg+='</svg>';
+container.innerHTML=svg;
+}catch(e){}
+}
+
+function renderHubTable(envArr,regArr){
+try{
+let container=$('chartTable');if(!container)return;
+let hubs={};
+envArr.forEach(e=>{let h=e.hub||e.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].env++});
+regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').forEach(r=>{let h=r.hub||r.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].ret++});
+let sorted=Object.entries(hubs).map(([n,v])=>({name:n,...v,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).sort((a,b)=>b.pend-a.pend).slice(0,10);
+if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
+let html='<table class="data-table"><thead><tr><th>Hub</th><th>Envios</th><th>Retornos</th><th>Pend.</th><th>%</th></tr></thead><tbody>';
+sorted.forEach(h=>{html+='<tr><td>'+h.name+'</td><td>'+h.env+'</td><td>'+h.ret+'</td><td style="color:var(--red)">'+h.pend+'</td><td>'+h.pct+'%</td></tr>'});
+html+='</tbody></table>';
+container.innerHTML=html;
+}catch(e){}
+}
+
+function exportReport(){
+try{
+let s=$('mSaidas'),r=$('mRetornos'),p=$('mPendentes'),pct=$('mPctRetorno');
+let text='📦 ScanTrack — Relatório\n';
+text+='DS: '+state.ds+' | Regional: '+state.regional+'\n';
+text+='Data: '+new Date().toLocaleDateString('pt-BR')+'\n\n';
+text+='📊 Resumo:\n';
+text+='• Saídas: '+(s?s.textContent:'?')+'\n';
+text+='• Retornos: '+(r?r.textContent:'?')+'\n';
+text+='• Pendentes: '+(p?p.textContent:'?')+'\n';
+text+='• % Retorno: '+(pct?pct.textContent:'?')+'\n';
+text+='\n— Gerado por ScanTrack v3.0';
+navigator.clipboard.writeText(text).then(()=>toast('Relatório copiado!','success')).catch(()=>toast('Erro ao copiar','error'));
+}catch(e){}
+}
+window.exportReport=exportReport;
 
 // ===== REGISTROS =====
-function loadRecords(){
+async function loadRegistros(){
 try{
-apiCall('getRecords',{ds:STATE.ds}).then(function(data){
-if(data&&data.records){
-STATE.records=data.records;STATE.filteredRecords=data.records;
-STATE.currentPage=1;
-renderRecords();
+let r=await apiCall('lerRegistros',{ds:state.ds});
+state.registros=r&&r.data?r.data:[];
+state.regPage=1;
+renderRegistros();
+}catch(e){state.registros=[];renderRegistros()}
 }
-}).catch(function(e){
-toast('Erro ao carregar registros','error');
-STATE.records=[];STATE.filteredRecords=[];renderRecords();
+
+function filterRegistros(){
+try{state.regPage=1;renderRegistros()}catch(e){}
+}
+window.filterRegistros=filterRegistros;
+
+function renderRegistros(){
+try{
+let body=$('regBody');if(!body)return;
+let search=(($('regSearch')||{}).value||'').toLowerCase();
+let filtered=state.registros.filter(r=>{
+let s=(r.codigo||'')+(r.operador||'')+(r.ds||'')+(r.tipo||'');
+return s.toLowerCase().includes(search);
 });
+let pages=Math.ceil(filtered.length/20)||1;
+let start=(state.regPage-1)*20;
+let pageData=filtered.slice(start,start+20);
+body.innerHTML=pageData.map((r,i)=>'<tr onclick="toggleDetail(this)" style="cursor:pointer"><td>'+((r.codigo||'').slice(0,20))+'</td><td>'+( r.tipo||'')+'</td><td>'+(r.movimento||'')+'</td><td>'+(r.ds||'')+'</td><td>'+(fmtDate(r.timestamp))+'</td></tr><tr class="detail-row hidden" id="det'+i+'"><td colspan="5">Op: '+(r.operador||'')+' | Class: '+(r.classificacao||'—')+' | Obs: '+(r.observacao||'—')+(r.fotourl?' | 📷 Foto':'')+'</td></tr>').join('');
+let pag=$('regPagination');if(pag){
+let html='';for(let p=1;p<=pages;p++){html+='<button class="page-btn '+(p===state.regPage?'active':'')+'" onclick="goRegPage('+p+')">'+p+'</button>'}
+pag.innerHTML=html;
+}
 }catch(e){}
 }
 
-function filterRecords(){
-try{
-var q=(($('reg-search')||{}).value||'').toLowerCase();
-if(!q){STATE.filteredRecords=STATE.records}
-else{
-STATE.filteredRecords=STATE.records.filter(function(r){
-return (r.code||'').toLowerCase().indexOf(q)>=0||
-(r.operator||'').toLowerCase().indexOf(q)>=0||
-(r.ds||'').toLowerCase().indexOf(q)>=0;
-});
-}
-STATE.currentPage=1;
-renderRecords();
-}catch(e){}
-}
+function goRegPage(p){state.regPage=p;renderRegistros()}
+window.goRegPage=goRegPage;
 
-function renderRecords(){
-try{
-var perPage=20;
-var total=STATE.filteredRecords.length;
-var pages=Math.max(1,Math.ceil(total/perPage));
-if(STATE.currentPage>pages)STATE.currentPage=pages;
-var start=(STATE.currentPage-1)*perPage;
-var slice=STATE.filteredRecords.slice(start,start+perPage);
-
-var body=$('records-body');
-if(body){
-body.innerHTML=slice.length?slice.map(function(r){
-return '<tr><td>'+escHtml(r.code||'')+'</td><td>'+escHtml(r.type||'')+'</td><td>'+escHtml(r.movement||'')+'</td><td>'+escHtml(r.classification||'-')+'</td><td>'+escHtml(r.ds||'')+'</td><td>'+escHtml(r.operator||'')+'</td><td>'+escHtml(r.timestamp?new Date(r.timestamp).toLocaleString('pt-BR'):'')+'</td></tr>';
-}).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:20px">Nenhum registro</td></tr>';
-}
-
-$('page-info').textContent=STATE.currentPage+'/'+pages;
-$('prev-page').disabled=STATE.currentPage<=1;
-$('next-page').disabled=STATE.currentPage>=pages;
-}catch(e){}
-}
-
-function changePage(dir){
-STATE.currentPage+=dir;renderRecords();
-}
+function toggleDetail(tr){try{let next=tr.nextElementSibling;if(next)next.classList.toggle('hidden')}catch(e){}}
+window.toggleDetail=toggleDetail;
 
 function exportCSV(){
 try{
-if(!STATE.filteredRecords||STATE.filteredRecords.length===0){toast('Sem registros para exportar','warning');return}
-var headers=['Código','Tipo','Movimento','Classificação','DS','Operador','Data/Hora','Observação'];
-var rows=[headers.join(',')];
-STATE.filteredRecords.forEach(function(r){
-rows.push([r.code||'',r.type||'',r.movement||'',r.classification||'',r.ds||'',r.operator||'',r.timestamp||'',r.observation||''].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(','));
+let csv='Codigo,Tipo,Movimento,Classificacao,DS,Operador,DataHora,Observacao\n';
+state.registros.forEach(r=>{csv+='"'+(r.codigo||'')+'","'+(r.tipo||'')+'","'+(r.movimento||'')+'","'+(r.classificacao||'')+'","'+(r.ds||'')+'","'+(r.operador||'')+'","'+(r.timestamp||'')+'","'+(r.observacao||'')+'"\n'});
+let blob=new Blob([csv],{type:'text/csv'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='scantrack_registros_'+today()+'.csv';a.click();
+}catch(e){toast('Erro ao exportar','error')}
+}
+window.exportCSV=exportCSV;
+
+// ===== ENVIOS (DISPATCH) =====
+function setupUpload(){
+try{
+let zone=$('uploadZone');let fi=$('fileInput');
+if(zone){
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover')});
+zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');let f=e.dataTransfer.files[0];if(f)parseCSVFile(f)});
+}
+if(fi)fi.addEventListener('change',e=>{let f=e.target.files[0];if(f)parseCSVFile(f)});
+}catch(e){}
+}
+
+function parseCSVFile(file){
+try{
+let reader=new FileReader();
+reader.onload=function(e){
+try{parseCSVData(e.target.result)}catch(ex){toast('Erro ao ler arquivo','error')}
+};
+reader.readAsText(file,'UTF-8');
+}catch(e){toast('Erro ao ler arquivo','error')}
+}
+
+function parsePaste(){
+try{let data=($('pasteArea')||{}).value;if(data)parseCSVData(data)}catch(e){}
+}
+window.parsePaste=parsePaste;
+
+function parseCSVData(raw){
+try{
+let lines=raw.split(/\r?\n/);
+let records=[];
+let currentRoute='',currentDate='';
+
+for(let i=0;i<lines.length;i++){
+let cols=lines[i].split(/[\t,](?=(?:[^"]*"[^"]*")*[^"]*$)/);
+cols=cols.map(c=>c.replace(/^"|"$/g,'').trim());
+
+if(cols[0]==='Route'||cols[0]==='route'){
+currentRoute=cols[1]||'';
+if(cols[9])currentDate=cols[9];
+continue;
+}
+
+if(cols[0]&&/^\d/.test(cols[0])&&cols.length>6&&cols[6]){
+let labels=(cols[6]||'').split(/[,\n;]+/).map(l=>l.trim()).filter(l=>l);
+let hub=cols[2]||cols[1]||'';
+let addr=cols[1]||'';
+
+labels.forEach(label=>{
+let tipo='Bag';
+if(label.startsWith('DN-'))tipo='Rafia';
+else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
+else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
+records.push({codigo:label,tipo,rota:currentRoute,hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
 });
-var blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
-var link=document.createElement('a');link.href=URL.createObjectURL(blob);
-link.download='scantrack_export_'+new Date().toISOString().slice(0,10)+'.csv';
-link.click();
-toast('CSV exportado!','success');
-}catch(e){toast('Erro na exportação','error')}
+}
+}
+
+if(!records.length){toast('Nenhum registro encontrado. Verifique o formato.','error');return}
+
+let bags=records.filter(r=>r.tipo==='Bag').length;
+let rafias=records.filter(r=>r.tipo==='Rafia').length;
+let rotas=[...new Set(records.map(r=>r.rota))].length;
+let date=currentDate||today();
+
+state.parsedDispatch=records;
+state.parsedDate=date;
+
+let prev=$('uploadPreview');if(!prev)return;
+show(prev);
+prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' Bags — '+rotas+' rotas — Data: '+date+' — DS: '+state.ds+'</h4><div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>'+records.slice(0,10).map(r=>'<tr><td>'+r.codigo+'</td><td>'+r.tipo+'</td><td>'+r.rota+'</td><td>'+r.hub+'</td></tr>').join('')+'</tbody></table></div>'+(records.length>10?'<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>':'')+'<button class="btn btn-success" style="width:100%;margin-top:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button></div>';
+
+// Anti-dup check
+let dupKey='lastupload_'+state.ds+'_'+date;
+if(ls(dupKey)){
+prev.innerHTML+='<div class="card" style="border:2px solid var(--orange);margin-top:8px"><p style="color:var(--orange);font-weight:600">⚠️ Já existe carga do dia '+date+' para '+state.ds+'. O envio irá sobrescrever.</p></div>';
+}
+}catch(e){toast('Erro no parse: '+e.message,'error')}
+}
+
+async function uploadDispatch(){
+try{
+let records=state.parsedDispatch;if(!records||!records.length)return;
+show($('uploadProgress'));
+let chunks=[];for(let i=0;i<records.length;i+=50){chunks.push(records.slice(i,i+50))}
+let done=0;
+for(let chunk of chunks){
+await apiCall('registrarBatch',{registros:chunk,tipo:'envio'});
+done+=chunk.length;
+let pct=Math.round((done/records.length)*100);
+let fill=$('progFill');if(fill)fill.style.width=pct+'%';
+let txt=$('progText');if(txt)txt.textContent='Enviando... '+done+'/'+records.length;
+}
+let dupKey='lastupload_'+state.ds+'_'+(state.parsedDate||today());
+ls(dupKey,{date:state.parsedDate,count:records.length,ts:Date.now()});
+saveRecentUpload(records);
+toast('✅ '+records.length+' registros enviados!','success');
+hide($('uploadProgress'));hide($('uploadPreview'));
+loadRecentUploads();
+}catch(e){toast('Erro no upload','error')}
+}
+window.uploadDispatch=uploadDispatch;
+
+function saveRecentUpload(records){
+try{
+let uploads=ls('recentUploads')||[];
+let bags=records.filter(r=>r.tipo==='Bag').length;
+let rafias=records.filter(r=>r.tipo==='Rafia').length;
+uploads.unshift({date:state.parsedDate||today(),ds:state.ds,bags,rafias,total:records.length,ts:new Date().toISOString()});
+if(uploads.length>5)uploads=uploads.slice(0,5);
+ls('recentUploads',uploads);
+}catch(e){}
+}
+
+function loadRecentUploads(){
+try{
+let el=$('recentUploads');if(!el)return;
+let uploads=ls('recentUploads')||[];
+if(!uploads.length){el.innerHTML='Nenhum upload registrado';return}
+el.innerHTML='<table class="data-table"><thead><tr><th>Data</th><th>DS</th><th>Bags</th><th>Ráfias</th><th>Total</th></tr></thead><tbody>'+uploads.map(u=>'<tr><td>'+u.date+'</td><td>'+u.ds+'</td><td>'+u.bags+'</td><td>'+u.rafias+'</td><td>'+u.total+'</td></tr>').join('')+'</tbody></table>';
+}catch(e){}
 }
 
 // ===== ADMIN =====
-function loadAdminPanel(){
+function checkAdmin(){
 try{
-var url=getApiUrl();
-if($('admin-api-url'))$('admin-api-url').value=url||'';
+if(isAdmin()){hide($('adminLocked'));show($('adminContent'));renderAdmin()}
+else{show($('adminLocked'));hide($('adminContent'))}
+}catch(e){}
+}
 
-var config=STATE.config||getCachedOrFallbackConfig();
+function renderAdmin(){
+try{
+if($('adminApiUrl'))$('adminApiUrl').value=getApiUrl();
+if($('currentPin'))$('currentPin').textContent=getPin();
 
 // DS list
-var dsList=$('admin-ds-list');
-if(dsList){
-var ds=(config.ds)||[];
-dsList.innerHTML=ds.map(function(d){
-var code=typeof d==='string'?d:d.code;
-var reg=typeof d==='object'?(d.regional||''):'';
-return '<li><span>'+escHtml(code)+(reg?' ('+escHtml(reg)+')':'')+'</span><button onclick="removeDS(\''+escHtml(code)+'\')">&times;</button></li>';
-}).join('');
+let dsList=$('adminDsList');if(dsList){
+dsList.innerHTML=getDS().map((d,i)=>{let n=typeof d==='string'?d:d.ds+':'+d.regional;return'<li>'+n+'<button onclick="removeDS('+i+')">✕</button></li>'}).join('');
 }
-
 // Classifications
-var clsList=$('admin-class-list');
-if(clsList){
-var cls=(config.classifications)||FALLBACK_CLASSIFICATIONS;
-clsList.innerHTML=cls.map(function(c){
-return '<li><span>'+escHtml(c)+'</span><button onclick="removeClass(\''+escHtml(c)+'\')">&times;</button></li>';
-}).join('');
+let clList=$('adminClassList');if(clList){
+clList.innerHTML=getClassifications().map((c,i)=>'<li>'+c+'<button onclick="removeClass('+i+')">✕</button></li>').join('');
 }
-
 // Admins
-var admList=$('admin-admins-list');
-if(admList){
-var adm=(config.admins)||[];
-admList.innerHTML=adm.map(function(a){
-return '<li><span>'+escHtml(a)+'</span><button onclick="removeAdmin(\''+escHtml(a)+'\')">&times;</button></li>';
-}).join('')||'<li style="color:var(--gray-400)">Nenhum admin (todos têm acesso)</li>';
+let aList=$('adminAdminsList');if(aList){
+aList.innerHTML=getAdmins().map((a,i)=>'<li>'+a+'<button onclick="removeAdmin('+i+')">✕</button></li>').join('');
 }
 }catch(e){}
 }
 
-function saveApiUrl(){
+function saveApiUrl(){try{let v=($('adminApiUrl')||{}).value;ls('api_url',v);toast('URL salva','success')}catch(e){}}
+window.saveApiUrl=saveApiUrl;
+
+async function testApi(){
 try{
-var url=($('admin-api-url')||{}).value||'';
-lsSet('api_url',url);
-toast('URL salva!','success');
+if($('apiTestResult'))$('apiTestResult').textContent='Testando...';
+let r=await apiCall('lerConfig');
+if(r)if($('apiTestResult'))$('apiTestResult').textContent='✅ Conexão OK';
+else if($('apiTestResult'))$('apiTestResult').textContent='❌ Falha na conexão';
+}catch(e){if($('apiTestResult'))$('apiTestResult').textContent='❌ Erro: '+e.message}
+}
+window.testApi=testApi;
+
+function addDS(){try{let v=($('addDsInput')||{}).value;if(v){let cfg=state.config||{};let ds=getDS();ds.push(v);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});if($('addDsInput'))$('addDsInput').value=''}}catch(e){}}
+window.addDS=addDS;
+function removeDS(i){try{let cfg=state.config||{};let ds=getDS();ds.splice(i,1);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeDS=removeDS;
+function addClass(){try{let v=($('addClassInput')||{}).value;if(v){let cfg=state.config||{};let cl=getClassifications();cl.push(v);cfg.classifications=cl;state.config=cfg;ls('config',cfg);renderAdmin();updateTbrClassOptions();apiCall('setup',{config:cfg});if($('addClassInput'))$('addClassInput').value=''}}catch(e){}}
+window.addClass=addClass;
+function removeClass(i){try{let cfg=state.config||{};let cl=getClassifications();cl.splice(i,1);cfg.classifications=cl;state.config=cfg;ls('config',cfg);renderAdmin();updateTbrClassOptions();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeClass=removeClass;
+function addAdmin(){try{let v=($('addAdminInput')||{}).value;if(v){let cfg=state.config||{};let ad=getAdmins();ad.push(v.toLowerCase());cfg.admins=ad;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});if($('addAdminInput'))$('addAdminInput').value=''}}catch(e){}}
+window.addAdmin=addAdmin;
+function removeAdmin(i){try{let cfg=state.config||{};let ad=getAdmins();ad.splice(i,1);cfg.admins=ad;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeAdmin=removeAdmin;
+function changePin(){try{let v=($('newPinInput')||{}).value;if(v&&v.length===4){let cfg=state.config||{};cfg.pin=v;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});toast('PIN alterado','success');if($('newPinInput'))$('newPinInput').value=''}else{toast('PIN deve ter 4 dígitos','error')}}catch(e){}}
+window.changePin=changePin;
+
+// ===== COMO USAR =====
+function loadHelp(){try{renderHelp(state.lang)}catch(e){}}
+function setLang(l,btn){
+try{
+state.lang=l;
+document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+renderHelp(l);
+}catch(e){}
+}
+window.setLang=setLang;
+
+function renderHelp(lang){
+try{
+let el=$('helpContent');if(!el)return;
+if(lang==='pt'){
+el.innerHTML=`
+<div class="help-section"><h3>🔐 Login</h3><p>Informe seu alias Amazon (login), selecione a DS e digite o PIN de 4 dígitos. O PIN padrão é 1234.</p></div>
+<div class="help-section"><h3>📱 Escaneando (Mobile)</h3><p>A câmera abre automaticamente. Aponte para o código QR/barcode e aguarde a leitura automática.</p><ul><li>Modo RETORNO: scan contínuo, sem confirmação</li><li>Modo SAÍDA: preencha rota e motorista, depois confirme</li><li>Modo PACOTE: preencha classificação e observe, depois confirme</li></ul></div>
+<div class="help-section"><h3>🖥️ Escaneando (Desktop/USB)</h3><p>Em telas grandes sem touch, o modo USB é ativado. O cursor fica no campo de texto. Aponte o leitor USB e o código é enviado automaticamente.</p></div>
+<div class="help-section"><h3>📦 Tipos de Ativos</h3><ul><li><strong>Bag</strong>: Sacolas com 4 dígitos no código (ex: "ABC 1234")</li><li><strong>Ráfia</strong>: Sacos grandes, código com "DN-" ou 3 dígitos (ex: "DN-001" ou "XYZ 123")</li><li><strong>Pacote (TBR)</strong>: Pacotes individuais com problemas — avariado, etiqueta ilegível, etc.</li></ul></div>
+<div class="help-section"><h3>📤 Upload Dispatch</h3><p>Exporte a aba "All Dispatch Sheet" como CSV no Excel, depois faça upload aqui. Os dados são enviados para a API em lotes de 50.</p></div>
+<div class="help-section"><h3>📊 Dashboard</h3><p>Visualize métricas de envios vs retornos, pendências por rota/hub, e classificações de TBR. Use os filtros para refinar.</p></div>
+<div class="help-section"><h3>⚙️ Admin</h3><p>Apenas aliases na lista de admins podem acessar. Configure URL da API, DSs, classificações e PIN.</p></div>
+<div class="help-section"><h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O app funciona offline? <span>▸</span></div><div class="faq-a">Parcialmente. Scans são salvos em fila local e enviados quando a conexão voltar.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Posso usar em vários dispositivos? <span>▸</span></div><div class="faq-a">Sim! Cada dispositivo mantém sua sessão. Os dados vão para a mesma planilha via API.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é o cooldown de 5 segundos? <span>▸</span></div><div class="faq-a">Evita duplicatas acidentais. O mesmo código não pode ser escaneado duas vezes em 5 segundos.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como configurar a API? <span>▸</span></div><div class="faq-a">Na aba Admin, cole a URL do seu Google Apps Script publicado e clique "Salvar".</div></div>
+</div></div>`;
+}else{
+el.innerHTML=`
+<div class="help-section"><h3>🔐 Login</h3><p>Enter your Amazon alias (login), select the DS, and type the 4-digit PIN. Default PIN is 1234.</p></div>
+<div class="help-section"><h3>📱 Scanning (Mobile)</h3><p>Camera opens automatically. Point at QR/barcode and wait for auto-read.</p><ul><li>RETURN mode: continuous scan, no confirmation needed</li><li>DEPARTURE mode: fill route and driver, then confirm</li><li>PACKAGE mode: fill classification and notes, then confirm</li></ul></div>
+<div class="help-section"><h3>🖥️ Scanning (Desktop/USB)</h3><p>On large screens without touch, USB mode activates. Cursor stays in the text field. Point USB reader and code auto-submits.</p></div>
+<div class="help-section"><h3>📦 Asset Types</h3><ul><li><strong>Bag</strong>: Bags with 4-digit codes (e.g. "ABC 1234")</li><li><strong>Ráfia</strong>: Large sacks, code with "DN-" or 3 digits</li><li><strong>Package (TBR)</strong>: Individual packages with issues — damaged, unreadable label, etc.</li></ul></div>
+<div class="help-section"><h3>📤 Upload Dispatch</h3><p>Export "All Dispatch Sheet" tab as CSV in Excel, then upload here. Data is sent to API in batches of 50.</p></div>
+<div class="help-section"><h3>📊 Dashboard</h3><p>View send vs return metrics, pending by route/hub, and TBR classifications. Use filters to refine.</p></div>
+<div class="help-section"><h3>⚙️ Admin</h3><p>Only aliases in the admin list can access. Configure API URL, DSs, classifications, and PIN.</p></div>
+<div class="help-section"><h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Does it work offline? <span>▸</span></div><div class="faq-a">Partially. Scans queue locally and send when connection returns.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Can I use multiple devices? <span>▸</span></div><div class="faq-a">Yes! Each device keeps its session. Data goes to the same spreadsheet via API.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">What's the 5-second cooldown? <span>▸</span></div><div class="faq-a">Prevents accidental duplicates. Same code can't scan twice within 5 seconds.</div></div>
+</div></div>`;
+}
 }catch(e){}
 }
 
-function testConnection(){
-try{
-var res=$('api-test-result');if(res)res.innerHTML='<span class="spinner"></span> Testando...';
-apiCall('ping').then(function(data){
-if(res)res.innerHTML='<span style="color:var(--green)">✅ Conectado! '+(data.message||'')+'</span>';
-}).catch(function(e){
-if(res)res.innerHTML='<span style="color:var(--red)">❌ Erro: '+escHtml(e.message)+'</span>';
-});
-}catch(e){}
-}
-
-function addDS(){
-try{
-var code=($('admin-new-ds')||{}).value||'';
-var reg=($('admin-new-regional')||{}).value||'';
-if(!code.trim()){toast('Informe o código DS','warning');return}
-var config=STATE.config||getCachedOrFallbackConfig();
-if(!config.ds)config.ds=[];
-config.ds.push({code:code.trim().toUpperCase(),regional:reg.trim()});
-lsSet('config',config);STATE.config=config;
-apiCall('updateConfig',{config:config}).catch(function(){});
-$('admin-new-ds').value='';$('admin-new-regional').value='';
-loadAdminPanel();toast('DS adicionada','success');
-}catch(e){}
-}
-
-function removeDS(code){
-try{
-var config=STATE.config||getCachedOrFallbackConfig();
-config.ds=(config.ds||[]).filter(function(d){return(typeof d==='string'?d:d.code)!==code});
-lsSet('config',config);STATE.config=config;
-apiCall('updateConfig',{config:config}).catch(function(){});
-loadAdminPanel();toast('DS removida','success');
-}catch(e){}
-}
-
-function updatePIN(){
-try{
-var pin=($('admin-pin')||{}).value||'';
-if(!/^\d{4}$/.test(pin)){toast('PIN deve ter 4 dígitos','error');return}
-var config=STATE.config||getCachedOrFallbackConfig();
-config.pin=pin;
-lsSet('config',config);STATE.config=config;
-apiCall('updateConfig',{config:config}).catch(function(){});
-$('admin-pin').value='';toast('PIN atualizado','success');
-}catch(e){}
-}
-
-function addClass(){
-try{
-var cls=($('admin-new-class')||{}).value||'';
-if(!cls.trim()){toast('Informe a classificação','warning');return}
-var config=STATE.config||getCachedOrFallbackConfig();
-if(!config.classifications)config.classifications=[];
-config.classifications.push(cls.trim());
-lsSet('config',config);STATE.config=config;
-apiCall('updateConfig',{config:config}).catch(function(){});
-$('admin-new-class').value='';
-loadAdminPanel();populateTBRClassifications();toast('Classificação adicionada','success');
-}catch(e){}
-}
-
-function removeClass(cls){
-try{
-var config=STATE.config||getCachedOrFallbackConfig();
-config.classifications=(config.classifications||[]).filter(function(c){return c!==cls});
-lsSet('config',config);STATE.config=config;
-apiCall('updateConfig',{config:config}).catch(function(){});
-loadAdminPanel();populateTBRClassifications();toast('Classificação removida','success');
-}catch(e){}
-}
-
-function addAdmin(){
-try{
-var a=($('admin-new-admin')||{}).value||'';
-if(!a.trim()){toast('Informe o alias','warning');return}
-var config=STATE.config||getCachedOrFallbackConfig();
-if(!config.admins)config.admins=[];
-config.admins.push(a.trim().toLowerCase());
-lsSet('config',config);STATE.config=config;
-apiCall('updateConfig',{config:config}).catch(function(){});
-$('admin-new-admin').value='';loadAdminPanel();toast('Admin adicionado','success');
-}catch(e){}
-}
-
-function removeAdmin(a){
-try{
-var config=STATE.config||getCachedOrFallbackConfig();
-config.admins=(config.admins||[]).filter(function(x){return x!==a});
-lsSet('config',config);STATE.config=config;
-apiCall('updateConfig',{config:config}).catch(function(){});
-loadAdminPanel();toast('Admin removido','success');
-}catch(e){}
-}
-
-// ===== HELP =====
-function setHelpLang(lang){
-try{
-$('help-content-pt').classList.toggle('hidden',lang!=='pt');
-$('help-content-en').classList.toggle('hidden',lang!=='en');
-$('lang-pt').classList.toggle('active',lang==='pt');
-$('lang-en').classList.toggle('active',lang==='en');
-}catch(e){}
-}
-
-function toggleAccordion(el){
-try{
-var body=el.nextElementSibling;
-if(body)body.classList.toggle('open');
-var arrow=el.querySelector('span');
-if(arrow)arrow.textContent=body.classList.contains('open')?'▲':'▼';
-}catch(e){}
-}
+// ===== MODAL =====
+function showModal(html){try{let o=$('modalOverlay'),c=$('modalContent');if(o&&c){c.innerHTML=html;show(o)}}catch(e){}}
+function hideModal(){try{hide($('modalOverlay'))}catch(e){}}
+window.showModal=showModal;window.hideModal=hideModal;
 
 // ===== INIT =====
+function init(){
 try{
-document.addEventListener('DOMContentLoaded',function(){
-try{initLogin()}catch(e){}
+// Load offline queue
+state.offlineQueue=ls('offlineQueue')||[];
+
+// Try auto-login
+let u=ls('user'),d=ls('ds'),r=ls('regional');
+// Load config first
+loadConfig(false).then(()=>{
+populateLoginDS();
+if(u&&d){state.user=u;state.ds=d;state.regional=r||'';showApp()}
 });
-// Also try immediate init in case DOMContentLoaded already fired
-if(document.readyState==='complete'||document.readyState==='interactive'){
-setTimeout(function(){try{initLogin()}catch(e){}},50);
+
+setupUpload();
+detectDesktop();
+
+// Enter key for manual entry
+let mc=$('manualCode');if(mc)mc.addEventListener('keydown',e=>{if(e.key==='Enter')manualSubmit()});
+// USB Enter
+let ui=$('usbInput');if(ui)ui.addEventListener('keydown',e=>{if(e.key==='Enter'){let v=ui.value.trim();if(v){processScan(v);ui.value=''}}});
+}catch(e){}
 }
-}catch(e){}
 
-// Periodic queue flush
-setInterval(function(){try{flushQueue()}catch(e){}},30000);
-
-// Clean old codes from anti-duplicate map
-setInterval(function(){
-try{
-var now=Date.now();
-Object.keys(STATE.recentCodes).forEach(function(k){
-if(now-STATE.recentCodes[k]>10000)delete STATE.recentCodes[k];
-});
-}catch(e){}
-},10000);
+init();
+})()}catch(e){}
 </script>
+
 
 </body></html>
