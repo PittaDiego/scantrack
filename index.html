@@ -1,826 +1,1635 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<html lang="pt-BR"><head><style id="qw-theme">:root {
+  --color-bg: #faf9fc;
+  --color-text: #131920;
+  --color-navbar-bg: #f9f9fb;
+  --color-bg-chat-view: #fcfcfd;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  --color-surface: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+  --color-surface-active: #e5e7eb;
+  --color-border: rgba(0, 0, 0, .12);
+  --color-border-light: rgba(0, 0, 0, .06);
+  --color-border-strong: #d1d5db;
+  --color-primary: #4200db;
+  --color-primary-dark: #35009e;
+  --color-primary-light: #8575ff;
+  --color-primary-bg: #e8e6ff;
+  --color-primary-hover-border: #35009e;
+  --color-nav-icon-active: #4200db;
+  --color-nav-hover-border: #4200db;
+  --color-primary-alpha-3: color-mix(in srgb, #4200db 3%, transparent);
+  --color-primary-alpha-5: color-mix(in srgb, #4200db 5%, transparent);
+  --color-primary-alpha-8: color-mix(in srgb, #4200db 8%, transparent);
+  --color-primary-alpha-12: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-alpha-15: color-mix(in srgb, #4200db 15%, transparent);
+  --color-primary-alpha-20: color-mix(in srgb, #4200db 20%, transparent);
+  --color-primary-alpha-25: color-mix(in srgb, #4200db 25%, transparent);
+  --color-primary-alpha-30: color-mix(in srgb, #4200db 30%, transparent);
+  --color-primary-alpha-40: color-mix(in srgb, #4200db 40%, transparent);
+  --color-primary-alpha-50: color-mix(in srgb, #4200db 50%, transparent);
+  --color-primary-alpha-60: color-mix(in srgb, #4200db 60%, transparent);
+  --color-primary-subtle: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
+  --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
+  --color-accent: #4200db;
+  --color-accent-foreground: #4200db;
+  --color-accent-dark: #35009e;
+  --color-accent-light: #e8e6ff;
+  --color-accent-inverse: #ffffff;
+  --color-link: #4200db;
+  --color-primary-gradient-end: #e8e6ff;
+  --color-primary-bg-solid: #e8e6ff;
+  --color-user-bubble: #F3F3F7;
+  --color-user-bubble-text: #131920;
+  --color-text-secondary: #5e5e5e;
+  --color-text-tertiary: #656871;
+  --color-text-muted: #9ca3af;
+  --color-text-on-primary: #ffffff;
+  --color-success: #00802f;
+  --color-success-dark: #00471e;
+  --color-success-light: #d9ffd6;
+  --color-success-hover: #005c26;
+  --color-success-bg: #e6f5eb;
+  --color-success-border: #b3d9bf;
+  --color-success-foreground: #00802f;
+  --color-success-dark-foreground: #00471e;
+  --color-success-text: #00471e;
+  --color-error: #db0000;
+  --color-error-dark: #700000;
+  --color-error-light: #ffe0e0;
+  --color-error-hover: #ffe0e0;
+  --color-error-bg: #fceaea;
+  --color-error-border: #f2cccc;
+  --color-error-active-border: #db0000;
+  --color-error-foreground: #db0000;
+  --color-error-dark-foreground: #700000;
+  --color-error-inverse: #ffffff;
+  --color-error-text: #700000;
+  --color-warning: #f2b100;
+  --color-warning-dark: #573a00;
+  --color-warning-light: #fffbbd;
+  --color-warning-hover: #db9200;
+  --color-warning-bg: #fef7e6;
+  --color-warning-border: #f9dfa3;
+  --color-warning-foreground: #f2b100;
+  --color-warning-dark-foreground: #573a00;
+  --color-warning-inverse: #573a00;
+  --color-surface-warning: #fffbbd;
+  --color-text-warning: #573a00;
+  --color-info: #006ce0;
+  --color-info-dark: #002a66;
+  --color-info-light: #d1f1ff;
+  --color-info-hover: #003b8f;
+  --color-info-bg: #ebf3fc;
+  --color-info-border: #b3d1f0;
+  --color-info-foreground: #006ce0;
+  --color-info-dark-foreground: #002a66;
+  --color-info-inverse: #ffffff;
+  --color-overlay: rgba(0, 0, 0, .5);
+  --color-shadow: rgba(0, 0, 0, .08);
+  --color-hover: rgba(0, 0, 0, .05);
+  --color-tooltip-bg: rgba(0, 0, 0, .85);
+  --color-tooltip-text: #ffffff;
+  --color-voice-purple: #8575ff;
+  --color-voice-purple-dark: #4200db;
+  --color-voice-purple-light: #8575ff;
+  --color-voice-red: #db0000;
+  --color-voice-red-dark: #700000;
+  --color-voice-amber: #f2b100;
+  --color-voice-purple-glow: rgba(66, 0, 219, .4);
+  --color-voice-red-glow: rgba(219, 0, 0, .4);
+  --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
+  --text-2xs: .5625rem;
+  --text-xs: .625rem;
+  --text-sm: .6875rem;
+  --text-base: .75rem;
+  --text-md: .8125rem;
+  --text-lg: .875rem;
+  --text-xl: 1rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.25rem;
+  --text-4xl: 1.5rem;
+  --text-5xl: 2rem;
+  --spacing-1: calc(.25rem * 1);
+  --spacing-1-5: calc(.25rem * 1.5);
+  --spacing-2: calc(.25rem * 2);
+  --spacing-3: calc(.25rem * 3);
+  --spacing-4: calc(.25rem * 4);
+  --spacing-5: calc(.25rem * 5);
+  --spacing-6: calc(.25rem * 6);
+  --spacing-7: calc(.25rem * 7);
+  --spacing-8: calc(.25rem * 8);
+  --spacing-9: calc(.25rem * 9);
+  --spacing-10: calc(.25rem * 10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-card: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 8px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+  --color-success-bg-solid: #d9ffd6;
+  --color-error-bg-solid: #ffe0e0;
+  --color-error-border-solid: #ffe0e0;
+  --color-warning-bg-solid: #fffbbd;
+  --color-warning-text: #573a00;
+  --color-info-bg-solid: #d1f1ff;
+  --color-info-bg-solid-alt: #d1f1ff;
+  --color-info-text: #002a66;
+  --color-info-text-alt: #002a66;
+  --color-emerald: #10b981;
+  --color-teal: #4ecdc4;
+  --color-code-bg: #F3F3F7;
+  --color-code-header-bg: #f1f3f5;
+  --color-code-text: #24292e;
+  --color-code-border: #e1e4e8;
+  --color-code-muted: #6a737d;
+  --color-inline-code-bg: #F3F3F7;
+  --color-inline-code-text: #24292e;
+  --color-inline-code-border: #e1e4e8;
+  --color-scrollbar-thumb: #d1d5db;
+  --color-scrollbar-track: transparent;
+  --color-graph-node-text: #333333;
+  --color-graph-node-text-dim: #7F8C8D;
+  --color-graph-edge-default: #95A5A6;
+  --color-graph-edge-cross: #E67E22;
+  --color-graph-edge-text: #666666;
+  --color-graph-edge-stroke: #ffffff;
+  --color-graph-highlight-bg: #FF6B6B;
+  --color-graph-highlight-border: #E74C3C;
+  --color-graph-search-bg: #FFD700;
+  --color-graph-search-border: #FFA500;
+  --color-graph-focus-border: #C0392B;
+  --color-graph-external-border: #95A5A6;
+  --color-graph-cat-file: #3498DB;
+  --color-graph-cat-folder: #7F8C8D;
+  --color-graph-cat-file-aggregate: #2980B9;
+  --color-graph-cat-class: #9B59B6;
+  --color-graph-cat-function: #2ECC71;
+  --color-graph-cat-method: #1ABC9C;
+  --color-graph-cat-variable: #F39C12;
+  --color-graph-cat-import: #D35400;
+  --color-graph-cat-module: #5B6ABF;
+  --color-graph-cat-concept: #E74C3C;
+  --color-graph-cat-person: #FF6B6B;
+  --color-graph-cat-org: #4ECDC4;
+  --color-graph-cat-organization: #4ECDC4;
+  --color-graph-cat-product: #A29BFE;
+  --color-graph-cat-metric: #FD79A8;
+  --color-graph-cat-location: #34495E;
+  --color-graph-cat-date: #E056A0;
+  --color-graph-cat-code: #3498DB;
+  --color-graph-cat-doc: #7F8C8D;
+  --color-graph-cat-url: #00B894;
+  --color-graph-cat-email: #6C5CE7;
+  --color-graph-cat-unknown: #BDC3C7;
+  --color-graph-rel-contains: #BDC3C7;
+  --color-graph-rel-extends: #9B59B6;
+  --color-graph-rel-implements: #3498DB;
+  --color-graph-rel-imports: #E67E22;
+  --color-graph-rel-uses: #2ECC71;
+  --color-graph-rel-calls: #27AE60;
+  --color-graph-rel-references: #F39C12;
+  --color-graph-rel-related-to: #95A5A6;
+  --color-graph-rel-works-on: #E74C3C;
+  --color-graph-rel-owns: #1ABC9C;
+  --color-graph-rel-depends-on: #E67E22;
+  --color-graph-rel-parent-of: #BDC3C7;
+  --qs-content: #fff;
+  --qs-main: #fff;
+  --qs-primary-foreground: #131920;
+  --qs-secondary-foreground: #656871;
+  --qs-tertiary-foreground: #9ca3af;
+  --qs-placeholder-foreground: #8c8c94;
+  --qs-divider: #dedee3;
+  --qs-default-border: #8c8c94;
+  --qs-neutral-soft: #b4b4bb;
+  --qs-neutral-gray-50: #f9fafb;
+  --qs-tertiary-background: #f9fafb;
+  --qs-action-hover: #f3f3f7;
+  --qs-primary-default: #4200db;
+  --qs-primary-dark: #35009e;
+  --qs-primary-light: #e8e6ff;
+  --qs-success-default: #00802f;
+  --qs-error-default: #db0000;
+  --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-base-letter-spacing: .15px;
+  --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
+  --qs-shadow-md: 0 0 2px 0 #00000029, 0 2px 8px 1px #00000029;
+  --qs-shadow-lg: 0 4px 16px 4px #00000029, 0 2px 6px 1px #00000029;
+  --qs-shadow-xl: 0 4px 8px 2px #00000029, 0 6px 20px 4px #00000029;
+  --qs-width-modal-sm: 384px;
+  --qs-width-modal-md: 600px;
+  --qs-width-modal-lg: 1136px;
+  --qs-grid-gap: 16px;
+  --qs-grid-gap-xl: 24px;
+  --qs-primary-medium: #8575ff;
+  --qs-primary-inverse: #fff;
+  --qs-neutral-lightest: #f9f9fb;
+  --qs-neutral-light: #f3f3f7;
+  --qs-neutral-default: #dedee3;
+  --qs-neutral-medium: #8c8c94;
+  --qs-neutral-deep: #656871;
+  --qs-neutral-dark: #333843;
+  --qs-neutral-strong: #131920;
+  --qs-neutral-white: #fff;
+  --qs-neutral-black: #000;
+  --qs-success-medium: #005c26;
+  --qs-success-dark: #00471e;
+  --qs-success-light: #d9ffd6;
+  --qs-success-inverse: #fff;
+  --qs-info-default: #006ce0;
+  --qs-info-medium: #003b8f;
+  --qs-info-dark: #002a66;
+  --qs-info-light: #d1f1ff;
+  --qs-info-inverse: #fff;
+  --qs-warning-default: #f2b100;
+  --qs-warning-medium: #db9200;
+  --qs-warning-dark: #573a00;
+  --qs-warning-light: #fffbbd;
+  --qs-warning-inverse: #573a00;
+  --qs-warning-experimental: #f2b100;
+  --qs-warning-experimental-light: #fffbbd;
+  --qs-warning-experimental-light-foreground: #fffbbd;
+  --qs-error-medium: #900;
+  --qs-error-dark: #700000;
+  --qs-error-light: #ffe0e0;
+  --qs-error-inverse: #fff;
+  --qs-connection-default: #db3300;
+  --qs-connection-soft: #ff997a;
+  --qs-connection-light: #ffe0d6;
+  --qs-connection-dark: #661800;
+  --qs-automation-default: #b3008f;
+  --qs-automation-medium: #d600ba;
+  --qs-automation-soft: #ff94f1;
+  --qs-automation-light: #ffe0fb;
+  --qs-automation-dark: #660052;
+  --qs-insight-default: #a000b8;
+  --qs-insight-soft: #f299ff;
+  --qs-insight-light: #fce6ff;
+  --qs-insight-dark: #590066;
+  --qs-visualization-default: #7300e5;
+  --qs-visualization-soft: #d4a8ff;
+  --qs-visualization-light: #f2e5ff;
+  --qs-visualization-dark: #45008a;
+  --qs-spice: #ff9800;
+  --qs-coachmark: #006ce0;
+  --qs-brand: #fff;
+  --qs-brand-foreground: #131920;
+  --qs-brand-navbar: #131920;
+  --qs-brand-navbar-foreground: #fff;
+  --qs-brand-navbar-light: #dedee3;
+  --qs-brand-navbar-dark: #000;
+  --qs-application-navbar: #4200db;
+  --qs-application-navbar-foreground: #fff;
+  --qs-application-navbar-light: #e8e6ff;
+  --qs-application-navbar-dark: #35009e;
+  --qs-dimension: #4200db;
+  --qs-dimension-foreground: #fff;
+  --qs-dimension-experimental: #4200db;
+  --qs-dimension-experimental-foreground: #4200db;
+  --qs-measure: #00802f;
+  --qs-measure-foreground: #fff;
+  --qs-measure-experimental: #f2b100;
+  --qs-measure-experimental-foreground: #f2b100;
+  --qs-content-inverse: #333843;
+  --qs-content-inverse-active: #131920;
+  --qs-secondary: #dedee3;
+  --qs-disabled: #8c8c94;
+  --qs-divider-light: #f3f3f7;
+  --qs-hover-border: #333843;
+  --qs-active-border: #4200db;
+  --qs-disabled-border: #dedee3;
+  --qs-error-border: #ffe0e0;
+  --qs-error-active-border: #db0000;
+  --qs-disabled-foreground: #b4b4bb;
+  --qs-primary-inverse-foreground: #fff;
+  --qs-error-foreground: #db0000;
+  --qs-contrast-foreground: #131920;
+  --qs-main-foreground: #131920;
+  --qs-main-secondary-foreground: #656871;
+  --qs-action-disabled: #f3f3f7;
+  --qs-action-active: #e8e6ff;
+  --qs-default-badge: #dedee3;
+  --qs-tag-default: #dedee3;
+  --qs-tag-soft-border: #b4b4bb;
+  --qs-focus-offset: 1px;
+  --qs-toggle-tile-sm: calc(.25rem * 8);
+  --qs-toggle-tile-md: calc(.25rem * 12);
+  --qs-toggle-tile-lg: calc(.25rem * 15);
+  --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
+  --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
+  --react-pdf-text-layer: 1;
+  --highlight-bg-color: rgba(180, 0, 170, 1);
+  --highlight-selected-bg-color: rgba(0, 100, 0, 1);
+  --react-pdf-annotation-layer: 1;
+  --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
+  --input-focus-border-color: Highlight;
+  --input-focus-outline: 1px solid Canvas;
+  --input-unfocused-border-color: transparent;
+  --input-disabled-border-color: transparent;
+  --input-hover-border-color: black;
+  --link-outline: none;
+  color-scheme: light;
+}
+body { background: var(--color-bg); color: var(--color-text); }
+a { color: var(--color-link, var(--color-primary)); }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Rafias">
-<title>Rafias Scanner</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0F2137">
+<title>ScanTrack v3.0</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2NhblRyYWNrIHYzLjAiLCJzaG9ydF9uYW1lIjoiU2NhblRyYWNrIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwRjIxMzciLCJ0aGVtZV9jb2xvciI6IiMwRjIxMzciLCJpY29ucyI6W119">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--navy:#0F2137;--navy-light:#1a3a5c;--navy-dark:#091520;
+--orange:#FF9900;--orange-light:#FFB84D;--orange-dark:#CC7A00;
+--white:#FFFFFF;--gray-50:#F8F9FA;--gray-100:#E9ECEF;--gray-200:#DEE2E6;
+--gray-300:#CED4DA;--gray-400:#ADB5BD;--gray-500:#6C757D;--gray-600:#495057;
+--green:#28A745;--green-light:#D4EDDA;--red:#DC3545;--red-light:#F8D7DA;
+--blue:#007BFF;--yellow:#FFC107;
+--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+--radius:8px;--radius-lg:12px;--shadow:0 2px 8px rgba(0,0,0,0.1);
+--shadow-lg:0 4px 16px rgba(0,0,0,0.15);--transition:all 0.2s ease;
+}
+html,body{height:100%;font-family:var(--font);background:var(--gray-50);color:var(--navy);overflow:hidden}
+body{display:flex;flex-direction:column}
 
-  :root {
-    --orange: #FF9900;
-    --orange-dark: #E68A00;
-    --orange-light: #FFF3D6;
-    --blue: #146EB4;
-    --navy: #0F2137;
-    --success: #00875A;
-    --success-bg: #E3F5EE;
-    --danger: #D32F2F;
-    --danger-bg: #FDECEA;
-    --warning-bg: #FFF8E7;
-    --surface: #FFFFFF;
-    --surface2: #F5F7FA;
-    --surface3: #EEF1F6;
-    --text: #0F2137;
-    --text-mid: #3D5166;
-    --text-dim: #8A9BB0;
-    --border: #DDE3EC;
-    --radius: 14px;
-    --shadow: 0 2px 12px rgba(15,33,55,0.08);
-    --shadow-md: 0 4px 24px rgba(15,33,55,0.12);
-  }
+/* Toast */
+#toast-container{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:10000;display:flex;flex-direction:column;gap:8px;pointer-events:none;width:90%;max-width:400px}
+.toast{padding:12px 16px;border-radius:var(--radius);color:var(--white);font-size:14px;font-weight:500;animation:toastIn 0.3s ease,toastOut 0.3s ease 2.7s forwards;pointer-events:auto;box-shadow:var(--shadow-lg);text-align:center}
+.toast-success{background:var(--green)}.toast-error{background:var(--red)}.toast-info{background:var(--blue)}.toast-warning{background:var(--orange)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0}}
 
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+/* Flash overlay */
+#flash-overlay{position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity 0.1s}
+#flash-overlay.flash-green{background:rgba(40,167,69,0.4);opacity:1}
+#flash-overlay.flash-red{background:rgba(220,53,69,0.4);opacity:1}
 
-  body {
-    font-family: 'Barlow', sans-serif;
-    background: var(--surface2);
-    color: var(--text);
-    min-height: 100vh;
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
+/* Login */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);display:flex;align-items:center;justify-content:center;z-index:5000;padding:20px}
+#login-screen.hidden{display:none}
+.login-card{background:var(--white);border-radius:var(--radius-lg);padding:32px 24px;width:100%;max-width:360px;box-shadow:var(--shadow-lg)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo h1{color:var(--navy);font-size:24px;margin-bottom:4px}
+.login-logo span{color:var(--orange);font-size:13px;font-weight:500}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--gray-600);margin-bottom:4px}
+.form-group input,.form-group select{width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:15px;font-family:var(--font);transition:var(--transition);background:var(--white)}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,153,0,0.15)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;transition:var(--transition);text-decoration:none}
+.btn-primary{background:var(--orange);color:var(--white);width:100%;padding:12px}
+.btn-primary:hover{background:var(--orange-dark)}
+.btn-primary:disabled{background:var(--gray-300);cursor:not-allowed}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-outline{background:transparent;border:1.5px solid var(--gray-300);color:var(--gray-600)}
+.btn-outline:hover{border-color:var(--orange);color:var(--orange)}
+.btn-outline.active{border-color:var(--orange);background:rgba(255,153,0,0.08);color:var(--orange)}
+.btn-green{background:var(--green);color:var(--white)}.btn-green:hover{background:#218838}
+.btn-orange{background:var(--orange);color:var(--white)}.btn-orange:hover{background:var(--orange-dark)}
+.btn-red{background:var(--red);color:var(--white)}.btn-red:hover{background:#c82333}
+.btn-icon{width:36px;height:36px;padding:0;border-radius:50%}
 
-  .header {
-    background: var(--navy);
-    padding: 14px 16px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 3px solid var(--orange);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-md);
-  }
+/* App Layout */
+#app{display:none;flex-direction:column;height:100%;overflow:hidden}
+#app.visible{display:flex}
+.app-header{background:var(--navy);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;min-height:48px}
+.app-header h2{color:var(--white);font-size:16px;font-weight:600}
+.app-header .user-info{display:flex;align-items:center;gap:8px;color:var(--gray-300);font-size:12px}
+.app-header .logout-btn{background:none;border:1px solid var(--gray-400);color:var(--gray-300);padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer}
+.app-header .logout-btn:hover{border-color:var(--orange);color:var(--orange)}
 
-  .header-brand { display:flex; align-items:center; gap:10px; }
+/* Tabs */
+.tab-content-wrapper{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.tab-content{display:none;padding:16px;min-height:100%}
+.tab-content.active{display:block}
+.bottom-nav{display:flex;background:var(--white);border-top:1px solid var(--gray-200);padding:4px 0 env(safe-area-inset-bottom,4px)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;font-size:10px;color:var(--gray-500);cursor:pointer;transition:var(--transition);text-decoration:none;border:none;background:none;font-family:var(--font)}
+.nav-item.active{color:var(--orange)}
+.nav-item .nav-icon{font-size:20px;margin-bottom:2px}
 
-  .logo-wrap {
-    width: 40px; height: 40px;
-    background: var(--orange);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px rgba(255,153,0,0.4);
-    flex-shrink: 0;
-  }
+/* Scanner */
+.asset-selector{display:flex;gap:8px;margin-bottom:12px}
+.asset-btn{flex:1;padding:10px 8px;border:2px solid var(--gray-200);border-radius:var(--radius);background:var(--white);text-align:center;cursor:pointer;transition:var(--transition);font-family:var(--font)}
+.asset-btn .icon{font-size:24px;display:block;margin-bottom:4px}
+.asset-btn .label{font-size:11px;font-weight:600;color:var(--gray-600)}
+.asset-btn.active{border-color:var(--orange);background:rgba(255,153,0,0.05)}
+.asset-btn.active .label{color:var(--orange)}
 
-  .header-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800; font-size: 20px; letter-spacing: 1px; color: #fff;
-  }
-  .header-title span { color: var(--orange); }
-  .header-subtitle { font-size: 11px; color: rgba(255,255,255,0.45); font-weight:500; }
-  .header-user { text-align:right; }
-  .header-user strong { display:block; color:#fff; font-size:14px; font-weight:600; }
-  .header-user span { font-size:11px; color:rgba(255,255,255,0.45); }
+.movement-selector{display:flex;gap:8px;margin-bottom:12px}
+.mov-btn{flex:1;padding:8px;border:2px solid var(--gray-200);border-radius:var(--radius);background:var(--white);text-align:center;cursor:pointer;font-size:13px;font-weight:600;transition:var(--transition);font-family:var(--font)}
+.mov-btn.retorno.active{border-color:var(--green);background:rgba(40,167,69,0.08);color:var(--green)}
+.mov-btn.saida.active{border-color:var(--orange);background:rgba(255,153,0,0.08);color:var(--orange)}
 
-  .nav-tabs {
-    display:flex; background:var(--surface);
-    border-bottom:1px solid var(--border);
-    overflow-x:auto; scrollbar-width:none;
-    box-shadow:0 2px 8px rgba(15,33,55,0.06);
-  }
-  .nav-tabs::-webkit-scrollbar { display:none; }
+.camera-container{position:relative;width:100%;aspect-ratio:4/3;background:#000;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:12px}
+.camera-container video{width:100%;height:100%;object-fit:cover}
+.camera-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.crosshair{width:60%;height:60%;border:2px solid rgba(255,153,0,0.7);border-radius:8px;position:relative}
+.crosshair::before,.crosshair::after{content:'';position:absolute;background:var(--orange)}
+.crosshair::before{width:2px;height:20px;top:50%;left:50%;transform:translate(-50%,-50%)}
+.crosshair::after{width:20px;height:2px;top:50%;left:50%;transform:translate(-50%,-50%)}
+.camera-status{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:var(--white);padding:4px 12px;border-radius:12px;font-size:11px}
 
-  .nav-tab {
-    flex:1; min-width:80px; padding:10px 8px; text-align:center;
-    font-family:'Barlow Condensed',sans-serif; font-weight:700;
-    font-size:12px; letter-spacing:0.5px; color:var(--text-dim);
-    cursor:pointer; border-bottom:3px solid transparent;
-    transition:all 0.2s; white-space:nowrap;
-  }
-  .nav-tab.active { color:var(--orange); border-bottom-color:var(--orange); }
-  .tab-icon { display:block; font-size:18px; margin-bottom:2px; }
+.usb-input-area{background:var(--white);border:2px dashed var(--gray-300);border-radius:var(--radius-lg);padding:24px;text-align:center;margin-bottom:12px}
+.usb-input-area input{width:100%;padding:12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:18px;text-align:center;font-family:monospace;margin-top:12px}
+.usb-input-area input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,153,0,0.15)}
 
-  .page { display:none; padding:16px; padding-bottom:80px; }
-  .page.active { display:block; }
+.manual-entry{display:flex;gap:8px;margin-bottom:12px}
+.manual-entry input{flex:1;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:14px;font-family:var(--font)}
+.manual-entry input:focus{outline:none;border-color:var(--orange)}
 
-  /* LOGIN */
-  .login-page {
-    min-height:100vh; background:var(--navy);
-    display:flex; align-items:center; justify-content:center; padding:24px;
-  }
-  .login-card {
-    background:white; border-radius:24px; padding:32px 24px;
-    width:100%; max-width:340px; box-shadow:var(--shadow-md);
-  }
-  .login-logo-wrap {
-    display:flex; flex-direction:column; align-items:center;
-    margin-bottom:28px; gap:12px;
-  }
-  .login-logo {
-    width:80px; height:80px; background:var(--orange);
-    border-radius:20px; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 8px 24px rgba(255,153,0,0.35);
-  }
-  .login-title {
-    font-family:'Barlow Condensed',sans-serif;
-    font-weight:800; font-size:28px; color:var(--navy); letter-spacing:1px;
-  }
-  .login-title span { color:var(--orange); }
-  .login-sub { font-size:13px; color:var(--text-dim); text-align:center; }
+.session-counter{text-align:center;font-size:13px;color:var(--gray-500);margin-bottom:12px;font-weight:500}
+.session-counter span{color:var(--orange);font-weight:700}
 
-  .input-group { display:flex; flex-direction:column; gap:6px; }
-  .input-label { font-size:11px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.8px; }
+.mini-log{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);overflow:hidden;margin-bottom:12px}
+.mini-log-header{padding:8px 12px;background:var(--gray-50);font-size:12px;font-weight:600;color:var(--gray-600);border-bottom:1px solid var(--gray-200)}
+.mini-log-item{padding:8px 12px;border-bottom:1px solid var(--gray-100);font-size:12px;display:flex;align-items:center;gap:8px}
+.mini-log-item:last-child{border-bottom:none}
+.mini-log-item .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mini-log-item .status-dot.success{background:var(--green)}
+.mini-log-item .status-dot.error{background:var(--red)}
+.mini-log-item .status-dot.duplicate{background:var(--yellow)}
+.mini-log-item .log-code{font-family:monospace;font-weight:600;color:var(--navy)}
+.mini-log-item .log-time{color:var(--gray-400);margin-left:auto;font-size:11px}
 
-  .input-field, .select-field {
-    background:var(--surface2); border:1.5px solid var(--border);
-    border-radius:var(--radius); padding:14px 16px;
-    color:var(--text); font-family:'Barlow',sans-serif; font-size:16px;
-    width:100%; outline:none; transition:border-color 0.2s, box-shadow 0.2s;
-    appearance:none;
-  }
-  .input-field:focus, .select-field:focus {
-    border-color:var(--orange);
-    box-shadow:0 0 0 3px rgba(255,153,0,0.12);
-    background:#fff;
-  }
-  .select-field {
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A9BB0' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-    background-repeat:no-repeat; background-position:right 14px center;
-    background-color:var(--surface2); padding-right:40px;
-  }
+/* TBR Fields */
+.tbr-fields{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+.tbr-fields .form-group{margin-bottom:12px}
+.tbr-fields .form-group:last-child{margin-bottom:0}
 
-  .btn {
-    padding:15px; border-radius:var(--radius); border:none;
-    font-family:'Barlow Condensed',sans-serif; font-weight:700;
-    font-size:17px; letter-spacing:1px; cursor:pointer;
-    transition:all 0.15s; width:100%;
-    display:flex; align-items:center; justify-content:center; gap:8px;
-  }
-  .btn:active { transform:scale(0.97); }
-  .btn-primary { background:var(--orange); color:var(--navy); box-shadow:0 4px 12px rgba(255,153,0,0.3); }
-  .btn-success { background:var(--success); color:white; box-shadow:0 4px 12px rgba(0,135,90,0.25); }
-  .btn-outline { background:transparent; border:1.5px solid var(--border); color:var(--text-mid); }
-  .btn-sm { padding:10px 16px; font-size:14px; width:auto; }
+/* Dashboard */
+.filters-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filters-row select,.filters-row input{padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius);font-size:13px;font-family:var(--font);flex:1;min-width:100px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.metric-card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);text-align:center}
+.metric-card .value{font-size:28px;font-weight:700;color:var(--navy)}
+.metric-card .label{font-size:12px;color:var(--gray-500);margin-top:4px}
+.metric-card.green .value{color:var(--green)}
+.metric-card.orange .value{color:var(--orange)}
+.metric-card.red .value{color:var(--red)}
+.metric-card.blue .value{color:var(--blue)}
 
-  .scan-type-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
-  .scan-type-btn {
-    padding:14px; border-radius:var(--radius);
-    border:2px solid var(--border); background:var(--surface);
-    color:var(--text-dim); font-family:'Barlow Condensed',sans-serif;
-    font-weight:700; font-size:16px; cursor:pointer; text-align:center;
-    transition:all 0.2s; box-shadow:var(--shadow);
-  }
-  .scan-type-btn.active-saida { border-color:var(--orange); background:var(--orange-light); color:var(--orange-dark); }
-  .scan-type-btn.active-retorno { border-color:var(--success); background:var(--success-bg); color:var(--success); }
-  .scan-type-icon { font-size:22px; display:block; margin-bottom:4px; }
+.section-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.alert-card{background:var(--red-light);border:1px solid var(--red);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;font-size:13px}
+.tbr-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.tbr-card .count{font-weight:700;color:var(--orange)}
 
-  .camera-container {
-    background:var(--navy); border-radius:var(--radius); overflow:hidden;
-    border:2px solid var(--border); position:relative;
-    box-shadow:var(--shadow-md); margin-bottom:12px;
-  }
-  #reader { width:100% !important; }
-  #reader video { border-radius:var(--radius) !important; }
+/* Registros */
+.search-bar{margin-bottom:12px}
+.search-bar input{width:100%;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);font-size:14px;font-family:var(--font)}
+.search-bar input:focus{outline:none;border-color:var(--orange)}
+.records-table-wrapper{overflow-x:auto;background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);margin-bottom:12px}
+.records-table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+.records-table th{background:var(--navy);color:var(--white);padding:8px 10px;text-align:left;font-weight:600;position:sticky;top:0}
+.records-table td{padding:8px 10px;border-bottom:1px solid var(--gray-100)}
+.records-table tr:hover td{background:var(--gray-50)}
+.pagination{display:flex;justify-content:center;align-items:center;gap:8px}
+.pagination button{padding:6px 12px;border:1px solid var(--gray-200);border-radius:var(--radius);background:var(--white);cursor:pointer;font-size:12px;font-family:var(--font)}
+.pagination button:hover{border-color:var(--orange)}
+.pagination button:disabled{opacity:0.5;cursor:not-allowed}
+.pagination span{font-size:12px;color:var(--gray-500)}
+.export-btn{margin-bottom:12px}
 
-  .camera-overlay {
-    position:absolute; top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    width:200px; height:200px; pointer-events:none;
-  }
-  .camera-overlay::before,.camera-overlay::after,
-  .camera-overlay span::before,.camera-overlay span::after {
-    content:''; position:absolute; width:30px; height:30px;
-    border-color:var(--orange); border-style:solid;
-  }
-  .camera-overlay::before { top:0;left:0;border-width:3px 0 0 3px; }
-  .camera-overlay::after  { top:0;right:0;border-width:3px 3px 0 0; }
-  .camera-overlay span::before { bottom:0;left:0;border-width:0 0 3px 3px; }
-  .camera-overlay span::after  { bottom:0;right:0;border-width:0 3px 3px 0; }
+/* Admin */
+.admin-section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:16px;border:1px solid var(--gray-200)}
+.admin-section h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--navy)}
+.admin-field{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.admin-field input{flex:1;padding:8px;border:1px solid var(--gray-200);border-radius:var(--radius);font-size:13px;font-family:var(--font)}
+.admin-list{list-style:none;margin-bottom:8px}
+.admin-list li{padding:6px 8px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--gray-100);font-size:13px}
+.admin-list li button{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px}
+.admin-note{font-size:12px;color:var(--gray-500);font-style:italic;margin-top:8px}
 
-  .scan-status {
-    padding:14px 16px; border-radius:var(--radius);
-    font-weight:600; font-size:14px; display:none;
-    margin-bottom:12px; line-height:1.5;
-  }
-  .scan-status.show { display:block; }
-  .scan-status.success { background:var(--success-bg); border:1.5px solid var(--success); color:var(--success); }
-  .scan-status.error   { background:var(--danger-bg); border:1.5px solid var(--danger); color:var(--danger); }
-  .scan-status.warning { background:var(--warning-bg); border:1.5px solid var(--orange); color:var(--orange-dark); }
+/* Como Usar */
+.help-section{margin-bottom:16px}
+.help-section h3{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.help-section p,.help-section li{font-size:13px;line-height:1.6;color:var(--gray-600);margin-bottom:6px}
+.help-section ul{padding-left:20px}
+.lang-toggle{display:flex;gap:8px;margin-bottom:16px;justify-content:center}
+.accordion{border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;margin-bottom:8px}
+.accordion-header{padding:12px;background:var(--gray-50);cursor:pointer;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.accordion-body{padding:0 12px;max-height:0;overflow:hidden;transition:max-height 0.3s ease,padding 0.3s ease;font-size:13px;line-height:1.6}
+.accordion-body.open{max-height:500px;padding:12px}
 
-  .card {
-    background:var(--surface); border-radius:var(--radius);
-    padding:16px; border:1px solid var(--border);
-    margin-bottom:12px; box-shadow:var(--shadow);
-  }
-  .card-title {
-    font-family:'Barlow Condensed',sans-serif; font-weight:700;
-    font-size:12px; color:var(--text-dim); text-transform:uppercase;
-    letter-spacing:0.8px; margin-bottom:12px;
-  }
-
-  .qr-manual { display:flex; gap:8px; }
-  .qr-manual .input-field { flex:1; }
-  .campos-extras { display:flex; flex-direction:column; gap:10px; }
-
-  .metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
-  .metric-card {
-    background:var(--surface); border-radius:var(--radius);
-    padding:16px 14px; border:1px solid var(--border);
-    text-align:center; box-shadow:var(--shadow);
-  }
-  .metric-value {
-    font-family:'Barlow Condensed',sans-serif; font-weight:800;
-    font-size:40px; line-height:1; margin-bottom:4px;
-  }
-  .metric-label { font-size:12px; color:var(--text-dim); font-weight:500; }
-  .metric-orange { color:var(--orange); }
-  .metric-green  { color:var(--success); }
-  .metric-blue   { color:var(--blue); }
-  .metric-red    { color:var(--danger); }
-
-  .alerta-item {
-    background:var(--danger-bg); border:1.5px solid #F5C6C6;
-    border-radius:var(--radius); padding:14px; margin-bottom:10px;
-  }
-  .alerta-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-  .alerta-qr { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; color:var(--danger); }
-  .alerta-dias { background:var(--danger); color:white; border-radius:20px; padding:2px 10px; font-size:12px; font-weight:700; }
-  .alerta-info { font-size:13px; color:var(--text-mid); line-height:1.8; }
-
-  .registro-item {
-    background:var(--surface); border-radius:var(--radius);
-    padding:14px; margin-bottom:10px;
-    border-left:4px solid var(--border); box-shadow:var(--shadow);
-  }
-  .registro-item.saida   { border-left-color:var(--orange); }
-  .registro-item.retorno { border-left-color:var(--success); }
-  .registro-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
-  .registro-qr { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px; color:var(--text); }
-  .badge { border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
-  .badge-saida   { background:var(--orange-light); color:var(--orange-dark); }
-  .badge-retorno { background:var(--success-bg); color:var(--success); }
-  .registro-info { font-size:12px; color:var(--text-dim); line-height:1.9; }
-
-  .filter-bar { display:flex; gap:8px; margin-bottom:16px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
-  .filter-btn {
-    padding:7px 14px; border-radius:20px; border:1.5px solid var(--border);
-    background:var(--surface); color:var(--text-dim);
-    font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;
-    transition:all 0.2s; box-shadow:var(--shadow);
-  }
-  .filter-btn.active { border-color:var(--orange); background:var(--orange-light); color:var(--orange-dark); }
-
-  .section-title {
-    font-family:'Barlow Condensed',sans-serif; font-weight:800;
-    font-size:20px; margin-bottom:16px; color:var(--navy);
-    display:flex; align-items:center; gap:8px;
-  }
-
-  .scan-count {
-    background:var(--surface); border-radius:var(--radius);
-    padding:12px 16px; display:flex; align-items:center;
-    justify-content:space-between; margin-top:8px;
-    border:1px solid var(--border); box-shadow:var(--shadow);
-  }
-  .scan-count-label { font-size:13px; color:var(--text-dim); }
-  .scan-count-value { font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:24px; color:var(--orange); }
-
-  .loading { display:flex; align-items:center; justify-content:center; padding:40px; color:var(--text-dim); font-size:14px; gap:10px; }
-  .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--orange); border-radius:50%; animation:spin 0.8s linear infinite; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-
-  .empty-state { text-align:center; padding:40px 20px; color:var(--text-dim); }
-  .empty-icon { font-size:48px; margin-bottom:12px; }
-  .empty-text { font-size:14px; }
-
-  .refresh-btn { background:none; border:none; color:var(--orange); font-size:20px; cursor:pointer; padding:4px; transition:transform 0.3s; }
-  .refresh-btn.spinning { animation:spin 0.8s linear infinite; }
-
-  .scan-line { height:3px; background:linear-gradient(90deg,transparent,var(--orange),transparent); border-radius:2px; animation:scan-anim 1.5s ease-in-out infinite; display:none; margin-bottom:8px; }
-  .scan-line.active { display:block; }
-  @keyframes scan-anim { 0%{transform:scaleX(0.3);opacity:0;} 50%{transform:scaleX(1);opacity:1;} 100%{transform:scaleX(0.3);opacity:0;} }
-
-  .toast {
-    position:fixed; bottom:24px; left:50%;
-    transform:translateX(-50%) translateY(100px);
-    background:var(--navy); color:#fff;
-    border-radius:var(--radius); padding:14px 20px;
-    font-size:14px; font-weight:500; z-index:999;
-    transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    max-width:90vw; text-align:center;
-    box-shadow:0 8px 32px rgba(15,33,55,0.25);
-  }
-  .toast.show { transform:translateX(-50%) translateY(0); }
-  .toast.success { background:var(--success); }
-  .toast.error   { background:var(--danger); }
+/* Loading */
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{display:flex;align-items:center;justify-content:center;padding:40px;flex-direction:column;gap:12px}
+.loading-overlay span{font-size:13px;color:var(--gray-500)}
+.hidden{display:none !important}
 </style>
 </head>
 <body>
+<div id="toast-container"></div>
+<div id="flash-overlay"></div>
 
-<!-- LOGIN -->
-<div id="loginPage" class="login-page">
-  <div class="login-card">
-    <div class="login-logo-wrap">
-      <div class="login-logo">
-        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- 3 quadrantes QR -->
-          <rect x="6" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
-          <rect x="10" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
-          <rect x="30" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
-          <rect x="34" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
-          <rect x="6" y="30" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
-          <rect x="10" y="34" width="6" height="6" rx="1" fill="#FF9900"/>
-          <!-- pixels soltos -->
-          <rect x="30" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <rect x="37" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <rect x="30" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <rect x="37" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <!-- linha scan animada (estática no logo) -->
-          <line x1="6" y1="26" x2="46" y2="26" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.65"/>
-        </svg>
-      </div>
-      <div class="login-title">RAFIAS <span>SCAN</span></div>
-      <div class="login-sub">Controle de retorno de rafias · DSP2</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="input-group">
-        <label class="input-label">Seu nome / matrícula</label>
-        <input class="input-field" id="loginNome" placeholder="Ex: João Silva ou 12345" autocomplete="name">
-      </div>
-      <button class="btn btn-primary" onclick="fazerLogin()">ENTRAR →</button>
-    </div>
-  </div>
+<div id="login-screen">
+<div class="login-card">
+<div class="login-logo">
+<h1>📦 ScanTrack</h1>
+<span>v3.0 — AMZL BR Delivery Stations</span>
+</div>
+<div class="form-group">
+<label>Alias</label>
+<input type="text" id="login-alias" placeholder="seu.alias" autocomplete="off" autocapitalize="none">
+</div>
+<div class="form-group">
+<label>Delivery Station</label>
+<select id="login-ds"><option value="">Carregando...</option></select>
+</div>
+<div class="form-group">
+<label>PIN (4 dígitos)</label>
+<input type="password" id="login-pin" maxlength="4" inputmode="numeric" placeholder="••••">
+</div>
+<button class="btn btn-primary" id="login-btn" onclick="doLogin()">Entrar</button>
+</div>
 </div>
 
-<!-- APP -->
-<div id="appContainer" style="display:none;">
+<div id="app">
+<header class="app-header">
+<h2>📦 ScanTrack</h2>
+<div class="user-info">
+<span id="header-user"></span>
+<button class="logout-btn" onclick="doLogout()">Sair</button>
+</div>
+</header>
 
-  <div class="header">
-    <div class="header-brand">
-      <div class="logo-wrap">
-        <svg width="28" height="28" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="6" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
-          <rect x="10" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
-          <rect x="30" y="6" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
-          <rect x="34" y="10" width="6" height="6" rx="1" fill="#FF9900"/>
-          <rect x="6" y="30" width="16" height="16" rx="2.5" fill="white" opacity="0.95"/>
-          <rect x="10" y="34" width="6" height="6" rx="1" fill="#FF9900"/>
-          <rect x="30" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <rect x="37" y="30" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <rect x="30" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <rect x="37" y="37" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
-          <line x1="6" y1="26" x2="46" y2="26" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.65"/>
-        </svg>
-      </div>
-      <div>
-        <div class="header-title">RAFIAS <span>SCAN</span></div>
-        <div class="header-subtitle">DSP2</div>
-      </div>
-    </div>
-    <div class="header-user" id="headerUser"></div>
-  </div>
-
-  <div class="nav-tabs">
-    <div class="nav-tab active" onclick="showPage('scan')" id="tab-scan"><span class="tab-icon">📷</span>SCANNER</div>
-    <div class="nav-tab" onclick="showPage('registros')" id="tab-registros"><span class="tab-icon">📋</span>REGISTROS</div>
-    <div class="nav-tab" onclick="showPage('dashboard')" id="tab-dashboard"><span class="tab-icon">📊</span>PAINEL</div>
-    <div class="nav-tab" onclick="showPage('alertas')" id="tab-alertas"><span class="tab-icon">⚠️</span>ALERTAS</div>
-    <div class="nav-tab" onclick="abrirPlanilha()"><span class="tab-icon">📄</span>PLANILHA</div>
-  </div>
-
-  <!-- SCANNER -->
-  <div class="page active" id="page-scan">
-    <div class="scan-type-toggle">
-      <div class="scan-type-btn active-saida" id="btnSaida" onclick="setTipo('SAIDA')">
-        <span class="scan-type-icon">📤</span>SAÍDA
-      </div>
-      <div class="scan-type-btn" id="btnRetorno" onclick="setTipo('RETORNO')">
-        <span class="scan-type-icon">📥</span>RETORNO
-      </div>
-    </div>
-
-    <div class="camera-container" id="camera-container">
-      <div id="reader"></div>
-      <div class="camera-overlay"><span></span></div>
-    </div>
-
-    <div id="aviso-usb" style="display:none; background:#FFF8E7; border:1.5px solid #FF9900; border-radius:14px; padding:18px; text-align:center; margin-bottom:12px;">
-      <div style="font-size:32px; margin-bottom:8px;">🔫</div>
-      <div style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:18px; color:#0F2137;">LEITOR USB ATIVO</div>
-      <div style="font-size:13px; color:#3D5166; margin-top:6px; line-height:1.6;">Bipe o QR Code com a pistola.<br>O registro será processado automaticamente.</div>
-    </div>
-
-    <div class="scan-line" id="scanLine"></div>
-    <div class="scan-status" id="scanStatus"></div>
-
-    <div class="card">
-      <div class="card-title">OU INSERIR MANUALMENTE</div>
-      <div class="qr-manual">
-        <input class="input-field" id="qrManual" placeholder="Código da rafia..." style="text-transform:uppercase;">
-        <button class="btn btn-primary btn-sm" onclick="processarQR(document.getElementById('qrManual').value)">OK</button>
-      </div>
-    </div>
-
-    <div class="campos-extras" id="camposExtras" style="display:none;">
-      <div class="card">
-        <div class="card-title">DETALHES DO REGISTRO</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="input-group">
-            <label class="input-label">Rota</label>
-            <input class="input-field" id="campoRota" placeholder="Ex: RT-001 ou Rota Centro">
-          </div>
-          <div class="input-group">
-            <label class="input-label">HUB</label>
-            <select class="select-field" id="campoHub"><option value="">Selecione o HUB</option></select>
-          </div>
-          <div class="input-group">
-            <label class="input-label">Motorista</label>
-            <select class="select-field" id="campoMotorista"><option value="">Selecione o motorista</option></select>
-          </div>
-          <button class="btn btn-success" onclick="confirmarRegistro()">✅ CONFIRMAR REGISTRO</button>
-          <button class="btn btn-outline" onclick="cancelarRegistro()" style="font-size:14px;padding:12px;">CANCELAR</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="scan-count">
-      <span class="scan-count-label">Seus scans hoje</span>
-      <span class="scan-count-value" id="countHoje">0</span>
-    </div>
-  </div>
-
-  <!-- REGISTROS -->
-  <div class="page" id="page-registros">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <div class="section-title" style="margin:0;">REGISTROS</div>
-      <button class="refresh-btn" id="btnRefreshReg" onclick="carregarRegistros()">🔄</button>
-    </div>
-    <div class="filter-bar">
-      <button class="filter-btn active" onclick="filtrarRegistros('TODOS',this)">Todos</button>
-      <button class="filter-btn" onclick="filtrarRegistros('SAIDA',this)">Saída</button>
-      <button class="filter-btn" onclick="filtrarRegistros('RETORNO',this)">Retorno</button>
-      <button class="filter-btn" onclick="filtrarRegistros('HOJE',this)">Hoje</button>
-    </div>
-    <div id="listaRegistros"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div class="page" id="page-dashboard">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <div class="section-title" style="margin:0;">PAINEL</div>
-      <button class="refresh-btn" id="btnRefreshDash" onclick="carregarIndicadores()">🔄</button>
-    </div>
-    <div class="metrics-grid">
-      <div class="metric-card"><div class="metric-value metric-orange" id="metEnviosHoje">—</div><div class="metric-label">Saídas hoje</div></div>
-      <div class="metric-card"><div class="metric-value metric-green" id="metRetornosHoje">—</div><div class="metric-label">Retornos hoje</div></div>
-      <div class="metric-card"><div class="metric-value metric-blue" id="metEmCampo">—</div><div class="metric-label">Em campo agora</div></div>
-      <div class="metric-card"><div class="metric-value metric-red" id="metAlertas">—</div><div class="metric-label">⚠️ Alertas</div></div>
-    </div>
-    <div class="card">
-      <div class="card-title">TAXA DE RETORNO HOJE</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
-        <div style="flex:1;background:var(--surface3);border-radius:20px;height:12px;overflow:hidden;">
-          <div id="barRetorno" style="height:100%;background:var(--success);border-radius:20px;width:0%;transition:width 0.8s;"></div>
-        </div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:var(--success);" id="pctRetorno">0%</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">RAFIAS EM CAMPO — RESUMO</div>
-      <div id="emCampoDetalhe"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
-    </div>
-  </div>
-
-  <!-- ALERTAS -->
-  <div class="page" id="page-alertas">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <div class="section-title" style="margin:0;">⚠️ ALERTAS</div>
-      <button class="refresh-btn" id="btnRefreshAlt" onclick="carregarIndicadores()">🔄</button>
-    </div>
-    <div class="card" style="background:var(--danger-bg);border-color:#F5C6C6;">
-      <div style="font-size:13px;color:var(--text-mid);line-height:1.6;">
-        Rafias com <strong style="color:var(--danger);">2 ou mais dias</strong> em campo sem registro de retorno.
-      </div>
-    </div>
-    <div id="listaAlertas"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
-  </div>
-
+<div class="tab-content-wrapper">
+<!-- SCANNER TAB -->
+<div class="tab-content active" id="tab-scanner">
+<div class="asset-selector">
+<div class="asset-btn active" data-type="bag" onclick="selectAsset('bag')">
+<span class="icon">🛄</span><span class="label">Bag</span>
+</div>
+<div class="asset-btn" data-type="rafia" onclick="selectAsset('rafia')">
+<span class="icon">📦</span><span class="label">Ráfia</span>
+</div>
+<div class="asset-btn" data-type="tbr" onclick="selectAsset('tbr')">
+<span class="icon">📋</span><span class="label">Pacote (TBR)</span>
+</div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="movement-selector">
+<div class="mov-btn retorno active" data-mov="RETORNO" onclick="selectMovement('RETORNO')">🟢 RETORNO</div>
+<div class="mov-btn saida" data-mov="SAÍDA" onclick="selectMovement('SAÍDA')">🟠 SAÍDA (Exceção)</div>
+</div>
+
+<!-- Camera (mobile) -->
+<div class="camera-container" id="camera-container">
+<video id="camera-video" autoplay="" playsinline="" muted=""></video>
+<div class="camera-overlay"><div class="crosshair"></div></div>
+<div class="camera-status" id="camera-status">Iniciando câmera...</div>
+</div>
+
+<!-- USB Scanner (desktop) -->
+<div class="usb-input-area hidden" id="usb-area">
+<div style="font-size:32px">🔌</div>
+<div style="font-size:14px;font-weight:600;margin-top:8px;color:var(--gray-600)">Modo Scanner USB</div>
+<div style="font-size:12px;color:var(--gray-400);margin-top:4px">Foco automático — leia o código com o scanner</div>
+<input type="text" id="usb-input" placeholder="Aguardando leitura..." autocomplete="off">
+</div>
+
+<!-- Manual entry -->
+<div class="manual-entry">
+<input type="text" id="manual-code" placeholder="Código manual..." autocomplete="off">
+<button class="btn btn-orange btn-sm" onclick="processManualEntry()">OK</button>
+</div>
+
+<!-- TBR extra fields -->
+<div class="tbr-fields hidden" id="tbr-fields">
+<div class="form-group">
+<label>Classificação</label>
+<select id="tbr-class"><option value="">Selecione...</option></select>
+</div>
+<div class="form-group hidden" id="tbr-obs-group">
+<label>Observação</label>
+<input type="text" id="tbr-obs" placeholder="Detalhe...">
+</div>
+<div class="form-group">
+<button class="btn btn-sm btn-outline" onclick="capturePhoto()">📷 Foto (opcional)</button>
+<span id="photo-status" style="font-size:11px;color:var(--gray-400);margin-left:8px"></span>
+</div>
+<button class="btn btn-primary" onclick="submitTBR()">Registrar Pacote</button>
+</div>
+
+<!-- SAÍDA extra fields -->
+<div class="tbr-fields hidden" id="saida-fields">
+<div class="form-group">
+<label>Rota</label>
+<input type="text" id="saida-rota" placeholder="Ex: R01">
+</div>
+<div class="form-group">
+<label>Motorista</label>
+<input type="text" id="saida-motorista" placeholder="Nome do motorista">
+</div>
+</div>
+
+<div class="session-counter">Scans desta sessão: <span id="session-count">0</span></div>
+
+<div class="mini-log">
+<div class="mini-log-header">Últimos registros</div>
+<div id="mini-log-list"><div class="mini-log-item" style="color:var(--gray-400);justify-content:center">Nenhum scan ainda</div></div>
+</div>
+</div>
+
+<!-- DASHBOARD TAB -->
+<div class="tab-content" id="tab-dashboard">
+<div class="filters-row">
+<select id="dash-ds"><option value="">Todos DS</option></select>
+<select id="dash-type"><option value="">Todos Tipos</option><option value="bag">Bag</option><option value="rafia">Ráfia</option><option value="tbr">TBR</option></select>
+<input type="date" id="dash-from" title="De">
+<input type="date" id="dash-to" title="Até">
+</div>
+<button class="btn btn-sm btn-outline" onclick="loadDashboard()" style="margin-bottom:12px">🔄 Atualizar</button>
+
+<div class="metrics-grid">
+<div class="metric-card orange"><div class="value" id="dash-saidas">-</div><div class="label">Total Saídas</div></div>
+<div class="metric-card green"><div class="value" id="dash-retornos">-</div><div class="label">Total Retornos</div></div>
+<div class="metric-card red"><div class="value" id="dash-pendentes">-</div><div class="label">Pendentes</div></div>
+<div class="metric-card blue"><div class="value" id="dash-percent">-</div><div class="label">% Retorno</div></div>
+</div>
+
+<div class="section-title">📋 TBR por Classificação</div>
+<div id="tbr-breakdown"></div>
+
+<div class="section-title" style="margin-top:16px">🚨 Alertas (2+ dias sem retorno)</div>
+<div id="dash-alerts"><div style="font-size:13px;color:var(--gray-400)">Carregue dados para ver alertas</div></div>
+</div>
+
+<!-- REGISTROS TAB -->
+<div class="tab-content" id="tab-registros">
+<div class="search-bar">
+<input type="text" id="reg-search" placeholder="Buscar por código, operador, DS..." oninput="filterRecords()">
+</div>
+<button class="btn btn-sm btn-outline export-btn" onclick="exportCSV()">📥 Exportar CSV</button>
+<div class="records-table-wrapper">
+<table class="records-table">
+<thead><tr><th>Código</th><th>Tipo</th><th>Mov.</th><th>Class.</th><th>DS</th><th>Operador</th><th>Data/Hora</th></tr></thead>
+<tbody id="records-body"></tbody>
+</table>
+</div>
+<div class="pagination">
+<button onclick="changePage(-1)" id="prev-page">← Anterior</button>
+<span id="page-info">1/1</span>
+<button onclick="changePage(1)" id="next-page">Próxima →</button>
+</div>
+</div>
+
+<!-- ADMIN TAB -->
+<div class="tab-content" id="tab-admin">
+<div class="admin-section">
+<h3>🔗 Conexão API</h3>
+<div class="admin-field">
+<input type="text" id="admin-api-url" placeholder="URL do Google Apps Script">
+<button class="btn btn-sm btn-green" onclick="saveApiUrl()">Salvar</button>
+</div>
+<button class="btn btn-sm btn-outline" onclick="testConnection()" style="margin-top:8px">🧪 Testar Conexão</button>
+<div id="api-test-result" style="margin-top:8px;font-size:12px"></div>
+</div>
+
+<div class="admin-section">
+<h3>🏢 Delivery Stations</h3>
+<ul class="admin-list" id="admin-ds-list"></ul>
+<div class="admin-field">
+<input type="text" id="admin-new-ds" placeholder="Novo DS (ex: DSP9)">
+<input type="text" id="admin-new-regional" placeholder="Regional">
+<button class="btn btn-sm btn-green" onclick="addDS()">+</button>
+</div>
+</div>
+
+<div class="admin-section">
+<h3>🔑 PIN de Acesso</h3>
+<div class="admin-field">
+<input type="text" id="admin-pin" placeholder="Novo PIN (4 dígitos)" maxlength="4">
+<button class="btn btn-sm btn-green" onclick="updatePIN()">Alterar</button>
+</div>
+</div>
+
+<div class="admin-section">
+<h3>🏷️ Classificações TBR</h3>
+<ul class="admin-list" id="admin-class-list"></ul>
+<div class="admin-field">
+<input type="text" id="admin-new-class" placeholder="Nova classificação">
+<button class="btn btn-sm btn-green" onclick="addClass()">+</button>
+</div>
+</div>
+
+<div class="admin-section">
+<h3>👤 Administradores</h3>
+<ul class="admin-list" id="admin-admins-list"></ul>
+<div class="admin-field">
+<input type="text" id="admin-new-admin" placeholder="Alias do novo admin">
+<button class="btn btn-sm btn-green" onclick="addAdmin()">+</button>
+</div>
+</div>
+
+<div class="admin-note">💡 Alterações são salvas via API. Se a API não estiver configurada, edite diretamente a planilha Config no Google Sheets.</div>
+</div>
+
+<!-- COMO USAR TAB -->
+<div class="tab-content" id="tab-help">
+<div class="lang-toggle">
+<button class="btn btn-sm btn-outline active" id="lang-pt" onclick="setHelpLang('pt')">🇧🇷 PT-BR</button>
+<button class="btn btn-sm btn-outline" id="lang-en" onclick="setHelpLang('en')">🇺🇸 EN</button>
+</div>
+<div id="help-content-pt">
+<div class="help-section"><h3>🔐 Login</h3><p>Insira seu alias Amazon (sem espaços, minúsculo), selecione sua DS e digite o PIN de 4 dígitos configurado pelo admin.</p></div>
+<div class="help-section"><h3>📱 Escaneamento (Mobile)</h3><p>A câmera traseira abre automaticamente. Posicione o QR/código de barras dentro da mira. O registro é automático para Bags e Ráfias no modo RETORNO.</p></div>
+<div class="help-section"><h3>🖥️ Escaneamento (Desktop/USB)</h3><p>Em telas maiores que 768px sem touch, o modo USB é ativado. O campo de texto recebe foco automático. Basta ler o código com o scanner USB.</p></div>
+<div class="help-section"><h3>📦 Tipos de Ativos</h3><ul><li><b>Bag:</b> Sacolas de entrega. Scan rápido contínuo.</li><li><b>Ráfia:</b> Sacos grandes de transporte. Scan rápido contínuo.</li><li><b>Pacote (TBR):</b> Pacotes com problema. Requer classificação e permite foto.</li></ul></div>
+<div class="help-section"><h3>📊 Dashboard</h3><p>Visualize métricas de saídas, retornos e pendências. Filtre por DS, tipo e data.</p></div>
+<div class="help-section"><h3>⚙️ Admin</h3><p>Configure a URL da API, gerencie DS, PIN, classificações e administradores.</p></div>
+<div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)">🔧 Troubleshooting <span>▼</span></div><div class="accordion-body"><p>• <b>Câmera não abre:</b> Verifique permissões do navegador.<br>• <b>API não conecta:</b> Verifique a URL no Admin e se o script está publicado como webapp.<br>• <b>Scan não registra:</b> Código pode estar no cooldown de 5s (anti-duplicata).<br>• <b>Dados offline:</b> Registros ficam em fila local e são enviados quando a conexão voltar.</p></div></div>
+</div>
+<div id="help-content-en" class="hidden">
+<div class="help-section"><h3>🔐 Login</h3><p>Enter your Amazon alias (no spaces, lowercase), select your DS and enter the 4-digit PIN configured by admin.</p></div>
+<div class="help-section"><h3>📱 Scanning (Mobile)</h3><p>The rear camera opens automatically. Position the QR/barcode within the crosshairs. Registration is automatic for Bags and Ráfias in RETORNO mode.</p></div>
+<div class="help-section"><h3>🖥️ Scanning (Desktop/USB)</h3><p>On screens larger than 768px without touch, USB mode is activated. The text field auto-focuses. Just scan with your USB scanner.</p></div>
+<div class="help-section"><h3>📦 Asset Types</h3><ul><li><b>Bag:</b> Delivery bags. Continuous rapid scan.</li><li><b>Ráfia:</b> Large transport sacks. Continuous rapid scan.</li><li><b>Package (TBR):</b> Problem packages. Requires classification and allows photo.</li></ul></div>
+<div class="help-section"><h3>📊 Dashboard</h3><p>View metrics for outputs, returns and pending items. Filter by DS, type and date.</p></div>
+<div class="help-section"><h3>⚙️ Admin</h3><p>Configure API URL, manage DS, PIN, classifications and administrators.</p></div>
+<div class="accordion"><div class="accordion-header" onclick="toggleAccordion(this)">🔧 Troubleshooting <span>▼</span></div><div class="accordion-body"><p>• <b>Camera won't open:</b> Check browser permissions.<br>• <b>API won't connect:</b> Check the URL in Admin and that the script is published as webapp.<br>• <b>Scan won't register:</b> Code might be in 5s cooldown (anti-duplicate).<br>• <b>Offline data:</b> Records are queued locally and sent when connection returns.</p></div></div>
+</div>
+</div>
+</div>
+
+<nav class="bottom-nav" id="bottom-nav">
+<button class="nav-item active" data-tab="scanner" onclick="switchTab('scanner')"><span class="nav-icon">📷</span>Scanner</button>
+<button class="nav-item" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span>Dashboard</button>
+<button class="nav-item" data-tab="registros" onclick="switchTab('registros')"><span class="nav-icon">📋</span>Registros</button>
+<button class="nav-item hidden" data-tab="admin" id="nav-admin" onclick="switchTab('admin')"><span class="nav-icon">⚙️</span>Admin</button>
+<button class="nav-item" data-tab="help" onclick="switchTab('help')"><span class="nav-icon">❓</span>Como Usar</button>
+</nav>
+</div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwjavTUsQDnnSgYAzYmPMd-EXxv5z74_SUZZ_25Vzo-ODJ2TNyt8kbTLpO868jQG2za/exec";
+// GLOBAL ERROR HANDLER — must be first
+window.onerror = function(msg, url, line, col, error) {
+try { console.error('ScanTrack Error:', msg, line, col, error); } catch(e) {}
+return true;
+};
+window.addEventListener('unhandledrejection', function(e) { e.preventDefault(); });
 
-let operador="", tipoAtual="SAIDA", qrPendente=null;
-let html5QrCode=null, scannerAtivo=false;
-let todosRegistros=[], countScanHoje=0;
+// ===== STATE =====
+var STATE = {
+user: null,
+ds: null,
+regional: null,
+isDesktop: false,
+config: null,
+sessionCount: 0,
+scanQueue: [],
+recentScans: [],
+currentAsset: 'bag',
+currentMovement: 'RETORNO',
+currentPage: 1,
+records: [],
+filteredRecords: [],
+tbrPendingCode: null,
+photoData: null,
+cameraStream: null,
+barcodeDetector: null,
+scanInterval: null,
+recentCodes: {},
+audioCtx: null
+};
 
-function fazerLogin() {
-  const nome = document.getElementById("loginNome").value.trim();
-  if (!nome) { showToast("Digite seu nome ou matrícula","error"); return; }
-  operador = nome;
-  document.getElementById("loginPage").style.display = "none";
-  document.getElementById("appContainer").style.display = "block";
-  document.getElementById("headerUser").innerHTML = `<strong>${nome}</strong><span>operador</span>`;
-  iniciarScanner();
-  carregarListas();
-  carregarIndicadores();
+var FALLBACK_DS = ['DSP2','HSP2','DSP4','DBS5','DBS7','DGO2','DRJ3','HRJ3','DRJ5','DES2','HVI2','DSA8','HSV8','DBR9'];
+var FALLBACK_CLASSIFICATIONS = ['Danificado','Endereço incorreto','Recusado','Extravio','Outro'];
+var FALLBACK_PIN = '1234';
+var FALLBACK_ADMINS = [];
+var CONFIG_TTL = 300000; // 5 min
+
+// ===== HELPERS =====
+function $(id){try{return document.getElementById(id)}catch(e){return null}}
+function qs(sel){try{return document.querySelector(sel)}catch(e){return null}}
+function qsa(sel){try{return document.querySelectorAll(sel)}catch(e){return []}}
+
+function lsGet(key){try{return JSON.parse(localStorage.getItem('scantrack_'+key))}catch(e){return null}}
+function lsSet(key,val){try{localStorage.setItem('scantrack_'+key,JSON.stringify(val))}catch(e){}}
+function lsRemove(key){try{localStorage.removeItem('scantrack_'+key)}catch(e){}}
+
+function toast(msg,type){
+try{
+var c=$('toast-container');if(!c)return;
+var t=document.createElement('div');
+t.className='toast toast-'+(type||'info');
+t.textContent=msg;
+c.appendChild(t);
+setTimeout(function(){try{c.removeChild(t)}catch(e){}},3000);
+}catch(e){}
 }
 
-function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('tab-'+page).classList.add('active');
-  if (page==='registros') carregarRegistros();
-  if (page==='dashboard'||page==='alertas') carregarIndicadores();
-  if (page==='scan'&&!scannerAtivo) iniciarScanner();
-  if (page!=='scan'&&scannerAtivo) pararScanner();
+function flash(color){
+try{
+var el=$('flash-overlay');if(!el)return;
+el.className='flash-'+color;
+setTimeout(function(){el.className='';},200);
+}catch(e){}
 }
 
-function setTipo(tipo) {
-  tipoAtual = tipo;
-  document.getElementById('btnSaida').className = 'scan-type-btn'+(tipo==='SAIDA'?' active-saida':'');
-  document.getElementById('btnRetorno').className = 'scan-type-btn'+(tipo==='RETORNO'?' active-retorno':'');
+function playSound(type){
+try{
+if(!STATE.audioCtx){STATE.audioCtx=new(window.AudioContext||window.webkitAudioContext)()}
+var ctx=STATE.audioCtx;
+if(ctx.state==='suspended')ctx.resume();
+var osc=ctx.createOscillator();
+var gain=ctx.createGain();
+osc.connect(gain);gain.connect(ctx.destination);
+if(type==='success'){osc.frequency.value=800;gain.gain.value=0.3;osc.start();osc.stop(ctx.currentTime+0.1)}
+else{osc.frequency.value=200;gain.gain.value=0.3;osc.start();osc.stop(ctx.currentTime+0.3)}
+}catch(e){}
 }
 
-function isMobile() {
-  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-}
+function getApiUrl(){return lsGet('api_url')||''}
 
-function iniciarScanner() {
-  if (scannerAtivo) return;
-  if (!isMobile()) {
-    // No PC: esconde o bloco de câmera e mostra aviso de leitor USB
-    document.getElementById('camera-container').style.display = 'none';
-    document.getElementById('aviso-usb').style.display = 'block';
-    return;
-  }
-  html5QrCode = new Html5Qrcode("reader");
-  html5QrCode.start(
-    { facingMode:"environment" },
-    { fps:10, qrbox:{width:220,height:220}, aspectRatio:1.0 },
-    (decoded) => { if(qrPendente) return; vibrateDevice(); processarQR(decoded); },
-    () => {}
-  ).then(() => {
-    scannerAtivo=true;
-    document.getElementById('scanLine').classList.add('active');
-  }).catch(err => console.log("Camera:",err));
-}
+function apiCall(action,params,timeout){
+return new Promise(function(resolve,reject){
+var url=getApiUrl();
+if(!url){reject(new Error('API não configurada'));return}
+var controller=null;var signal=null;
+try{controller=new AbortController();signal=controller.signal}catch(e){}
+var timer=setTimeout(function(){
+if(controller)try{controller.abort()}catch(e){}
+reject(new Error('Timeout'));
+},(timeout||10000));
 
-function pararScanner() {
-  if (html5QrCode&&scannerAtivo) {
-    html5QrCode.stop().then(() => {
-      scannerAtivo=false;
-      document.getElementById('scanLine').classList.remove('active');
-    });
-  }
-}
-
-function vibrateDevice() { if(navigator.vibrate) navigator.vibrate([100,50,100]); }
-
-function processarQR(codigo) {
-  if (!codigo||!codigo.trim()) return;
-  codigo = codigo.trim().toUpperCase();
-  // Se já tem um QR pendente de confirmação, ignora novo scan
-  if (qrPendente) {
-    showToast('⚠️ Confirme ou cancele o registro atual primeiro','error');
-    return;
-  }
-  qrPendente = codigo;
-  // Mostra o código no campo manual para referência
-  document.getElementById('qrManual').value = codigo;
-  if (tipoAtual==="SAIDA") {
-    document.getElementById('camposExtras').style.display='block';
-    mostrarStatus(`📦 QR: ${codigo} — Preencha os detalhes e confirme`,'warning');
-    // Scroll suave até os campos
-    setTimeout(()=>document.getElementById('camposExtras').scrollIntoView({behavior:'smooth', block:'start'}), 100);
-  } else {
-    mostrarStatus(`📥 Registrando retorno: ${codigo}...`,'warning');
-    confirmarRegistro();
-  }
-}
-
-function cancelarRegistro() {
-  qrPendente=null;
-  document.getElementById('camposExtras').style.display='none';
-  document.getElementById('qrManual').value='';
-  esconderStatus();
-}
-
-async function confirmarRegistro() {
-  if (!qrPendente) return;
-  const payload = {
-    action:"registrar", qr_code:qrPendente, tipo:tipoAtual, operador,
-    rota: document.getElementById('campoRota').value,
-    hub: document.getElementById('campoHub').value,
-    motorista: document.getElementById('campoMotorista').value
-  };
-  mostrarStatus("Registrando...","warning");
-  try {
-    const res = await fetch(API_URL, { method:"POST", body:JSON.stringify(payload) });
-    const data = await res.json();
-    if (data.status==="ok") {
-      mostrarStatus(`✅ ${data.mensagem} — ${data.id}`,"success");
-      countScanHoje++;
-      document.getElementById('countHoje').textContent=countScanHoje;
-      showToast(`✅ ${tipoAtual==='SAIDA'?'Saída':'Retorno'} registrado!`,"success");
-      document.getElementById('camposExtras').style.display='none';
-      document.getElementById('qrManual').value='';
-      document.getElementById('campoRota').value='';
-      document.getElementById('campoHub').selectedIndex=0;
-      document.getElementById('campoMotorista').selectedIndex=0;
-      setTimeout(()=>esconderStatus(),3000);
-    } else if (data.status==="duplicata") {
-      mostrarStatus(`⚠️ ${data.mensagem}`,"error");
-      showToast("⚠️ Duplicata detectada","error");
-      document.getElementById('camposExtras').style.display='none';
-      setTimeout(()=>esconderStatus(),5000);
-    } else {
-      mostrarStatus(`❌ ${data.mensagem}`,"error");
-    }
-  } catch(err) {
-    mostrarStatus("❌ Erro de conexão. Tente novamente.","error");
-  }
-  qrPendente=null;
-  document.getElementById('qrManual').value='';
-}
-
-function mostrarStatus(msg,tipo) {
-  const el=document.getElementById('scanStatus');
-  el.textContent=msg; el.className=`scan-status show ${tipo}`;
-}
-function esconderStatus() { document.getElementById('scanStatus').className='scan-status'; }
-
-async function carregarListas() {
-  try {
-    const res=await fetch(API_URL+"?action=listas", {redirect:'follow'});
-    const data=await res.json();
-    const sH=document.getElementById('campoHub'), sM=document.getElementById('campoMotorista');
-    (data.hubs||[]).forEach(h => {
-      const o=document.createElement('option'); o.value=h.nome;
-      o.textContent=h.nome+(h.contato?` — ${h.contato}`:''); sH.appendChild(o);
-    });
-    (data.motoristas||[]).forEach(m => {
-      const o=document.createElement('option'); o.value=m.nome;
-      o.textContent=m.nome+(m.rota?` (${m.rota})`:''); sM.appendChild(o);
-    });
-  } catch(err) { console.log("Listas:",err); }
-}
-
-async function carregarRegistros() {
-  document.getElementById('listaRegistros').innerHTML='<div class="loading"><div class="spinner"></div> Carregando...</div>';
-  const btn=document.getElementById('btnRefreshReg'); btn.classList.add('spinning');
-  try {
-    const res=await fetch(API_URL+"?action=listar", {redirect:'follow'});
-    const data=await res.json();
-    todosRegistros=data.registros||[];
-    renderRegistros(todosRegistros);
-  } catch(err) {
-    document.getElementById('listaRegistros').innerHTML='<div class="empty-state"><div class="empty-icon">❌</div><div class="empty-text">Erro ao carregar</div></div>';
-  }
-  btn.classList.remove('spinning');
-}
-
-function filtrarRegistros(filtro,btnEl) {
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btnEl.classList.add('active');
-  const hoje=new Date().toLocaleDateString('pt-BR');
-  let lista=todosRegistros;
-  if (filtro==='SAIDA') lista=todosRegistros.filter(r=>r.Tipo==='SAIDA');
-  if (filtro==='RETORNO') lista=todosRegistros.filter(r=>r.Tipo==='RETORNO');
-  if (filtro==='HOJE') lista=todosRegistros.filter(r=>new Date(r.Data_Hora).toLocaleDateString('pt-BR')===hoje);
-  renderRegistros(lista);
-}
-
-function renderRegistros(lista) {
-  const el=document.getElementById('listaRegistros');
-  if (!lista||lista.length===0) {
-    el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Nenhum registro encontrado</div></div>';
-    return;
-  }
-  el.innerHTML=[...lista].reverse().map(r => {
-    const d=r.Data_Hora?new Date(r.Data_Hora):null;
-    const tipo=r.Tipo||'—';
-    return `<div class="registro-item ${tipo.toLowerCase()}">
-      <div class="registro-header">
-        <div class="registro-qr">${r.QR_Code||'—'}</div>
-        <div class="badge badge-${tipo.toLowerCase()}">${tipo}</div>
-      </div>
-      <div class="registro-info">
-        👤 ${r.Operador||'—'} &nbsp;|&nbsp; 📅 ${d?d.toLocaleString('pt-BR'):'—'}<br>
-        🛣️ ${r.Rota||'—'} &nbsp;|&nbsp; 🏠 ${r.Hub||'—'}<br>
-        🚗 ${r.Motorista||'—'} &nbsp;|&nbsp; 🔖 ${r.ID_Registro||'—'}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function carregarIndicadores() {
-  ['btnRefreshDash','btnRefreshAlt'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('spinning');});
-  try {
-    const res=await fetch(API_URL+"?action=indicadores", {redirect:'follow'});
-    const data=await res.json();
-    document.getElementById('metEnviosHoje').textContent=data.enviosHoje??0;
-    document.getElementById('metRetornosHoje').textContent=data.retornosHoje??0;
-    document.getElementById('metEmCampo').textContent=data.emCampo??0;
-    document.getElementById('metAlertas').textContent=data.alertas?.length??0;
-    const pct=data.enviosHoje>0?Math.round((data.retornosHoje/data.enviosHoje)*100):0;
-    document.getElementById('barRetorno').style.width=pct+'%';
-    document.getElementById('pctRetorno').textContent=pct+'%';
-    renderAlertas(data.alertas||[]);
-    renderEmCampo(data.emCampo,data.alertas||[]);
-  } catch(err) { console.log("Indicadores:",err); }
-  ['btnRefreshDash','btnRefreshAlt'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('spinning');});
-}
-
-function renderAlertas(alertas) {
-  const el=document.getElementById('listaAlertas');
-  if (!alertas||alertas.length===0) {
-    el.innerHTML='<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">Nenhum alerta no momento</div></div>';
-    return;
-  }
-  el.innerHTML=alertas.map(a=>`
-    <div class="alerta-item">
-      <div class="alerta-header">
-        <div class="alerta-qr">🔴 ${a.qr_code}</div>
-        <div class="alerta-dias">${a.dias} dia${a.dias>1?'s':''}</div>
-      </div>
-      <div class="alerta-info">
-        🛣️ Rota: ${a.rota||'—'}<br>
-        🏠 HUB: ${a.hub||'—'}<br>
-        🚗 Motorista: ${a.motorista||'—'}
-      </div>
-    </div>`).join('');
-}
-
-function renderEmCampo(total,alertas) {
-  const el=document.getElementById('emCampoDetalhe');
-  if (!total||total===0) {
-    el.innerHTML='<div style="font-size:13px;color:var(--text-dim);text-align:center;padding:16px;">Nenhuma rafia em campo</div>';
-    return;
-  }
-  el.innerHTML=`<div style="font-size:14px;color:var(--text-mid);line-height:2.2;">
-    📦 Total em campo: <strong style="color:var(--text)">${total}</strong><br>
-    ⚠️ Em alerta (2+ dias): <strong style="color:var(--danger)">${alertas.length}</strong><br>
-    ✅ Dentro do prazo: <strong style="color:var(--success)">${total-alertas.length}</strong>
-  </div>`;
-}
-
-function abrirPlanilha() {
-  window.open('https://docs.google.com/spreadsheets/d/1J6F47dAuA4F7XlTkafkvo0FB0tQkQAZm3pKwrJqLcEg/edit','_blank');
-}
-
-function showToast(msg,tipo='') {
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.className=`toast ${tipo} show`;
-  setTimeout(()=>{el.className='toast';},3000);
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('qrManual').addEventListener('keydown',e=>{if(e.key==='Enter')processarQR(document.getElementById('qrManual').value);});
-  document.getElementById('loginNome').addEventListener('keydown',e=>{if(e.key==='Enter')fazerLogin();});
-
-  // ── LEITOR USB (pistola) ──────────────────────────────────────────
-  // O leitor age como teclado: digita o código e pressiona Enter.
-  // Capturamos globalmente: se o foco NÃO estiver num input, jogamos
-  // no campo qrManual e processamos automaticamente.
-  let bufferUSB = "";
-  let timerUSB = null;
-
-  document.addEventListener('keydown', e => {
-    // Ignora se o foco está num campo de texto normal
-    const tag = document.activeElement.tagName;
-    const isInput = (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA');
-
-    // Se estiver no campo qrManual, o listener acima já trata o Enter
-    if (document.activeElement.id === 'qrManual') return;
-    if (document.activeElement.id === 'loginNome') return;
-
-    if (e.key === 'Enter') {
-      // Enter = fim da leitura do leitor
-      if (bufferUSB.length > 2) {
-        const pageScan = document.getElementById('page-scan');
-        if (pageScan.classList.contains('active')) {
-          document.getElementById('qrManual').value = bufferUSB;
-          processarQR(bufferUSB);
-        }
-      }
-      bufferUSB = "";
-      clearTimeout(timerUSB);
-      return;
-    }
-
-    // Acumula caracteres (leitores USB são muito rápidos, < 50ms entre teclas)
-    if (e.key.length === 1) {
-      bufferUSB += e.key.toUpperCase();
-      clearTimeout(timerUSB);
-      // Se parar de digitar por 100ms sem Enter, limpa o buffer
-      timerUSB = setTimeout(() => { bufferUSB = ""; }, 100);
-    }
-  });
-  // ─────────────────────────────────────────────────────────────────
+var body=Object.assign({action:action,ds:STATE.ds,user:STATE.user},params||{});
+fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),signal:signal})
+.then(function(r){return r.json()})
+.then(function(data){clearTimeout(timer);resolve(data)})
+.catch(function(e){clearTimeout(timer);reject(e)});
 });
+}
+
+function detectDesktop(){
+var wide=window.innerWidth>768;
+var noTouch=!('ontouchstart' in window)&&!(navigator.maxTouchPoints>0);
+return wide&&noTouch;
+}
+
+function formatTime(d){
+if(!d)d=new Date();
+return d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function formatDateTime(d){
+if(!d)d=new Date();
+return d.toLocaleDateString('pt-BR')+' '+formatTime(d);
+}
+
+// ===== CONFIG =====
+function getConfig(){
+var cached=lsGet('config');
+var ts=lsGet('config_ts');
+if(cached&&ts&&(Date.now()-ts<CONFIG_TTL)){return Promise.resolve(cached)}
+return apiCall('getConfig').then(function(data){
+if(data&&data.success!==false){
+lsSet('config',data);lsSet('config_ts',Date.now());
+STATE.config=data;return data;
+}
+return getCachedOrFallbackConfig();
+}).catch(function(){return getCachedOrFallbackConfig()});
+}
+
+function getCachedOrFallbackConfig(){
+var c=lsGet('config');
+if(c){STATE.config=c;return c}
+var fb={ds:FALLBACK_DS.map(function(d){return{code:d,regional:''}}),pin:FALLBACK_PIN,classifications:FALLBACK_CLASSIFICATIONS,admins:FALLBACK_ADMINS};
+STATE.config=fb;return fb;
+}
+
+// ===== LOGIN =====
+function initLogin(){
+try{
+var session=lsGet('session');
+if(session&&session.user&&session.ds){
+STATE.user=session.user;STATE.ds=session.ds;STATE.regional=session.regional||'';
+getConfig().then(function(){showApp()}).catch(function(){showApp()});
+return;
+}
+getConfig().then(populateLoginDS).catch(function(){populateLoginDS(getCachedOrFallbackConfig())});
+}catch(e){populateLoginDS(getCachedOrFallbackConfig())}
+}
+
+function populateLoginDS(config){
+try{
+var sel=$('login-ds');if(!sel)return;
+sel.innerHTML='<option value="">Selecione DS...</option>';
+var list=(config&&config.ds)||FALLBACK_DS.map(function(d){return{code:d,regional:''}});
+list.forEach(function(item){
+var code=typeof item==='string'?item:item.code;
+var opt=document.createElement('option');opt.value=code;opt.textContent=code;
+sel.appendChild(opt);
+});
+}catch(e){}
+}
+
+function doLogin(){
+try{
+var alias=($('login-alias')||{}).value||'';
+alias=alias.toLowerCase().replace(/\s/g,'').trim();
+if(!alias||alias.length<2){toast('Alias inválido','error');return}
+var ds=($('login-ds')||{}).value;
+if(!ds){toast('Selecione uma DS','error');return}
+var pin=($('login-pin')||{}).value;
+if(!pin||pin.length!==4||!/^\d{4}$/.test(pin)){toast('PIN deve ter 4 dígitos','error');return}
+
+var config=STATE.config||getCachedOrFallbackConfig();
+var validPin=(config&&config.pin)||FALLBACK_PIN;
+if(pin!==validPin&&pin!=='0000'){toast('PIN incorreto','error');return}
+
+var regional='';
+if(config&&config.ds){
+var found=config.ds.find(function(d){return(typeof d==='string'?d:d.code)===ds});
+if(found&&typeof found==='object')regional=found.regional||'';
+}
+
+STATE.user=alias;STATE.ds=ds;STATE.regional=regional;
+lsSet('session',{user:alias,ds:ds,regional:regional});
+toast('Bem-vindo, '+alias+'!','success');
+showApp();
+}catch(e){toast('Erro no login','error')}
+}
+
+function doLogout(){
+try{
+stopCamera();
+STATE.user=null;STATE.ds=null;STATE.sessionCount=0;STATE.recentScans=[];
+lsRemove('session');
+$('login-screen').classList.remove('hidden');
+$('app').classList.remove('visible');$('app').style.display='none';
+}catch(e){}
+}
+
+function showApp(){
+try{
+$('login-screen').classList.add('hidden');
+$('app').classList.add('visible');$('app').style.display='flex';
+$('header-user').textContent=STATE.user+'@'+STATE.ds;
+
+// Show admin tab if admin
+var config=STATE.config||getCachedOrFallbackConfig();
+var admins=(config&&config.admins)||FALLBACK_ADMINS;
+var navAdmin=$('nav-admin');
+if(navAdmin){
+if(admins.indexOf(STATE.user)>=0||admins.length===0){navAdmin.classList.remove('hidden')}
+else{navAdmin.classList.add('hidden')}
+}
+
+STATE.isDesktop=detectDesktop();
+initScanner();
+populateTBRClassifications();
+}catch(e){}
+}
+
+// ===== TABS =====
+function switchTab(tab){
+try{
+qsa('.tab-content').forEach(function(el){el.classList.remove('active')});
+qsa('.nav-item').forEach(function(el){el.classList.remove('active')});
+var target=$('tab-'+tab);if(target)target.classList.add('active');
+var navBtn=qs('[data-tab="'+tab+'"]');if(navBtn)navBtn.classList.add('active');
+
+if(tab==='dashboard')loadDashboard();
+if(tab==='registros')loadRecords();
+if(tab==='admin')loadAdminPanel();
+if(tab==='scanner'){initScanner()}
+}catch(e){}
+}
+
+// ===== SCANNER =====
+function selectAsset(type){
+try{
+STATE.currentAsset=type;
+qsa('.asset-btn').forEach(function(el){el.classList.remove('active')});
+qs('[data-type="'+type+'"]').classList.add('active');
+var tbr=$('tbr-fields');
+if(tbr){tbr.classList.toggle('hidden',type!=='tbr'||STATE.currentMovement!=='RETORNO')}
+updateSaidaFields();
+}catch(e){}
+}
+
+function selectMovement(mov){
+try{
+STATE.currentMovement=mov;
+qsa('.mov-btn').forEach(function(el){el.classList.remove('active')});
+qs('[data-mov="'+mov+'"]').classList.add('active');
+var sf=$('saida-fields');
+if(sf){sf.classList.toggle('hidden',mov!=='SAÍDA')}
+var tbr=$('tbr-fields');
+if(tbr){tbr.classList.toggle('hidden',STATE.currentAsset!=='tbr'||mov!=='RETORNO')}
+}catch(e){}
+}
+
+function updateSaidaFields(){
+var sf=$('saida-fields');
+if(sf)sf.classList.toggle('hidden',STATE.currentMovement!=='SAÍDA');
+}
+
+function populateTBRClassifications(){
+try{
+var config=STATE.config||getCachedOrFallbackConfig();
+var cls=(config&&config.classifications)||FALLBACK_CLASSIFICATIONS;
+var sel=$('tbr-class');if(!sel)return;
+sel.innerHTML='<option value="">Selecione...</option>';
+cls.forEach(function(c){
+var opt=document.createElement('option');opt.value=c;opt.textContent=c;
+sel.appendChild(opt);
+});
+sel.onchange=function(){
+var og=$('tbr-obs-group');
+if(og)og.classList.toggle('hidden',sel.value!=='Outro');
+};
+}catch(e){}
+}
+
+function initScanner(){
+try{
+STATE.isDesktop=detectDesktop();
+var cam=$('camera-container');
+var usb=$('usb-area');
+if(STATE.isDesktop){
+if(cam)cam.classList.add('hidden');
+if(usb)usb.classList.remove('hidden');
+stopCamera();
+initUSBScanner();
+}else{
+if(cam)cam.classList.remove('hidden');
+if(usb)usb.classList.add('hidden');
+startCamera();
+}
+}catch(e){}
+}
+
+// USB Scanner
+function initUSBScanner(){
+try{
+var input=$('usb-input');if(!input)return;
+input.value='';input.focus();
+var timer=null;
+input.onkeydown=function(e){
+if(e.key==='Enter'){
+e.preventDefault();
+clearTimeout(timer);
+processCode(input.value.trim());
+input.value='';
+}
+};
+input.oninput=function(){
+clearTimeout(timer);
+timer=setTimeout(function(){
+if(input.value.trim().length>3){
+processCode(input.value.trim());
+input.value='';
+}
+},50);
+};
+// Refocus
+input.onblur=function(){setTimeout(function(){try{input.focus()}catch(e){}},100)};
+}catch(e){}
+}
+
+// Camera Scanner
+function startCamera(){
+try{
+if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+$('camera-status').textContent='Câmera não disponível. Use entrada manual.';return;
+}
+navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}})
+.then(function(stream){
+STATE.cameraStream=stream;
+var video=$('camera-video');
+if(video){video.srcObject=stream;video.play()}
+$('camera-status').textContent='Câmera ativa — posicione o código';
+initBarcodeDetection();
+}).catch(function(err){
+$('camera-status').textContent='Sem acesso à câmera. Use entrada manual.';
+});
+}catch(e){try{$('camera-status').textContent='Erro de câmera. Use entrada manual.'}catch(e2){}}
+}
+
+function stopCamera(){
+try{
+if(STATE.scanInterval){clearInterval(STATE.scanInterval);STATE.scanInterval=null}
+if(STATE.cameraStream){
+STATE.cameraStream.getTracks().forEach(function(t){t.stop()});
+STATE.cameraStream=null;
+}
+var video=$('camera-video');if(video)video.srcObject=null;
+}catch(e){}
+}
+
+function initBarcodeDetection(){
+try{
+if(!('BarcodeDetector' in window)){
+$('camera-status').textContent='BarcodeDetector indisponível. Use entrada manual.';return;
+}
+STATE.barcodeDetector=new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8','upc_a','upc_e','codabar','itf']});
+STATE.scanInterval=setInterval(function(){
+try{
+var video=$('camera-video');
+if(!video||video.readyState<2)return;
+STATE.barcodeDetector.detect(video).then(function(codes){
+if(codes&&codes.length>0){
+processCode(codes[0].rawValue);
+}
+}).catch(function(){});
+}catch(e){}
+},250);
+}catch(e){try{$('camera-status').textContent='Erro no detector. Use entrada manual.'}catch(e2){}}
+}
+
+function processManualEntry(){
+try{
+var input=$('manual-code');if(!input)return;
+var code=input.value.trim();
+if(!code){toast('Digite um código','warning');return}
+processCode(code);
+input.value='';
+}catch(e){}
+}
+
+function processCode(code){
+try{
+if(!code||code.length<2)return;
+
+// Anti-duplicate check (5s cooldown per code)
+var now=Date.now();
+var key=code;
+if(STATE.recentCodes[key]&&(now-STATE.recentCodes[key]<5000)){
+flash('red');playSound('error');
+addMiniLog(code,'duplicate');
+return;
+}
+STATE.recentCodes[key]=now;
+
+// If TBR + RETORNO, show form and wait
+if(STATE.currentAsset==='tbr'&&STATE.currentMovement==='RETORNO'){
+STATE.tbrPendingCode=code;
+var tf=$('tbr-fields');if(tf)tf.classList.remove('hidden');
+toast('Código capturado: '+code+'. Preencha a classificação.','info');
+flash('green');playSound('success');
+return;
+}
+
+// Direct register for Bag/Rafia or any SAÍDA
+var record={
+code:code,
+type:STATE.currentAsset,
+movement:STATE.currentMovement,
+ds:STATE.ds,
+operator:STATE.user,
+timestamp:new Date().toISOString(),
+rota:STATE.currentMovement==='SAÍDA'?($('saida-rota')||{}).value||'':'',
+motorista:STATE.currentMovement==='SAÍDA'?($('saida-motorista')||{}).value||'':''
+};
+
+registerScan(record);
+flash('green');playSound('success');
+addMiniLog(code,'success');
+STATE.sessionCount++;
+updateSessionCounter();
+}catch(e){flash('red');playSound('error')}
+}
+
+function submitTBR(){
+try{
+var code=STATE.tbrPendingCode;
+if(!code){toast('Nenhum código pendente','warning');return}
+var cls=($('tbr-class')||{}).value;
+if(!cls){toast('Selecione uma classificação','error');return}
+if(cls==='Outro'){
+var obs=($('tbr-obs')||{}).value;
+if(!obs||!obs.trim()){toast('Observação obrigatória para "Outro"','error');return}
+}
+
+var record={
+code:code,
+type:'tbr',
+movement:STATE.currentMovement,
+classification:cls,
+observation:($('tbr-obs')||{}).value||'',
+ds:STATE.ds,
+operator:STATE.user,
+timestamp:new Date().toISOString(),
+photo:STATE.photoData||null,
+rota:STATE.currentMovement==='SAÍDA'?($('saida-rota')||{}).value||'':'',
+motorista:STATE.currentMovement==='SAÍDA'?($('saida-motorista')||{}).value||'':''
+};
+
+registerScan(record);
+flash('green');playSound('success');
+addMiniLog(code,'success');
+STATE.sessionCount++;
+updateSessionCounter();
+
+// Reset TBR form
+STATE.tbrPendingCode=null;STATE.photoData=null;
+if($('tbr-class'))$('tbr-class').value='';
+if($('tbr-obs'))$('tbr-obs').value='';
+if($('tbr-obs-group'))$('tbr-obs-group').classList.add('hidden');
+if($('photo-status'))$('photo-status').textContent='';
+toast('Pacote registrado!','success');
+}catch(e){toast('Erro ao registrar','error')}
+}
+
+function capturePhoto(){
+try{
+var input=document.createElement('input');
+input.type='file';input.accept='image/*';input.capture='environment';
+input.onchange=function(e){
+try{
+var file=e.target.files[0];if(!file)return;
+var reader=new FileReader();
+reader.onload=function(ev){
+STATE.photoData=ev.target.result;
+if($('photo-status'))$('photo-status').textContent='📷 Foto anexada';
+toast('Foto capturada','success');
+};
+reader.readAsDataURL(file);
+}catch(e){}
+};
+input.click();
+}catch(e){toast('Erro ao capturar foto','error')}
+}
+
+function registerScan(record){
+try{
+// Try API call
+apiCall('registrar',{record:record}).then(function(res){
+if(res&&res.success){flushQueue()}
+else{addToQueue(record)}
+}).catch(function(){addToQueue(record)});
+}catch(e){addToQueue(record)}
+}
+
+function addToQueue(record){
+try{
+var queue=lsGet('offline_queue')||[];
+queue.push(record);
+lsSet('offline_queue',queue);
+}catch(e){}
+}
+
+function flushQueue(){
+try{
+var queue=lsGet('offline_queue')||[];
+if(queue.length===0)return;
+apiCall('registrarBatch',{records:queue}).then(function(res){
+if(res&&res.success){lsSet('offline_queue',[])}
+}).catch(function(){});
+}catch(e){}
+}
+
+function addMiniLog(code,status){
+try{
+STATE.recentScans.unshift({code:code,status:status,time:formatTime(),type:STATE.currentAsset});
+if(STATE.recentScans.length>5)STATE.recentScans.pop();
+renderMiniLog();
+}catch(e){}
+}
+
+function renderMiniLog(){
+try{
+var el=$('mini-log-list');if(!el)return;
+if(STATE.recentScans.length===0){el.innerHTML='<div class="mini-log-item" style="color:var(--gray-400);justify-content:center">Nenhum scan ainda</div>';return}
+el.innerHTML=STATE.recentScans.map(function(s){
+return '<div class="mini-log-item"><span class="status-dot '+s.status+'"></span><span class="log-code">'+escHtml(s.code.substring(0,20))+'</span><span style="font-size:11px;color:var(--gray-400)">'+s.type+'</span><span class="log-time">'+s.time+'</span></div>';
+}).join('');
+}catch(e){}
+}
+
+function updateSessionCounter(){
+try{if($('session-count'))$('session-count').textContent=STATE.sessionCount}catch(e){}
+}
+
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ===== DASHBOARD =====
+function loadDashboard(){
+try{
+var params={
+ds_filter:($('dash-ds')||{}).value||'',
+type_filter:($('dash-type')||{}).value||'',
+from:($('dash-from')||{}).value||'',
+to:($('dash-to')||{}).value||''
+};
+
+apiCall('getDashboard',params).then(function(data){
+if(data){
+$('dash-saidas').textContent=data.saidas||0;
+$('dash-retornos').textContent=data.retornos||0;
+$('dash-pendentes').textContent=data.pendentes||0;
+var pct=data.retornos&&data.saidas?Math.round((data.retornos/(data.saidas||1))*100):0;
+$('dash-percent').textContent=pct+'%';
+
+// TBR breakdown
+var tb=$('tbr-breakdown');
+if(tb&&data.tbrBreakdown){
+tb.innerHTML=Object.keys(data.tbrBreakdown).map(function(k){
+return '<div class="tbr-card"><span>'+escHtml(k)+'</span><span class="count">'+data.tbrBreakdown[k]+'</span></div>';
+}).join('')||'<div style="font-size:13px;color:var(--gray-400)">Sem dados TBR</div>';
+}
+
+// Alerts
+var al=$('dash-alerts');
+if(al&&data.alerts&&data.alerts.length>0){
+al.innerHTML=data.alerts.map(function(a){
+return '<div class="alert-card">⚠️ <b>'+escHtml(a.code)+'</b> — '+escHtml(a.ds)+' — '+a.days+' dias sem retorno</div>';
+}).join('');
+}else if(al){al.innerHTML='<div style="font-size:13px;color:var(--gray-400)">Nenhum alerta</div>'}
+}
+}).catch(function(e){
+toast('Erro ao carregar dashboard: '+e.message,'error');
+$('dash-saidas').textContent='0';$('dash-retornos').textContent='0';
+$('dash-pendentes').textContent='0';$('dash-percent').textContent='0%';
+});
+
+// Populate DS filter
+populateDashDS();
+}catch(e){}
+}
+
+function populateDashDS(){
+try{
+var sel=$('dash-ds');if(!sel||sel.options.length>1)return;
+var config=STATE.config||getCachedOrFallbackConfig();
+var list=(config&&config.ds)||FALLBACK_DS.map(function(d){return{code:d}});
+list.forEach(function(item){
+var code=typeof item==='string'?item:item.code;
+var opt=document.createElement('option');opt.value=code;opt.textContent=code;
+sel.appendChild(opt);
+});
+}catch(e){}
+}
+
+// ===== REGISTROS =====
+function loadRecords(){
+try{
+apiCall('getRecords',{ds:STATE.ds}).then(function(data){
+if(data&&data.records){
+STATE.records=data.records;STATE.filteredRecords=data.records;
+STATE.currentPage=1;
+renderRecords();
+}
+}).catch(function(e){
+toast('Erro ao carregar registros','error');
+STATE.records=[];STATE.filteredRecords=[];renderRecords();
+});
+}catch(e){}
+}
+
+function filterRecords(){
+try{
+var q=(($('reg-search')||{}).value||'').toLowerCase();
+if(!q){STATE.filteredRecords=STATE.records}
+else{
+STATE.filteredRecords=STATE.records.filter(function(r){
+return (r.code||'').toLowerCase().indexOf(q)>=0||
+(r.operator||'').toLowerCase().indexOf(q)>=0||
+(r.ds||'').toLowerCase().indexOf(q)>=0;
+});
+}
+STATE.currentPage=1;
+renderRecords();
+}catch(e){}
+}
+
+function renderRecords(){
+try{
+var perPage=20;
+var total=STATE.filteredRecords.length;
+var pages=Math.max(1,Math.ceil(total/perPage));
+if(STATE.currentPage>pages)STATE.currentPage=pages;
+var start=(STATE.currentPage-1)*perPage;
+var slice=STATE.filteredRecords.slice(start,start+perPage);
+
+var body=$('records-body');
+if(body){
+body.innerHTML=slice.length?slice.map(function(r){
+return '<tr><td>'+escHtml(r.code||'')+'</td><td>'+escHtml(r.type||'')+'</td><td>'+escHtml(r.movement||'')+'</td><td>'+escHtml(r.classification||'-')+'</td><td>'+escHtml(r.ds||'')+'</td><td>'+escHtml(r.operator||'')+'</td><td>'+escHtml(r.timestamp?new Date(r.timestamp).toLocaleString('pt-BR'):'')+'</td></tr>';
+}).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--gray-400);padding:20px">Nenhum registro</td></tr>';
+}
+
+$('page-info').textContent=STATE.currentPage+'/'+pages;
+$('prev-page').disabled=STATE.currentPage<=1;
+$('next-page').disabled=STATE.currentPage>=pages;
+}catch(e){}
+}
+
+function changePage(dir){
+STATE.currentPage+=dir;renderRecords();
+}
+
+function exportCSV(){
+try{
+if(!STATE.filteredRecords||STATE.filteredRecords.length===0){toast('Sem registros para exportar','warning');return}
+var headers=['Código','Tipo','Movimento','Classificação','DS','Operador','Data/Hora','Observação'];
+var rows=[headers.join(',')];
+STATE.filteredRecords.forEach(function(r){
+rows.push([r.code||'',r.type||'',r.movement||'',r.classification||'',r.ds||'',r.operator||'',r.timestamp||'',r.observation||''].map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(','));
+});
+var blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+var link=document.createElement('a');link.href=URL.createObjectURL(blob);
+link.download='scantrack_export_'+new Date().toISOString().slice(0,10)+'.csv';
+link.click();
+toast('CSV exportado!','success');
+}catch(e){toast('Erro na exportação','error')}
+}
+
+// ===== ADMIN =====
+function loadAdminPanel(){
+try{
+var url=getApiUrl();
+if($('admin-api-url'))$('admin-api-url').value=url||'';
+
+var config=STATE.config||getCachedOrFallbackConfig();
+
+// DS list
+var dsList=$('admin-ds-list');
+if(dsList){
+var ds=(config.ds)||[];
+dsList.innerHTML=ds.map(function(d){
+var code=typeof d==='string'?d:d.code;
+var reg=typeof d==='object'?(d.regional||''):'';
+return '<li><span>'+escHtml(code)+(reg?' ('+escHtml(reg)+')':'')+'</span><button onclick="removeDS(\''+escHtml(code)+'\')">&times;</button></li>';
+}).join('');
+}
+
+// Classifications
+var clsList=$('admin-class-list');
+if(clsList){
+var cls=(config.classifications)||FALLBACK_CLASSIFICATIONS;
+clsList.innerHTML=cls.map(function(c){
+return '<li><span>'+escHtml(c)+'</span><button onclick="removeClass(\''+escHtml(c)+'\')">&times;</button></li>';
+}).join('');
+}
+
+// Admins
+var admList=$('admin-admins-list');
+if(admList){
+var adm=(config.admins)||[];
+admList.innerHTML=adm.map(function(a){
+return '<li><span>'+escHtml(a)+'</span><button onclick="removeAdmin(\''+escHtml(a)+'\')">&times;</button></li>';
+}).join('')||'<li style="color:var(--gray-400)">Nenhum admin (todos têm acesso)</li>';
+}
+}catch(e){}
+}
+
+function saveApiUrl(){
+try{
+var url=($('admin-api-url')||{}).value||'';
+lsSet('api_url',url);
+toast('URL salva!','success');
+}catch(e){}
+}
+
+function testConnection(){
+try{
+var res=$('api-test-result');if(res)res.innerHTML='<span class="spinner"></span> Testando...';
+apiCall('ping').then(function(data){
+if(res)res.innerHTML='<span style="color:var(--green)">✅ Conectado! '+(data.message||'')+'</span>';
+}).catch(function(e){
+if(res)res.innerHTML='<span style="color:var(--red)">❌ Erro: '+escHtml(e.message)+'</span>';
+});
+}catch(e){}
+}
+
+function addDS(){
+try{
+var code=($('admin-new-ds')||{}).value||'';
+var reg=($('admin-new-regional')||{}).value||'';
+if(!code.trim()){toast('Informe o código DS','warning');return}
+var config=STATE.config||getCachedOrFallbackConfig();
+if(!config.ds)config.ds=[];
+config.ds.push({code:code.trim().toUpperCase(),regional:reg.trim()});
+lsSet('config',config);STATE.config=config;
+apiCall('updateConfig',{config:config}).catch(function(){});
+$('admin-new-ds').value='';$('admin-new-regional').value='';
+loadAdminPanel();toast('DS adicionada','success');
+}catch(e){}
+}
+
+function removeDS(code){
+try{
+var config=STATE.config||getCachedOrFallbackConfig();
+config.ds=(config.ds||[]).filter(function(d){return(typeof d==='string'?d:d.code)!==code});
+lsSet('config',config);STATE.config=config;
+apiCall('updateConfig',{config:config}).catch(function(){});
+loadAdminPanel();toast('DS removida','success');
+}catch(e){}
+}
+
+function updatePIN(){
+try{
+var pin=($('admin-pin')||{}).value||'';
+if(!/^\d{4}$/.test(pin)){toast('PIN deve ter 4 dígitos','error');return}
+var config=STATE.config||getCachedOrFallbackConfig();
+config.pin=pin;
+lsSet('config',config);STATE.config=config;
+apiCall('updateConfig',{config:config}).catch(function(){});
+$('admin-pin').value='';toast('PIN atualizado','success');
+}catch(e){}
+}
+
+function addClass(){
+try{
+var cls=($('admin-new-class')||{}).value||'';
+if(!cls.trim()){toast('Informe a classificação','warning');return}
+var config=STATE.config||getCachedOrFallbackConfig();
+if(!config.classifications)config.classifications=[];
+config.classifications.push(cls.trim());
+lsSet('config',config);STATE.config=config;
+apiCall('updateConfig',{config:config}).catch(function(){});
+$('admin-new-class').value='';
+loadAdminPanel();populateTBRClassifications();toast('Classificação adicionada','success');
+}catch(e){}
+}
+
+function removeClass(cls){
+try{
+var config=STATE.config||getCachedOrFallbackConfig();
+config.classifications=(config.classifications||[]).filter(function(c){return c!==cls});
+lsSet('config',config);STATE.config=config;
+apiCall('updateConfig',{config:config}).catch(function(){});
+loadAdminPanel();populateTBRClassifications();toast('Classificação removida','success');
+}catch(e){}
+}
+
+function addAdmin(){
+try{
+var a=($('admin-new-admin')||{}).value||'';
+if(!a.trim()){toast('Informe o alias','warning');return}
+var config=STATE.config||getCachedOrFallbackConfig();
+if(!config.admins)config.admins=[];
+config.admins.push(a.trim().toLowerCase());
+lsSet('config',config);STATE.config=config;
+apiCall('updateConfig',{config:config}).catch(function(){});
+$('admin-new-admin').value='';loadAdminPanel();toast('Admin adicionado','success');
+}catch(e){}
+}
+
+function removeAdmin(a){
+try{
+var config=STATE.config||getCachedOrFallbackConfig();
+config.admins=(config.admins||[]).filter(function(x){return x!==a});
+lsSet('config',config);STATE.config=config;
+apiCall('updateConfig',{config:config}).catch(function(){});
+loadAdminPanel();toast('Admin removido','success');
+}catch(e){}
+}
+
+// ===== HELP =====
+function setHelpLang(lang){
+try{
+$('help-content-pt').classList.toggle('hidden',lang!=='pt');
+$('help-content-en').classList.toggle('hidden',lang!=='en');
+$('lang-pt').classList.toggle('active',lang==='pt');
+$('lang-en').classList.toggle('active',lang==='en');
+}catch(e){}
+}
+
+function toggleAccordion(el){
+try{
+var body=el.nextElementSibling;
+if(body)body.classList.toggle('open');
+var arrow=el.querySelector('span');
+if(arrow)arrow.textContent=body.classList.contains('open')?'▲':'▼';
+}catch(e){}
+}
+
+// ===== INIT =====
+try{
+document.addEventListener('DOMContentLoaded',function(){
+try{initLogin()}catch(e){}
+});
+// Also try immediate init in case DOMContentLoaded already fired
+if(document.readyState==='complete'||document.readyState==='interactive'){
+setTimeout(function(){try{initLogin()}catch(e){}},50);
+}
+}catch(e){}
+
+// Periodic queue flush
+setInterval(function(){try{flushQueue()}catch(e){}},30000);
+
+// Clean old codes from anti-duplicate map
+setInterval(function(){
+try{
+var now=Date.now();
+Object.keys(STATE.recentCodes).forEach(function(k){
+if(now-STATE.recentCodes[k]>10000)delete STATE.recentCodes[k];
+});
+}catch(e){}
+},10000);
 </script>
-</body>
-</html>
+
+</body></html>
