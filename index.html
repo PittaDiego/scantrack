@@ -733,7 +733,7 @@ function detectDesktop(){let w=window.innerWidth>768;let noTouch=!('ontouchstart
 // ===== API =====
 async function apiCall(action,params){
 let url=getApiUrl();
-if(!url){toast('Configure a API na aba Admin','error');return null}
+if(!url){return null}
 let body=Object.assign({action},params||{});
 try{
 let r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),redirect:'follow'});
@@ -1478,6 +1478,7 @@ state.offlineQueue=ls('offlineQueue')||[];
 // Try auto-login
 let u=ls('user'),d=ls('ds'),r=ls('regional');
 // Load config first
+populateLoginDS();
 loadConfig(false).then(()=>{
 populateLoginDS();
 if(u&&d){state.user=u;state.ds=d;state.regional=r||'';showApp()}
