@@ -559,7 +559,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 
 <!-- Confirm button for saída/TBR -->
 <div id="confirmArea" class="hidden" style="margin-bottom:12px">
+<div id="pendingCodeDisplay" style="display:none;background:#fff3e0;border:1px solid var(--orange);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;text-align:center">
+📌 Código capturado: <strong id="pendingCodeText" style="font-size:15px;color:var(--navy)">—</strong>
+</div>
 <button class="btn btn-success" style="width:100%;padding:14px;font-size:16px" onclick="confirmScan()" id="confirmBtn">✅ Registrar</button>
+<button class="btn" style="width:100%;padding:8px;font-size:13px;margin-top:6px;background:var(--gray);color:var(--navy)" onclick="cancelPending()">✖ Cancelar</button>
 </div>
 
 <div class="session-counter">Scans desta sessão: <strong id="sessionCount">0</strong></div>
@@ -591,7 +595,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <div class="chart-section"><h3>📋 Pendências Hubs</h3><div class="chart-container" id="chartTable"></div></div>
 <div class="charts-row"><div class="chart-section"><h3 style="font-size:13px;margin-bottom:8px">📊 Envios vs Retornos (7d)</h3><div class="chart-container" id="chartBar" style="max-height:150px;overflow:hidden"></div></div>
 <div class="chart-section"><h3 style="font-size:13px;margin-bottom:8px">❌ Rotas s/ Devolução</h3><div class="chart-container" id="chartRoutes" style="max-height:200px;overflow:hidden"></div></div></div>
-<hr style="margin:20px 0;border:none;border-top:2px solid var(--gray1)">
+<hr style="margin:20px 0;border:none;border-top:2px solid var(--gray2)">
 <div class="card" style="margin-bottom:12px">
 <h4 style="font-size:13px;margin-bottom:10px">📦 TBR por Classificação</h4>
 <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
@@ -698,7 +702,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <button class="nav-btn" data-tab="tabDashboard" onclick="switchTab('tabDashboard',this)"><span class="nav-icon">📊</span>Dashboard</button>
 <button class="nav-btn" data-tab="tabRegistros" onclick="switchTab('tabRegistros',this)"><span class="nav-icon">📋</span>Registros</button>
 <button class="nav-btn" data-tab="tabEnvios" onclick="switchTab('tabEnvios',this)"><span class="nav-icon">📤</span>Envios</button>
-<button class="nav-btn" data-tab="tabAdmin" onclick="switchTab('tabAdmin',this)"><span class="nav-icon">⚙️</span>Admin</button>
+<button class="nav-btn" id="adminNavBtn" data-tab="tabAdmin" onclick="switchTab('tabAdmin',this)"><span class="nav-icon">⚙️</span>Admin</button>
 <button class="nav-btn" data-tab="tabHelp" onclick="switchTab('tabHelp',this)"><span class="nav-icon">❓</span>Como Usar</button>
 </div>
 </div>
@@ -966,18 +970,40 @@ state.pendingCode=code;
 if(state.moveType==='retorno'&&state.scanType!=='Pacote'){
 // Cooldown check
 let key=code+'_'+state.scanType;
-if(lastScans[key]&&(Date.now()-lastScans[key]<COOLDOWN_MS)){toast('Duplicata bloqueada (5s)','warn');return}
+if(lastScans[key]&&(Date.now()-lastScans[key]<COOLDOWN_MS)){toast('Duplicata bloqueada — aguarde 5s','warn');return}
 lastScans[key]=Date.now();
 doRegister(code,state.scanType,'retorno');
 }else if(state.scanType==='Pacote'){
-// Show code, wait for confirm
-toast('Código: '+code+' — Preencha e confirme','warn');
+showPendingCode(code);
+toast('📌 '+code+' — preencha e confirme','warn');
 }else{
-// Saída - wait for confirm
-toast('Código: '+code+' — Confirme a saída','warn');
+showPendingCode(code);
+toast('📌 '+code+' — confirme a saída','warn');
 }
 }catch(e){}
 }
+
+function showPendingCode(code){
+try{
+let pd=$('pendingCodeDisplay'),pt=$('pendingCodeText');
+if(pd)pd.style.display='block';
+if(pt)pt.textContent=code;
+}catch(e){}
+}
+
+function cancelPending(){
+try{
+state.pendingCode=null;
+let pd=$('pendingCodeDisplay');if(pd)pd.style.display='none';
+let pt=$('pendingCodeText');if(pt)pt.textContent='—';
+hide($('confirmArea'));
+if($('tbrClass'))$('tbrClass').value='';
+if($('tbrObs'))$('tbrObs').value='';
+if($('saidaRota'))$('saidaRota').value='';
+if($('saidaMotorista'))$('saidaMotorista').value='';
+}catch(e){}
+}
+window.cancelPending=cancelPending;
 
 function confirmScan(){
 try{
@@ -999,6 +1025,8 @@ let mot=($('saidaMotorista')||{}).value||'';
 doRegister(code,state.scanType,'saida',{rota,motorista:mot});
 }
 state.pendingCode=null;
+let pd=$('pendingCodeDisplay');if(pd)pd.style.display='none';
+let pt=$('pendingCodeText');if(pt)pt.textContent='—';
 }catch(e){toast('Erro ao confirmar','error')}
 }
 window.confirmScan=confirmScan;
@@ -1027,7 +1055,12 @@ function updateMiniLog(){
 try{
 let ml=$('miniLog');if(!ml)return;
 if(!state.recentScans.length){ml.innerHTML='<p style="color:var(--gray3);text-align:center;font-size:12px">Nenhum scan ainda</p>';return}
-let html=state.recentScans.map(s=>'<div class="log-item"><span>'+s.code+'</span><span>'+s.tipo+' • '+s.movimento+'</span><span style="color:'+(s.status==='ok'?'var(--green)':'var(--orange)')+'">'+s.status+'</span></div>').join('');
+let html=state.recentScans.map(s=>{
+let t=s.time;
+let ts=t?t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0')+':'+t.getSeconds().toString().padStart(2,'0'):'';
+let colS=s.status==='ok'?'var(--green)':'var(--orange)';
+return '<div class="log-item"><span style="font-size:10px;color:var(--gray3);min-width:54px">'+ts+'</span><span style="flex:1;margin:0 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.code+'</span><span style="font-size:11px;color:var(--gray3)">'+s.tipo+'</span><span style="font-size:11px;font-weight:600;color:'+colS+'">'+s.status+'</span></div>';
+}).join('');
 ml.innerHTML=html;
 }catch(e){}
 }
@@ -1065,6 +1098,12 @@ let td=today();if($('dashFrom'))$('dashFrom').value=td;if($('dashTo'))$('dashTo'
 
 async function loadDashboard(){
 try{
+// Loading state
+if($('mSaidas')){$('mSaidas').textContent='…';$('mSaidas').style.color='var(--gray3)'}
+if($('mRetornos')){$('mRetornos').textContent='…';$('mRetornos').style.color='var(--gray3)'}
+if($('mPendentes')){$('mPendentes').textContent='…';$('mPendentes').style.color='var(--gray3)'}
+if($('mPctRetorno')){$('mPctRetorno').textContent='…';$('mPctRetorno').style.color='var(--gray3)'}
+if($('mRetAdic')){$('mRetAdic').textContent='…';$('mRetAdic').style.color='#3B82F6'}
 let params={ds:($('dashDS')||{}).value,regional:($('dashRegional')||{}).value,tipo:($('dashTipo')||{}).value,from:($('dashFrom')||{}).value,to:($('dashTo')||{}).value};
 let envData=await apiCall('lerEnvios',params);
 let regData=await apiCall('lerRegistros',params);
@@ -1081,17 +1120,18 @@ var retNormal=retAll.filter(r=>allEnvCodes[r.codigo]);
 var retAdicional=retAll.filter(r=>!allEnvCodes[r.codigo]);
 retornos=retNormal.length;
 tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.datahora&&r.datahora.startsWith(today())).length;
-let weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
-tbrSemana=regArr.filter(r=>{try{if(r.tipo!=='Pacote')return false;var d=new Date(r.datahora);return!isNaN(d.getTime())&&d>=weekAgo}catch(e){return false}}).length;
+var weekAgoD=new Date();weekAgoD.setDate(weekAgoD.getDate()-7);
+var weekAgoStr=weekAgoD.toISOString().split('T')[0];
+tbrSemana=regArr.filter(r=>{try{if(r.tipo!=='Pacote')return false;var ds=(r.datahora||'').split('T')[0];return ds>=weekAgoStr}catch(e){return false}}).length;
 
 let pendentes=Math.max(0,saidas-retornos);
 let pct=saidas?Math.round((retornos/saidas)*100):0;
 
-if($('mSaidas'))$('mSaidas').textContent=saidas;
-if($('mRetornos'))$('mRetornos').textContent=retornos;
-if($('mPendentes'))$('mPendentes').textContent=pendentes;
-if($('mPctRetorno'))$('mPctRetorno').textContent=pct+'%';
-if($('mRetAdic'))$('mRetAdic').textContent=retAdicional.length;
+if($('mSaidas')){$('mSaidas').textContent=saidas;$('mSaidas').style.color='var(--orange)'}
+if($('mRetornos')){$('mRetornos').textContent=retornos;$('mRetornos').style.color='var(--green)'}
+if($('mPendentes')){$('mPendentes').textContent=pendentes;$('mPendentes').style.color=pendentes>0?'var(--red)':'var(--green)'}
+if($('mPctRetorno')){$('mPctRetorno').textContent=pct+'%';$('mPctRetorno').style.color=pct>=80?'var(--green)':pct>=60?'var(--orange)':'var(--red)'}
+if($('mRetAdic')){$('mRetAdic').textContent=retAdicional.length;$('mRetAdic').style.color='#3B82F6'}
 if($('mTbrHoje'))$('mTbrHoje').textContent=tbrHoje;
 if($('mTbrSemana'))$('mTbrSemana').textContent=tbrSemana;
 
@@ -1100,7 +1140,6 @@ renderRoutesChart(envArr,regArr,retNormal);
 renderDonutChart(regArr);
 renderHubTable(envArr,regArr);
 }catch(e){
-// Render demo data
 if($('mSaidas'))$('mSaidas').textContent='—';
 renderBarChart([],[]);renderRoutesChart([],[]);renderDonutChart([]);renderHubTable([],[]);
 }
@@ -1157,10 +1196,10 @@ container.innerHTML=svg;
 function renderDonutChart(regArr){
 try{
 let container=$('tbrClassBadges');if(!container)return;
-let tbrs=regArr.filter(function(r){return r.Tipo==='Pacote'});
+let tbrs=regArr.filter(function(r){return r.tipo==='Pacote'});
 if(!tbrs.length){container.innerHTML='<span style="font-size:11px;color:var(--gray3)">Nenhum TBR registrado</span>';return}
 let counts={};
-tbrs.forEach(function(r){var c=r.Classificacao||'Sem class.';counts[c]=(counts[c]||0)+1});
+tbrs.forEach(function(r){var c=r.classificacao||'Sem class.';counts[c]=(counts[c]||0)+1});
 var colors=['#FF9900','#E74C3C','#00A86B','#3498DB','#9B59B6','#F39C12','#1ABC9C','#E91E63','#607D8B','#795548'];
 var html='';var i=0;
 Object.keys(counts).forEach(function(k){
@@ -1179,7 +1218,7 @@ regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='P
 let sorted=Object.entries(hubs).map(([n,v])=>({name:n,...v,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).sort((a,b)=>b.pend-a.pend).slice(0,10);
 if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
 let html='<table class="data-table"><thead><tr><th>Hub</th><th>Envios</th><th>Retornos</th><th>Pend.</th><th>%</th></tr></thead><tbody>';
-sorted.forEach(h=>{html+='<tr><td>'+h.name+'</td><td>'+h.env+'</td><td>'+h.ret+'</td><td style="color:var(--red)">'+h.pend+'</td><td>'+h.pct+'%</td></tr>'});
+sorted.forEach(h=>{let pctColor=h.pct<80?'color:var(--red);font-weight:700':'';html+='<tr><td>'+h.name+'</td><td>'+h.env+'</td><td>'+h.ret+'</td><td style="color:var(--red);font-weight:600">'+h.pend+'</td><td style="'+pctColor+'">'+h.pct+'%'+(h.pct<80?' 🔴':'')+'</td></tr>'});
 html+='</tbody></table>';
 container.innerHTML=html;
 }catch(e){}
@@ -1284,7 +1323,7 @@ reader.readAsArrayBuffer(file);
 }else if(ext==='csv'||ext==='txt'){
 let reader=new FileReader();
 reader.onload=function(e){
-try{parseCSVData(e.target.result)}catch(ex){toast('Erro ao ler CSV','error')}
+try{parseCSVData(e.target.result,file.name)}catch(ex){toast('Erro ao ler CSV','error')}
 };
 reader.readAsText(file,'UTF-8');
 }else{
@@ -1300,7 +1339,7 @@ try{let data=($('pasteArea')||{}).value;if(data)parseCSVData(data)}catch(e){}
 }
 window.parsePaste=parsePaste;
 
-function parseCSVData(raw){
+function parseCSVData(raw,filename){
 try{
 let lines=raw.split(/\r?\n/);
 let records=[];
@@ -1347,10 +1386,10 @@ show(prev);
 var dupKey='scantrack_dup_'+state.ds+'_'+(filename||date||'').replace(/[^a-zA-Z0-9-_]/g,'');
 var dupVal=null;try{dupVal=localStorage.getItem(dupKey)}catch(e){}
 if(dupVal){
-html='<div class="card" style="border:2px solid var(--red)"><p style="color:var(--red);font-weight:600">⚠️ Este arquivo já foi enviado para '+state.ds+'!</p><p style="font-size:12px;margin-top:8px">Arquivo: '+(filename||'dispatch')+' ('+records.length+' registros). Para reenviar, clique abaixo:</p><button class="btn" style="background:var(--red);color:white;margin-top:8px;width:100%" onclick="forceUploadDispatch()">🔄 Sobrescrever carga</button></div>';
+html='<div class="card" style="border:2px solid var(--red)"><p style="color:var(--red);font-weight:600">⚠️ Este arquivo já foi enviado para '+state.ds+'!</p><p style="font-size:12px;margin-top:8px">Arquivo: '+(filename||'dispatch')+' ('+records.length+' registros). Para reenviar, clique abaixo:</p><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="flex:1;background:var(--red);color:white" onclick="forceUploadDispatch()">🔄 Sobrescrever carga</button><button class="btn" style="background:var(--gray);color:var(--navy)" onclick="cancelDispatch()">✖ Cancelar</button></div></div>';
 prev.innerHTML=html;return;
 }
-prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' Bags — '+rotas+' rotas — Data: '+date+' — DS: '+state.ds+'</h4><div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>'+records.slice(0,10).map(r=>'<tr><td>'+r.codigo+'</td><td>'+r.tipo+'</td><td>'+r.rota+'</td><td>'+r.hub+'</td></tr>').join('')+'</tbody></table></div>'+(records.length>10?'<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>':'')+'<button class="btn btn-success" style="width:100%;margin-top:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button></div>';
+prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' Bags — '+rotas+' rotas — Data: '+date+' — DS: '+state.ds+'</h4><div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>'+records.slice(0,10).map(r=>'<tr><td>'+r.codigo+'</td><td>'+r.tipo+'</td><td>'+r.rota+'</td><td>'+r.hub+'</td></tr>').join('')+'</tbody></table></div>'+(records.length>10?'<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>':'')+'<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-success" style="flex:1;padding:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button><button class="btn" style="padding:12px;background:var(--gray);color:var(--navy)" onclick="cancelDispatch()">✖</button></div></div>';
 
 
 }catch(e){toast('Erro no parse: '+e.message,'error')}
@@ -1382,10 +1421,22 @@ window.uploadDispatch=uploadDispatch;
 function forceUploadDispatch(){uploadDispatch()}
 window.forceUploadDispatch=forceUploadDispatch;
 
+function cancelDispatch(){
+try{
+state.parsedDispatch=null;state.parsedFilename='';state.parsedDate='';
+hide($('uploadPreview'));
+let fi=$('fileInput');if(fi)fi.value='';
+let pa=$('pasteArea');if(pa)pa.value='';
+}catch(e){}
+}
+window.cancelDispatch=cancelDispatch;
+
 function clearUploadHistory(){
 try{
+if(!confirm('Limpar todo o histórico de uploads e anti-duplicatas? Esta ação não pode ser desfeita.'))return;
 var keys=Object.keys(localStorage);
-keys.forEach(function(k){if(k.includes('lastupload')||k.includes('scantrack_dup_'))localStorage.removeItem(k)});
+keys.forEach(function(k){if(k.includes('lastupload')||k.includes('scantrack_dup_')||k==='scantrack_recentUploads')localStorage.removeItem(k)});
+ls('recentUploads',null);lsDel('recentUploads');
 toast('Histórico de uploads limpo!','success');
 loadRecentUploads();
 }catch(e){}
@@ -1473,7 +1524,7 @@ html+='<div style="overflow-x:auto;margin-top:8px"><table class="data-table"><th
 for(var j=0;j<Math.min(records.length,10);j++){html+='<tr><td>'+records[j].codigo+'</td><td>'+records[j].tipo+'</td><td>'+records[j].rota+'</td><td>'+records[j].hub+'</td></tr>'}
 html+='</tbody></table></div>';
 if(records.length>10)html+='<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>';
-html+='<button class="btn btn-success" style="width:100%;margin-top:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button></div>';
+html+='<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-success" style="flex:1;padding:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button><button class="btn" style="padding:12px;background:var(--gray);color:var(--navy)" onclick="cancelDispatch()">✖</button></div></div>';
 prev.innerHTML=html;
 }catch(e){toast('Erro: '+e.message,'error')}
 }
@@ -1503,8 +1554,14 @@ el.innerHTML='<table class="data-table"><thead><tr><th>Data</th><th>DS</th><th>B
 // ===== ADMIN =====
 function checkAdmin(){
 try{
-if(isAdmin()){hide($('adminLocked'));show($('adminContent'));renderAdmin()}
-else{show($('adminLocked'));hide($('adminContent'))}
+let nb=$('adminNavBtn');
+if(isAdmin()){
+hide($('adminLocked'));show($('adminContent'));renderAdmin();
+if(nb)show(nb);
+}else{
+show($('adminLocked'));hide($('adminContent'));
+if(nb)hide(nb);
+}
 }catch(e){}
 }
 
@@ -1620,7 +1677,7 @@ let u=ls('user'),d=ls('ds'),r=ls('regional');
 // Load config first
 populateLoginDS();
 if(u&&d){state.user=u;state.ds=d;state.regional=r||'';showApp()}
-try{loadConfig(false).then(()=>{populateLoginDS()}).catch(()=>{})}catch(e){}
+try{loadConfig(false).then(()=>{populateLoginDS();if(state.user)checkAdmin()}).catch(()=>{})}catch(e){}
 
 setupUpload();
 detectDesktop();
@@ -1638,6 +1695,8 @@ init();
 window.addAdmin=addAdmin;
 window.addClass=addClass;
 window.addDS=addDS;
+window.cancelDispatch=cancelDispatch;
+window.cancelPending=cancelPending;
 window.capturePhoto=capturePhoto;
 window.changePin=changePin;
 window.confirmScan=confirmScan;
@@ -1645,6 +1704,7 @@ window.doLogin=doLogin;
 window.doLogout=doLogout;
 window.exportCSV=exportCSV;
 window.exportReport=exportReport;
+window.filterRegistros=filterRegistros;
 window.goRegPage=goRegPage;
 window.loadDashboard=loadDashboard;
 window.manualSubmit=manualSubmit;
