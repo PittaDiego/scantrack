@@ -1245,10 +1245,10 @@ let reader=new FileReader();
 reader.onload=function(e){
 try{
 let data=new Uint8Array(e.target.result);
-let wb=XLSX.read(data,{type:'array'});
+let wb=XLSX.read(data,{type:'array',cellDates:true});
 let sheetName=wb.SheetNames.find(n=>n.includes('All Dispatch'))||wb.SheetNames[0];
 let ws=wb.Sheets[sheetName];
-let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,dateNF:'yyyy-mm-dd'});
+let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true});
 processDispatchRows(rows);
 }catch(ex){toast('Erro ao processar xlsx: '+ex.message,'error')}
 };
@@ -1352,29 +1352,49 @@ function processDispatchRows(rows){
 try{
 var records=[];
 var currentRoute='',currentDate='';
-for(var i=0;i<rows.length;i++){
-var cols=(rows[i]||[]).map(function(c){return String(c==null?'':c).trim()});
-if(cols[0]==='Route'||cols[0]==='route'){
-currentRoute=cols[1]||'';
-if(cols[9]){
-var dv=cols[9];
-if(typeof dv==='number'){var d=new Date((dv-25569)*86400000);currentDate=d.toISOString().split('T')[0]}
-else{var ds=String(dv);if(ds.includes('T'))currentDate=ds.split('T')[0];else if(ds.match(/^\d{4}-\d{2}-\d{2}/))currentDate=ds.substring(0,10);else if(ds.match(/^\d{2}\/\d{2}\/\d{4}/)){var p=ds.split('/');currentDate=p[2]+'-'+p[1]+'-'+p[0]}else currentDate=ds}
+
+function parseDate(val){
+if(!val)return '';
+if(val instanceof Date){try{return val.toISOString().split('T')[0]}catch(e){return ''}}
+if(typeof val==='number'){try{var d=new Date((val-25569)*86400000);return d.toISOString().split('T')[0]}catch(e){return ''}}
+var s=String(val).trim();
+if(s.match(/^\d{4}-\d{2}-\d{2}/))return s.substring(0,10);
+if(s.match(/^\d{4}\/\d{2}\/\d{2}/))return s.substring(0,10).replace(/\//g,'-');
+if(s.match(/^\d{2}\/\d{2}\/\d{4}/)){var p=s.split('/');return p[2]+'-'+p[1]+'-'+p[0]}
+if(s.match(/^\d{2}-\d{2}-\d{4}/)){var p=s.split('-');return p[2]+'-'+p[1]+'-'+p[0]}
+if(s.includes('T'))return s.split('T')[0];
+return s;
 }
+
+for(var i=0;i<rows.length;i++){
+var rawRow=rows[i]||[];
+var cols=[];
+for(var c=0;c<rawRow.length;c++){
+var cell=rawRow[c];
+if(cell==null)cols.push('');
+else if(cell instanceof Date)cols.push(cell);
+else cols.push(String(cell).trim());
+}
+if(cols[0]==='Route'||cols[0]==='route'){
+currentRoute=String(cols[1]||'');
+var dateCell=rawRow[9];
+if(dateCell)currentDate=parseDate(dateCell);
+if(!currentDate){for(var dc=7;dc<cols.length;dc++){var pd=parseDate(rawRow[dc]);if(pd&&pd.match(/^\d{4}-/)){currentDate=pd;break}}}
 continue;
 }
-if(cols[0]&&/^\d/.test(cols[0])&&cols.length>6&&cols[6]){
-var raw=String(cols[6]||'');
-var labels=raw.split(/[\n\r;]+/).map(function(l){return l.trim()}).filter(function(l){return l});
-var hub=(cols[2]||cols[1]||'').substring(0,50);
-var addr=(cols[1]||'').substring(0,80);
+var firstCol=String(cols[0]||'');
+if(firstCol&&/^\d/.test(firstCol)&&cols.length>6&&cols[6]){
+var rawLabels=String(cols[6]||'');
+var labels=rawLabels.split(/[\n\r;,]+/).map(function(l){return l.trim()}).filter(function(l){return l.length>1});
+var hub=String(cols[2]||cols[1]||'').substring(0,50);
+var addr=String(cols[1]||'').substring(0,80);
 for(var k=0;k<labels.length;k++){
 var label=labels[k];
 var tipo='Bag';
 if(label.indexOf('DN-')===0)tipo='Rafia';
 else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
 else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
-records.push({codigo:label,tipo:tipo,movimento:'Saída',rota:currentRoute,hub:hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
+records.push({codigo:label,tipo:tipo,movimento:'Saida',rota:currentRoute,hub:hub,endereco:addr,data:currentDate||new Date().toISOString().split('T')[0],ds:state.ds,regional:state.regional||''});
 }
 }
 }
@@ -1387,7 +1407,7 @@ state.parsedDispatch=records;
 state.parsedDate=date;
 var prev=$('uploadPreview');if(!prev)return;
 show(prev);
-var html='<div class="card"><h4>📊 '+rafias+' Ráfias, '+bags+' Bags — '+rotas.length+' rotas — '+date+' — '+state.ds+'</h4>';
+var html='<div class="card"><h4>📊 '+rafias+' Ráfias, '+bags+' Bags — '+rotas.length+' rotas</h4><p style="font-size:12px;color:var(--gray3)">Data: '+date+' | DS: '+state.ds+'</p>';
 html+='<div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>';
 for(var j=0;j<Math.min(records.length,10);j++){html+='<tr><td>'+records[j].codigo+'</td><td>'+records[j].tipo+'</td><td>'+records[j].rota+'</td><td>'+records[j].hub+'</td></tr>'}
 html+='</tbody></table></div>';
