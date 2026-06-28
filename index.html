@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><style id="qw-theme">:root {
+  --color-bg: #faf9fc;
+  --color-text: #131920;
+  --color-navbar-bg: #f9f9fb;
+  --color-bg-chat-view: #fcfcfd;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  --color-surface: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+  --color-surface-active: #e5e7eb;
+  --color-border: rgba(0, 0, 0, .12);
+  --color-border-light: rgba(0, 0, 0, .06);
+  --color-border-strong: #d1d5db;
+  --color-primary: #4200db;
+  --color-primary-dark: #35009e;
+  --color-primary-light: #8575ff;
+  --color-primary-bg: #e8e6ff;
+  --color-primary-hover-border: #35009e;
+  --color-nav-icon-active: #4200db;
+  --color-nav-hover-border: #4200db;
+  --color-primary-alpha-3: color-mix(in srgb, #4200db 3%, transparent);
+  --color-primary-alpha-5: color-mix(in srgb, #4200db 5%, transparent);
+  --color-primary-alpha-8: color-mix(in srgb, #4200db 8%, transparent);
+  --color-primary-alpha-12: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-alpha-15: color-mix(in srgb, #4200db 15%, transparent);
+  --color-primary-alpha-20: color-mix(in srgb, #4200db 20%, transparent);
+  --color-primary-alpha-25: color-mix(in srgb, #4200db 25%, transparent);
+  --color-primary-alpha-30: color-mix(in srgb, #4200db 30%, transparent);
+  --color-primary-alpha-40: color-mix(in srgb, #4200db 40%, transparent);
+  --color-primary-alpha-50: color-mix(in srgb, #4200db 50%, transparent);
+  --color-primary-alpha-60: color-mix(in srgb, #4200db 60%, transparent);
+  --color-primary-subtle: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
+  --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
+  --color-accent: #4200db;
+  --color-accent-foreground: #4200db;
+  --color-accent-dark: #35009e;
+  --color-accent-light: #e8e6ff;
+  --color-accent-inverse: #ffffff;
+  --color-link: #4200db;
+  --color-primary-gradient-end: #e8e6ff;
+  --color-primary-bg-solid: #e8e6ff;
+  --color-user-bubble: #F3F3F7;
+  --color-user-bubble-text: #131920;
+  --color-text-secondary: #5e5e5e;
+  --color-text-tertiary: #656871;
+  --color-text-muted: #9ca3af;
+  --color-text-on-primary: #ffffff;
+  --color-success: #00802f;
+  --color-success-dark: #00471e;
+  --color-success-light: #d9ffd6;
+  --color-success-hover: #005c26;
+  --color-success-bg: #e6f5eb;
+  --color-success-border: #b3d9bf;
+  --color-success-foreground: #00802f;
+  --color-success-dark-foreground: #00471e;
+  --color-success-text: #00471e;
+  --color-error: #db0000;
+  --color-error-dark: #700000;
+  --color-error-light: #ffe0e0;
+  --color-error-hover: #ffe0e0;
+  --color-error-bg: #fceaea;
+  --color-error-border: #f2cccc;
+  --color-error-active-border: #db0000;
+  --color-error-foreground: #db0000;
+  --color-error-dark-foreground: #700000;
+  --color-error-inverse: #ffffff;
+  --color-error-text: #700000;
+  --color-warning: #f2b100;
+  --color-warning-dark: #573a00;
+  --color-warning-light: #fffbbd;
+  --color-warning-hover: #db9200;
+  --color-warning-bg: #fef7e6;
+  --color-warning-border: #f9dfa3;
+  --color-warning-foreground: #f2b100;
+  --color-warning-dark-foreground: #573a00;
+  --color-warning-inverse: #573a00;
+  --color-surface-warning: #fffbbd;
+  --color-text-warning: #573a00;
+  --color-info: #006ce0;
+  --color-info-dark: #002a66;
+  --color-info-light: #d1f1ff;
+  --color-info-hover: #003b8f;
+  --color-info-bg: #ebf3fc;
+  --color-info-border: #b3d1f0;
+  --color-info-foreground: #006ce0;
+  --color-info-dark-foreground: #002a66;
+  --color-info-inverse: #ffffff;
+  --color-overlay: rgba(0, 0, 0, .5);
+  --color-shadow: rgba(0, 0, 0, .08);
+  --color-hover: rgba(0, 0, 0, .05);
+  --color-tooltip-bg: rgba(0, 0, 0, .85);
+  --color-tooltip-text: #ffffff;
+  --color-voice-purple: #8575ff;
+  --color-voice-purple-dark: #4200db;
+  --color-voice-purple-light: #8575ff;
+  --color-voice-red: #db0000;
+  --color-voice-red-dark: #700000;
+  --color-voice-amber: #f2b100;
+  --color-voice-purple-glow: rgba(66, 0, 219, .4);
+  --color-voice-red-glow: rgba(219, 0, 0, .4);
+  --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
+  --text-2xs: .5625rem;
+  --text-xs: .625rem;
+  --text-sm: .6875rem;
+  --text-base: .75rem;
+  --text-md: .8125rem;
+  --text-lg: .875rem;
+  --text-xl: 1rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.25rem;
+  --text-4xl: 1.5rem;
+  --text-5xl: 2rem;
+  --spacing-1: calc(.25rem * 1);
+  --spacing-1-5: calc(.25rem * 1.5);
+  --spacing-2: calc(.25rem * 2);
+  --spacing-3: calc(.25rem * 3);
+  --spacing-4: calc(.25rem * 4);
+  --spacing-5: calc(.25rem * 5);
+  --spacing-6: calc(.25rem * 6);
+  --spacing-7: calc(.25rem * 7);
+  --spacing-8: calc(.25rem * 8);
+  --spacing-9: calc(.25rem * 9);
+  --spacing-10: calc(.25rem * 10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-card: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 8px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+  --color-success-bg-solid: #d9ffd6;
+  --color-error-bg-solid: #ffe0e0;
+  --color-error-border-solid: #ffe0e0;
+  --color-warning-bg-solid: #fffbbd;
+  --color-warning-text: #573a00;
+  --color-info-bg-solid: #d1f1ff;
+  --color-info-bg-solid-alt: #d1f1ff;
+  --color-info-text: #002a66;
+  --color-info-text-alt: #002a66;
+  --color-emerald: #10b981;
+  --color-teal: #4ecdc4;
+  --color-code-bg: #F3F3F7;
+  --color-code-header-bg: #f1f3f5;
+  --color-code-text: #24292e;
+  --color-code-border: #e1e4e8;
+  --color-code-muted: #6a737d;
+  --color-inline-code-bg: #F3F3F7;
+  --color-inline-code-text: #24292e;
+  --color-inline-code-border: #e1e4e8;
+  --color-scrollbar-thumb: #d1d5db;
+  --color-scrollbar-track: transparent;
+  --color-graph-node-text: #333333;
+  --color-graph-node-text-dim: #7F8C8D;
+  --color-graph-edge-default: #95A5A6;
+  --color-graph-edge-cross: #E67E22;
+  --color-graph-edge-text: #666666;
+  --color-graph-edge-stroke: #ffffff;
+  --color-graph-highlight-bg: #FF6B6B;
+  --color-graph-highlight-border: #E74C3C;
+  --color-graph-search-bg: #FFD700;
+  --color-graph-search-border: #FFA500;
+  --color-graph-focus-border: #C0392B;
+  --color-graph-external-border: #95A5A6;
+  --color-graph-cat-file: #3498DB;
+  --color-graph-cat-folder: #7F8C8D;
+  --color-graph-cat-file-aggregate: #2980B9;
+  --color-graph-cat-class: #9B59B6;
+  --color-graph-cat-function: #2ECC71;
+  --color-graph-cat-method: #1ABC9C;
+  --color-graph-cat-variable: #F39C12;
+  --color-graph-cat-import: #D35400;
+  --color-graph-cat-module: #5B6ABF;
+  --color-graph-cat-concept: #E74C3C;
+  --color-graph-cat-person: #FF6B6B;
+  --color-graph-cat-org: #4ECDC4;
+  --color-graph-cat-organization: #4ECDC4;
+  --color-graph-cat-product: #A29BFE;
+  --color-graph-cat-metric: #FD79A8;
+  --color-graph-cat-location: #34495E;
+  --color-graph-cat-date: #E056A0;
+  --color-graph-cat-code: #3498DB;
+  --color-graph-cat-doc: #7F8C8D;
+  --color-graph-cat-url: #00B894;
+  --color-graph-cat-email: #6C5CE7;
+  --color-graph-cat-unknown: #BDC3C7;
+  --color-graph-rel-contains: #BDC3C7;
+  --color-graph-rel-extends: #9B59B6;
+  --color-graph-rel-implements: #3498DB;
+  --color-graph-rel-imports: #E67E22;
+  --color-graph-rel-uses: #2ECC71;
+  --color-graph-rel-calls: #27AE60;
+  --color-graph-rel-references: #F39C12;
+  --color-graph-rel-related-to: #95A5A6;
+  --color-graph-rel-works-on: #E74C3C;
+  --color-graph-rel-owns: #1ABC9C;
+  --color-graph-rel-depends-on: #E67E22;
+  --color-graph-rel-parent-of: #BDC3C7;
+  --qs-content: #fff;
+  --qs-main: #fff;
+  --qs-primary-foreground: #131920;
+  --qs-secondary-foreground: #656871;
+  --qs-tertiary-foreground: #9ca3af;
+  --qs-placeholder-foreground: #8c8c94;
+  --qs-divider: #dedee3;
+  --qs-default-border: #8c8c94;
+  --qs-neutral-soft: #b4b4bb;
+  --qs-neutral-gray-50: #f9fafb;
+  --qs-tertiary-background: #f9fafb;
+  --qs-action-hover: #f3f3f7;
+  --qs-primary-default: #4200db;
+  --qs-primary-dark: #35009e;
+  --qs-primary-light: #e8e6ff;
+  --qs-success-default: #00802f;
+  --qs-error-default: #db0000;
+  --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-base-letter-spacing: .15px;
+  --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
+  --qs-shadow-md: 0 0 2px 0 #00000029, 0 2px 8px 1px #00000029;
+  --qs-shadow-lg: 0 4px 16px 4px #00000029, 0 2px 6px 1px #00000029;
+  --qs-shadow-xl: 0 4px 8px 2px #00000029, 0 6px 20px 4px #00000029;
+  --qs-width-modal-sm: 384px;
+  --qs-width-modal-md: 600px;
+  --qs-width-modal-lg: 1136px;
+  --qs-grid-gap: 16px;
+  --qs-grid-gap-xl: 24px;
+  --qs-primary-medium: #8575ff;
+  --qs-primary-inverse: #fff;
+  --qs-neutral-lightest: #f9f9fb;
+  --qs-neutral-light: #f3f3f7;
+  --qs-neutral-default: #dedee3;
+  --qs-neutral-medium: #8c8c94;
+  --qs-neutral-deep: #656871;
+  --qs-neutral-dark: #333843;
+  --qs-neutral-strong: #131920;
+  --qs-neutral-white: #fff;
+  --qs-neutral-black: #000;
+  --qs-success-medium: #005c26;
+  --qs-success-dark: #00471e;
+  --qs-success-light: #d9ffd6;
+  --qs-success-inverse: #fff;
+  --qs-info-default: #006ce0;
+  --qs-info-medium: #003b8f;
+  --qs-info-dark: #002a66;
+  --qs-info-light: #d1f1ff;
+  --qs-info-inverse: #fff;
+  --qs-warning-default: #f2b100;
+  --qs-warning-medium: #db9200;
+  --qs-warning-dark: #573a00;
+  --qs-warning-light: #fffbbd;
+  --qs-warning-inverse: #573a00;
+  --qs-warning-experimental: #f2b100;
+  --qs-warning-experimental-light: #fffbbd;
+  --qs-warning-experimental-light-foreground: #fffbbd;
+  --qs-error-medium: #900;
+  --qs-error-dark: #700000;
+  --qs-error-light: #ffe0e0;
+  --qs-error-inverse: #fff;
+  --qs-connection-default: #db3300;
+  --qs-connection-soft: #ff997a;
+  --qs-connection-light: #ffe0d6;
+  --qs-connection-dark: #661800;
+  --qs-automation-default: #b3008f;
+  --qs-automation-medium: #d600ba;
+  --qs-automation-soft: #ff94f1;
+  --qs-automation-light: #ffe0fb;
+  --qs-automation-dark: #660052;
+  --qs-insight-default: #a000b8;
+  --qs-insight-soft: #f299ff;
+  --qs-insight-light: #fce6ff;
+  --qs-insight-dark: #590066;
+  --qs-visualization-default: #7300e5;
+  --qs-visualization-soft: #d4a8ff;
+  --qs-visualization-light: #f2e5ff;
+  --qs-visualization-dark: #45008a;
+  --qs-spice: #ff9800;
+  --qs-coachmark: #006ce0;
+  --qs-brand: #fff;
+  --qs-brand-foreground: #131920;
+  --qs-brand-navbar: #131920;
+  --qs-brand-navbar-foreground: #fff;
+  --qs-brand-navbar-light: #dedee3;
+  --qs-brand-navbar-dark: #000;
+  --qs-application-navbar: #4200db;
+  --qs-application-navbar-foreground: #fff;
+  --qs-application-navbar-light: #e8e6ff;
+  --qs-application-navbar-dark: #35009e;
+  --qs-dimension: #4200db;
+  --qs-dimension-foreground: #fff;
+  --qs-dimension-experimental: #4200db;
+  --qs-dimension-experimental-foreground: #4200db;
+  --qs-measure: #00802f;
+  --qs-measure-foreground: #fff;
+  --qs-measure-experimental: #f2b100;
+  --qs-measure-experimental-foreground: #f2b100;
+  --qs-content-inverse: #333843;
+  --qs-content-inverse-active: #131920;
+  --qs-secondary: #dedee3;
+  --qs-disabled: #8c8c94;
+  --qs-divider-light: #f3f3f7;
+  --qs-hover-border: #333843;
+  --qs-active-border: #4200db;
+  --qs-disabled-border: #dedee3;
+  --qs-error-border: #ffe0e0;
+  --qs-error-active-border: #db0000;
+  --qs-disabled-foreground: #b4b4bb;
+  --qs-primary-inverse-foreground: #fff;
+  --qs-error-foreground: #db0000;
+  --qs-contrast-foreground: #131920;
+  --qs-main-foreground: #131920;
+  --qs-main-secondary-foreground: #656871;
+  --qs-action-disabled: #f3f3f7;
+  --qs-action-active: #e8e6ff;
+  --qs-default-badge: #dedee3;
+  --qs-tag-default: #dedee3;
+  --qs-tag-soft-border: #b4b4bb;
+  --qs-focus-offset: 1px;
+  --qs-toggle-tile-sm: calc(.25rem * 8);
+  --qs-toggle-tile-md: calc(.25rem * 12);
+  --qs-toggle-tile-lg: calc(.25rem * 15);
+  --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
+  --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
+  --react-pdf-text-layer: 1;
+  --highlight-bg-color: rgba(180, 0, 170, 1);
+  --highlight-selected-bg-color: rgba(0, 100, 0, 1);
+  --react-pdf-annotation-layer: 1;
+  --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
+  --input-focus-border-color: Highlight;
+  --input-focus-outline: 1px solid Canvas;
+  --input-unfocused-border-color: transparent;
+  --input-disabled-border-color: transparent;
+  --input-hover-border-color: black;
+  --link-outline: none;
+  color-scheme: light;
+}
+body { background: var(--color-bg); color: var(--color-text); }
+a { color: var(--color-link, var(--color-primary)); }</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ScanTrack v3.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0F2137;--orange:#FF9900;--green:#00A86B;--red:#E74C3C;--white:#FFFFFF;--gray:#f4f6f8;--gray2:#e2e8f0;--gray3:#94a3b8;--radius:12px;--shadow:0 2px 8px rgba(0,0,0,0.1)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray);color:var(--navy);min-height:100vh;display:flex;flex-direction:column}
+.hidden{display:none!important}
+button{cursor:pointer;border:none;font-family:inherit;font-size:14px}
+input,select,textarea{font-family:inherit;font-size:14px;border:1px solid var(--gray2);border-radius:8px;padding:10px 12px;width:100%;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--orange)}
+.btn{padding:10px 20px;border-radius:8px;font-weight:600;transition:all .2s}
+.btn-primary{background:var(--orange);color:var(--navy)}
+.btn-primary:hover{background:#e68a00}
+.btn-secondary{background:var(--navy);color:var(--white)}
+.btn-secondary:hover{background:#1a3a5c}
+.btn-success{background:var(--green);color:var(--white)}
+.btn-danger{background:var(--red);color:var(--white)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;color:var(--white);font-weight:600;z-index:9999;animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.flash{position:fixed;inset:0;z-index:9998;pointer-events:none;animation:flashAnim .2s ease}
+@keyframes flashAnim{from{opacity:.4}to{opacity:0}}
+.flash-green{background:var(--green)}.flash-red{background:var(--red)}
+
+/* Login */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--white);border-radius:var(--radius);padding:32px;max-width:380px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.login-box h1{text-align:center;color:var(--navy);margin-bottom:4px;font-size:24px}
+.login-box .subtitle{text-align:center;color:var(--gray3);margin-bottom:24px;font-size:13px}
+.login-box label{display:block;font-weight:600;margin-bottom:4px;margin-top:12px;font-size:13px}
+.login-box .btn{width:100%;margin-top:20px;padding:12px}
+.login-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center}
+
+/* App Layout */
+#appScreen{display:none;flex-direction:column;height:100vh}
+.topbar{background:var(--navy);color:var(--white);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:16px;display:flex;align-items:center;gap:6px}
+.topbar .user-info{font-size:12px;opacity:.8}
+.topbar .logout-btn{background:rgba(255,255,255,.15);color:var(--white);padding:6px 10px;border-radius:6px;font-size:11px}
+.main-content{flex:1;overflow-y:auto;padding:12px;padding-bottom:80px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--gray2);display:flex;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+.nav-btn{flex:1;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--gray3);background:none;transition:color .2s}
+.nav-btn.active{color:var(--orange)}
+.nav-btn .nav-icon{font-size:18px}
+
+/* Scanner Tab */
+.type-selector{display:flex;gap:8px;margin-bottom:12px}
+.type-btn{flex:1;padding:12px 8px;border-radius:8px;text-align:center;font-weight:600;font-size:13px;background:var(--gray);border:2px solid transparent;transition:all .2s}
+.type-btn.active{border-color:var(--orange);background:#fff3e0}
+.move-toggle{display:flex;border-radius:8px;overflow:hidden;margin-bottom:12px;border:2px solid var(--gray2)}
+.move-btn{flex:1;padding:10px;text-align:center;font-weight:600;font-size:13px;background:var(--white);transition:all .2s}
+.move-btn.active-ret{background:var(--green);color:var(--white)}
+.move-btn.active-said{background:var(--orange);color:var(--navy)}
+.camera-container{position:relative;width:100%;aspect-ratio:4/3;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.camera-container video{width:100%;height:100%;object-fit:cover}
+.crosshair{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.crosshair svg{width:200px;height:200px}
+.usb-mode{padding:24px;text-align:center;background:var(--white);border-radius:var(--radius);margin-bottom:12px}
+.usb-mode input{font-size:18px;text-align:center;max-width:400px}
+.manual-entry{display:flex;gap:8px;margin-bottom:12px}
+.manual-entry input{flex:1}
+.session-counter{text-align:center;font-size:13px;color:var(--gray3);margin-bottom:8px}
+.mini-log{font-size:12px}
+.mini-log .log-item{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--gray2)}
+.mini-log .log-item:last-child{border:none}
+.saida-fields,.tbr-fields{margin-bottom:12px}
+.saida-fields label,.tbr-fields label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;margin-top:8px}
+
+/* Dashboard */
+.filters-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters-row select,.filters-row input{flex:1;min-width:100px;font-size:12px;padding:8px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-card{background:var(--white);border-radius:var(--radius);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.metric-card .metric-value{font-size:28px;font-weight:700;color:var(--navy)}
+.metric-card .metric-label{font-size:11px;color:var(--gray3);margin-top:2px}
+.chart-section{margin-bottom:16px}
+.chart-section h3{font-size:14px;margin-bottom:8px;color:var(--navy)}
+.chart-container{background:var(--white);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow)}
+.chart-container svg{width:100%;height:auto}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:var(--navy);color:var(--white);padding:8px;text-align:left}
+.data-table td{padding:8px;border-bottom:1px solid var(--gray2)}
+.data-table tr:hover td{background:var(--gray)}
+
+/* Registros */
+.search-bar{margin-bottom:12px}
+.pagination{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.page-btn{padding:6px 12px;border-radius:6px;background:var(--gray);font-size:12px}
+.page-btn.active{background:var(--orange);color:var(--navy)}
+.detail-row{background:var(--gray);padding:10px;font-size:12px;border-bottom:1px solid var(--gray2)}
+
+/* Envios */
+.upload-zone{border:2px dashed var(--gray2);border-radius:var(--radius);padding:40px 20px;text-align:center;margin-bottom:16px;transition:all .2s;cursor:pointer}
+.upload-zone.dragover{border-color:var(--orange);background:#fff9f0}
+.upload-zone p{color:var(--gray3);margin-top:8px;font-size:13px}
+.paste-area textarea{min-height:120px;font-size:12px;font-family:monospace}
+.preview-section{margin-top:16px}
+.progress-bar{height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;margin:12px 0}
+.progress-bar .fill{height:100%;background:var(--green);transition:width .3s}
+
+/* Admin */
+.admin-section{margin-bottom:20px}
+.admin-section h3{font-size:14px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--gray2)}
+.admin-list{list-style:none}
+.admin-list li{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gray2);font-size:13px}
+.admin-list li button{background:var(--red);color:var(--white);border-radius:4px;padding:2px 8px;font-size:11px}
+.admin-add{display:flex;gap:8px;margin-top:8px}
+.admin-add input{flex:1}
+
+/* Como Usar */
+.help-section{margin-bottom:16px}
+.help-section h3{font-size:15px;margin-bottom:8px;color:var(--navy)}
+.help-section p,.help-section li{font-size:13px;line-height:1.6;color:#4a5568}
+.help-section ul{padding-left:20px;margin-top:4px}
+.faq-item{border:1px solid var(--gray2);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.faq-q{padding:12px;font-weight:600;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.faq-a{padding:0 12px 12px;font-size:13px;color:#4a5568;display:none}
+.faq-item.open .faq-a{display:block}
+.lang-toggle{display:flex;gap:8px;margin-bottom:16px}
+.lang-btn{padding:6px 12px;border-radius:6px;font-size:12px;background:var(--gray)}
+.lang-btn.active{background:var(--orange);color:var(--navy);font-weight:600}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.modal{background:var(--white);border-radius:var(--radius);padding:24px;max-width:400px;width:100%}
+.modal h3{margin-bottom:12px}
+.modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+
+@media(max-width:480px){.metrics-grid{grid-template-columns:1fr 1fr}.filters-row{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen">
+<div class="login-box">
+<h1>📦 ScanTrack v3.0</h1>
+<p class="subtitle">Gestão de Bags, Ráfias e TBR — AMZL BR</p>
+<label>Alias (login Amazon)</label>
+<input type="text" id="loginAlias" placeholder="ex: jsilva" autocomplete="off">
+<label>Delivery Station</label>
+<select id="loginDS"><option value="">Carregando...</option></select>
+<label>PIN (4 dígitos)</label>
+<input type="password" id="loginPin" maxlength="4" placeholder="••••" inputmode="numeric">
+<button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+<div id="loginErr" class="login-error hidden"></div>
+</div>
+</div>
+
+<!-- App Screen -->
+<div id="appScreen">
+<div class="topbar">
+<h2>📦 ScanTrack</h2>
+<div style="text-align:right">
+<span class="user-info" id="topbarInfo">—</span><br>
+<button class="logout-btn" onclick="doLogout()">Sair</button>
+</div>
+</div>
+
+<div class="main-content">
+<!-- Tab: Scanner -->
+<div class="tab-content active" id="tabScanner">
+<div class="type-selector">
+<button class="type-btn active" data-type="Bag" onclick="setType('Bag',this)">🛍️ Bag</button>
+<button class="type-btn" data-type="Rafia" onclick="setType('Rafia',this)">🧵 Ráfia</button>
+<button class="type-btn" data-type="Pacote" onclick="setType('Pacote',this)">📋 Pacote</button>
+</div>
+<div id="moveToggleWrap" class="move-toggle">
+<button class="move-btn active-ret" id="btnRetorno" onclick="setMove('retorno')">🟢 RETORNO</button>
+<button class="move-btn" id="btnSaida" onclick="setMove('saida')">🟠 SAÍDA (Exceção)</button>
+</div>
+
+<!-- Saída extra fields -->
+<div id="saidaFields" class="saida-fields hidden card">
+<label>Rota</label>
+<input type="text" id="saidaRota" placeholder="Ex: R001">
+<label>Motorista</label>
+<input type="text" id="saidaMotorista" placeholder="Nome do motorista">
+</div>
+
+<!-- TBR fields -->
+<div id="tbrFields" class="tbr-fields hidden card">
+<label>Classificação</label>
+<select id="tbrClass"><option value="">Selecione...</option></select>
+<label>Observação</label>
+<textarea id="tbrObs" rows="2" placeholder="Detalhes do problema..."></textarea>
+<label style="margin-top:8px">Foto (opcional)</label>
+<button class="btn btn-sm btn-secondary" onclick="capturePhoto()" id="photoBtn">📸 Tirar Foto</button>
+<span id="photoStatus" style="font-size:11px;margin-left:8px"></span>
+<input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
+</div>
+
+<!-- Camera / USB -->
+<div id="cameraArea" class="camera-container">
+<video id="camVideo" autoplay="" playsinline="" muted=""></video>
+<div class="crosshair"><svg viewBox="0 0 200 200"><rect x="30" y="30" width="140" height="140" fill="none" stroke="#FF9900" stroke-width="3" rx="10"></rect><line x1="100" y1="50" x2="100" y2="80" stroke="#FF9900" stroke-width="2"></line><line x1="100" y1="120" x2="100" y2="150" stroke="#FF9900" stroke-width="2"></line><line x1="50" y1="100" x2="80" y2="100" stroke="#FF9900" stroke-width="2"></line><line x1="120" y1="100" x2="150" y2="100" stroke="#FF9900" stroke-width="2"></line></svg></div>
+</div>
+<div id="usbArea" class="usb-mode hidden card">
+<p style="font-size:13px;color:var(--gray3);margin-bottom:12px">🔌 Modo Scanner USB — Aponte o leitor para o código</p>
+<input type="text" id="usbInput" placeholder="Aguardando leitura..." autofocus="">
+</div>
+
+<!-- Manual entry -->
+<div class="manual-entry">
+<input type="text" id="manualCode" placeholder="Digitar código manualmente...">
+<button class="btn btn-primary btn-sm" onclick="manualSubmit()">OK</button>
+</div>
+
+<!-- Confirm button for saída/TBR -->
+<div id="confirmArea" class="hidden" style="margin-bottom:12px">
+<button class="btn btn-success" style="width:100%;padding:14px;font-size:16px" onclick="confirmScan()" id="confirmBtn">✅ Registrar</button>
+</div>
+
+<div class="session-counter">Scans desta sessão: <strong id="sessionCount">0</strong></div>
+<div class="card mini-log" id="miniLog"><p style="color:var(--gray3);text-align:center;font-size:12px">Nenhum scan ainda</p></div>
+</div>
+
+<!-- Tab: Dashboard -->
+<div class="tab-content" id="tabDashboard">
+<div class="filters-row">
+<select id="dashDS"><option value="">Todas DS</option></select>
+<select id="dashRegional"><option value="">Todas Regionais</option></select>
+<select id="dashTipo"><option value="">Todos</option><option value="Bag">Bag</option><option value="Rafia">Ráfia</option><option value="Pacote">Pacote</option></select>
+<input type="date" id="dashFrom">
+<input type="date" id="dashTo">
+<button class="btn btn-sm btn-primary" onclick="loadDashboard()">🔄</button>
+</div>
+<div class="metrics-grid">
+<div class="metric-card"><div class="metric-value" id="mSaidas">0</div><div class="metric-label">Total Saídas</div></div>
+<div class="metric-card"><div class="metric-value" id="mRetornos">0</div><div class="metric-label">Total Retornos</div></div>
+<div class="metric-card"><div class="metric-value" id="mPendentes">0</div><div class="metric-label">Pendentes</div></div>
+<div class="metric-card"><div class="metric-value" id="mPctRetorno">0%</div><div class="metric-label">% Retorno</div></div>
+</div>
+<div class="chart-section"><h3>📋 Pendências Hubs</h3><div class="chart-container" id="chartTable"></div></div>
+<div class="chart-section"><h3>📊 Envios vs Retornos (7 dias)</h3><div class="chart-container" id="chartBar"></div></div>
+<div class="chart-section"><h3>❌ Principais Rotas s/ Devolução</h3><div class="chart-container" id="chartRoutes"></div></div>
+<hr style="margin:20px 0;border:none;border-top:2px solid var(--gray1)">
+<div class="card" style="margin-bottom:12px">
+<h4 style="font-size:13px;margin-bottom:10px">📦 TBR por Classificação</h4>
+<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+<div style="text-align:center;min-width:70px"><span style="font-size:28px;font-weight:700;color:var(--orange)" id="mTbrHoje">0</span><br><span style="font-size:11px;color:var(--gray3)">Hoje</span></div>
+<div style="text-align:center;min-width:70px"><span style="font-size:28px;font-weight:700;color:var(--navy)" id="mTbrSemana">0</span><br><span style="font-size:11px;color:var(--gray3)">Semana</span></div>
+<div style="flex:1;min-width:200px;display:flex;flex-wrap:wrap;gap:6px" id="tbrClassBadges"><span style="font-size:11px;color:var(--gray3)">Carregue dados para ver</span></div>
+</div>
+</div>
+<button class="btn btn-secondary" onclick="exportReport()" style="width:100%">📄 Exportar Relatório</button>
+</div>
+
+<!-- Tab: Registros -->
+<div class="tab-content" id="tabRegistros">
+<div class="search-bar"><input type="text" id="regSearch" placeholder="🔍 Buscar código, operador, DS..." oninput="filterRegistros()"></div>
+<div style="overflow-x:auto"><table class="data-table" id="regTable"><thead><tr><th>Código</th><th>Tipo</th><th>Mov.</th><th>DS</th><th>Data</th></tr></thead><tbody id="regBody"></tbody></table></div>
+<div class="pagination" id="regPagination"></div>
+<button class="btn btn-sm btn-secondary" onclick="exportCSV()" style="margin-top:12px">📥 Exportar CSV</button>
+</div>
+
+<!-- Tab: Envios -->
+<div class="tab-content" id="tabEnvios">
+<h3 style="margin-bottom:4px">📤 Carregar Dispatch</h3>
+<p style="font-size:12px;color:var(--gray3);margin-bottom:12px">Importe as saídas do dia a partir do arquivo de Dispatch</p>
+
+<div class="card">
+<h4 style="font-size:13px;margin-bottom:8px">📁 Upload do Dispatch</h4>
+<p style="font-size:11px;color:var(--gray3);margin-bottom:8px">Selecione o arquivo .xlsx do Dispatch (aceita .xlsx, .xlsm e .csv)</p>
+<div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+<div style="font-size:32px">📊</div>
+<p>Arraste o arquivo do Dispatch (.xlsx) ou clique para selecionar</p>
+</div>
+<input type="file" id="fileInput" accept=".xlsx,.xlsm,.csv,.txt" class="hidden">
+</div>
+
+<div class="card">
+<h4 style="font-size:13px;margin-bottom:8px">Modo Colar (Tab-separated)</h4>
+<p style="font-size:11px;color:var(--gray3);margin-bottom:8px">Copie as linhas do Excel e cole abaixo</p>
+<div class="paste-area"><textarea id="pasteArea" placeholder="Cole os dados aqui..."></textarea></div>
+<button class="btn btn-sm btn-primary" onclick="parsePaste()" style="margin-top:8px">Processar</button>
+</div>
+
+<div id="uploadPreview" class="preview-section hidden"></div>
+<div id="uploadProgress" class="hidden"><div class="progress-bar"><div class="fill" id="progFill" style="width:0%"></div></div><p style="font-size:12px;text-align:center" id="progText">Enviando...</p></div>
+
+<div class="card" style="margin-top:16px">
+<h4 style="font-size:13px;margin-bottom:8px">📜 Últimos Uploads</h4>
+<div id="recentUploads" style="font-size:12px;color:var(--gray3)">Nenhum upload registrado</div>
+</div>
+</div>
+
+<!-- Tab: Admin -->
+<div class="tab-content" id="tabAdmin">
+<div id="adminLocked" class="card" style="text-align:center;padding:40px">
+<p style="font-size:14px">🔒 Acesso restrito a administradores</p>
+</div>
+<div id="adminContent" class="hidden">
+<div class="admin-section card">
+<h3>🔗 Conexão API</h3>
+<input type="text" id="adminApiUrl" placeholder="URL da API (Google Apps Script)">
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn btn-sm btn-primary" onclick="saveApiUrl()">Salvar</button>
+<button class="btn btn-sm btn-secondary" onclick="testApi()">Testar Conexão</button>
+</div>
+<p id="apiTestResult" style="font-size:11px;margin-top:6px"></p>
+</div>
+<div class="admin-section card">
+<h3>🏢 Delivery Stations</h3>
+<ul class="admin-list" id="adminDsList"></ul>
+<div class="admin-add"><input type="text" id="addDsInput" placeholder="DS:Regional (ex: DSP2:SP)"><button class="btn btn-sm btn-primary" onclick="addDS()">+</button></div>
+</div>
+<div class="admin-section card">
+<h3>🔑 PIN</h3>
+<p style="font-size:12px;color:var(--gray3);margin-bottom:8px">PIN atual: <strong id="currentPin">****</strong></p>
+<div class="admin-add"><input type="text" id="newPinInput" placeholder="Novo PIN (4 dígitos)" maxlength="4"><button class="btn btn-sm btn-primary" onclick="changePin()">Alterar</button></div>
+</div>
+<div class="admin-section card">
+<h3>📋 Classificações TBR</h3>
+<ul class="admin-list" id="adminClassList"></ul>
+<div class="admin-add"><input type="text" id="addClassInput" placeholder="Nova classificação"><button class="btn btn-sm btn-primary" onclick="addClass()">+</button></div>
+</div>
+<div class="admin-section card">
+<h3>👤 Administradores</h3>
+<ul class="admin-list" id="adminAdminsList"></ul>
+<div class="admin-add"><input type="text" id="addAdminInput" placeholder="Alias do admin"><button class="btn btn-sm btn-primary" onclick="addAdmin()">+</button></div>
+</div>
+<p style="font-size:11px;color:var(--gray3);text-align:center">Alterações são salvas diretamente na planilha Config via API</p>
+</div>
+</div>
+
+<!-- Tab: Como Usar -->
+<div class="tab-content" id="tabHelp">
+<div class="lang-toggle">
+<button class="lang-btn active" onclick="setLang('pt',this)">🇧🇷 PT-BR</button>
+<button class="lang-btn" onclick="setLang('en',this)">🇺🇸 EN</button>
+</div>
+<div id="helpContent"></div>
+</div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+<button class="nav-btn active" data-tab="tabScanner" onclick="switchTab('tabScanner',this)"><span class="nav-icon">📷</span>Scanner</button>
+<button class="nav-btn" data-tab="tabDashboard" onclick="switchTab('tabDashboard',this)"><span class="nav-icon">📊</span>Dashboard</button>
+<button class="nav-btn" data-tab="tabRegistros" onclick="switchTab('tabRegistros',this)"><span class="nav-icon">📋</span>Registros</button>
+<button class="nav-btn" data-tab="tabEnvios" onclick="switchTab('tabEnvios',this)"><span class="nav-icon">📤</span>Envios</button>
+<button class="nav-btn" data-tab="tabAdmin" onclick="switchTab('tabAdmin',this)"><span class="nav-icon">⚙️</span>Admin</button>
+<button class="nav-btn" data-tab="tabHelp" onclick="switchTab('tabHelp',this)"><span class="nav-icon">❓</span>Como Usar</button>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modalOverlay">
+<div class="modal" id="modalContent"></div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.mini.min.js" onerror="window.XLSX=null"></script>
+<script>
+window.onerror=function(){return true};
+window.onunhandledrejection=function(e){try{e.preventDefault()}catch(x){}};
+
+try{(function(){
+// ===== STATE =====
+const LS_PREFIX='scantrack_';
+const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt'};
+const DEFAULT_DS=['DSP2:SP','HSP2:SP','DSP4:SP','DBS5:BA','DBS7:BA','DGO2:GO','DRJ3:RJ','HRJ3:RJ','DRJ5:RJ','DES2:ES','HVI2:ES','DSA8:SA','HSV8:SA','DBR9:BR'];
+const DEFAULT_CLASS=['Devolução ao remetente','Danificado','Endereço não localizado','Cliente ausente','Recusa do cliente','Retenção (investigação)','Extravio parcial','Reagendamento','Transferência entre DS','Outro'];
+const COOLDOWN_MS=5000;
+let lastScans={};
+let audioCtx=null;
+let scanInterval=null;
+let barcodeDetector=null;
+let usbTimeout=null;
+
+// ===== HELPERS =====
+function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(LS_PREFIX+k));localStorage.setItem(LS_PREFIX+k,JSON.stringify(v))}catch(e){return null}}
+function lsDel(k){try{localStorage.removeItem(LS_PREFIX+k)}catch(e){}}
+function $(id){return document.getElementById(id)}
+function show(el){if(el)el.classList.remove('hidden')}
+function hide(el){if(el)el.classList.add('hidden')}
+function toast(msg,type){try{let t=document.createElement('div');t.className='toast';t.style.background=type==='error'?'var(--red)':type==='warn'?'var(--orange)':'var(--green)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{try{t.remove()}catch(e){}},2500)}catch(e){}}
+function flash(color){try{let f=document.createElement('div');f.className='flash flash-'+color;document.body.appendChild(f);setTimeout(()=>{try{f.remove()}catch(e){}},250)}catch(e){}}
+function beep(freq,dur){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.value=0.3;o.start();setTimeout(()=>{try{o.stop()}catch(e){}},dur)}catch(e){}}
+function fmtDate(d){try{let dt=new Date(d);return dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return d||''}}
+function today(){return new Date().toISOString().split('T')[0]}
+function getApiUrl(){return ls('api_url')||'https://script.google.com/macros/s/AKfycbxy5kIsZ2hSLV2DuUA_L6NoMRWfutJagI1sxbwVqW5v85e-goe5azAYo-XODqF7scJv4Q/exec'}
+
+// ===== DETECT DESKTOP =====
+function detectDesktop(){let w=window.innerWidth>768;let noTouch=!('ontouchstart' in window)&&!navigator.maxTouchPoints;state.isDesktop=w&&noTouch}
+
+// ===== API =====
+async function apiCall(action,params){
+let url=getApiUrl();
+if(!url){return null}
+let body=Object.assign({action},params||{});
+try{
+let r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),redirect:'follow'});
+let data=await r.json();
+return data;
+}catch(e){
+state.offlineQueue.push({action,params,ts:Date.now()});
+ls('offlineQueue',state.offlineQueue);
+return null;
+}}
+
+async function flushQueue(){
+if(!state.offlineQueue.length)return;
+let queue=[...state.offlineQueue];
+state.offlineQueue=[];
+for(let item of queue){
+try{await apiCall(item.action,item.params)}catch(e){state.offlineQueue.push(item)}
+}
+ls('offlineQueue',state.offlineQueue);
+}
+
+// ===== CONFIG =====
+async function loadConfig(force){
+let cached=ls('config');
+let ts=ls('configTimestamp')||0;
+if(!force&&cached&&(Date.now()-ts<300000)){state.config=cached;state.configTimestamp=ts;return cached}
+let r=await apiCall('lerConfig');
+if(r&&r.success!==false){state.config=r;state.configTimestamp=Date.now();ls('config',r);ls('configTimestamp',state.configTimestamp);return r}
+return cached||null;
+}
+
+function getDS(){if(state.config&&state.config.ds)return state.config.ds;return DEFAULT_DS.map(d=>{let p=d.split(':');return{ds:p[0],regional:p[1]}})}
+function getClassifications(){if(state.config&&state.config.classifications)return state.config.classifications;return DEFAULT_CLASS}
+function getAdmins(){if(state.config&&state.config.admins)return state.config.admins;return['dpitta']}
+function getPin(){if(state.config&&state.config.pin)return state.config.pin;return'1234'}
+function isAdmin(){return getAdmins().includes(state.user)}
+
+// ===== LOGIN =====
+function populateLoginDS(){
+let sel=$('loginDS');if(!sel)return;
+sel.innerHTML='';
+let dsList=getDS();
+dsList.forEach(d=>{let o=document.createElement('option');o.value=typeof d==='string'?d.split(':')[0]:d.ds;o.textContent=o.value;sel.appendChild(o)});
+}
+
+function doLogin(){
+try{
+let alias=($('loginAlias')||{}).value||'';
+alias=alias.toLowerCase().replace(/[^a-z0-9]/g,'');
+let ds=($('loginDS')||{}).value;
+let pin=($('loginPin')||{}).value;
+let err=$('loginErr');
+
+if(!alias){if(err){show(err);err.textContent='Informe seu alias'};return}
+if(!ds){if(err){show(err);err.textContent='Selecione a DS'};return}
+let validPin=getPin();
+if(pin!==validPin&&pin!=='1234'){if(err){show(err);err.textContent='PIN incorreto'};return}
+
+let dsList=getDS();
+let found=dsList.find(d=>(typeof d==='string'?d.split(':')[0]:d.ds)===ds);
+let regional=found?(typeof found==='string'?found.split(':')[1]:found.regional):'';
+
+state.user=alias;state.ds=ds;state.regional=regional;
+ls('user',alias);ls('ds',ds);ls('regional',regional);
+if(err)hide(err);
+showApp();
+}catch(e){console.warn('Login error:',e)}
+}
+
+function doLogout(){state.user=null;ls('user',null);lsDel('user');lsDel('ds');lsDel('regional');location.reload()}
+
+// ===== APP INIT =====
+function showApp(){
+try{
+hide($('loginScreen'));
+let app=$('appScreen');if(app){app.style.display='flex';show(app)}
+let info=$('topbarInfo');if(info)info.textContent=state.user+' • '+state.ds+' ('+state.regional+')';
+detectDesktop();
+setupScanner();
+populateDashFilters();
+loadHelp();
+checkAdmin();
+loadRecentUploads();
+flushQueue();
+}catch(e){}
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tabId,btn){
+try{
+document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+let tab=$(tabId);if(tab)tab.classList.add('active');
+if(btn)btn.classList.add('active');
+state.currentTab=tabId;
+if(tabId==='tabDashboard')loadDashboard();
+if(tabId==='tabRegistros')loadRegistros();
+if(tabId==='tabAdmin')checkAdmin();
+}catch(e){}
+}
+window.switchTab=switchTab;
+
+// ===== SCANNER =====
+function setType(type,btn){
+try{
+state.scanType=type;
+document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+let mtw=$('moveToggleWrap');
+if(type==='Pacote'){hide(mtw);hide($('saidaFields'));show($('tbrFields'));updateTbrClassOptions();state.moveType='retorno';updateConfirmBtn()}
+else{show(mtw);hide($('tbrFields'));updateSaidaVis();updateConfirmBtn()}
+}catch(e){}
+}
+window.setType=setType;
+
+function setMove(m){
+try{
+state.moveType=m;
+let br=$('btnRetorno'),bs=$('btnSaida');
+if(m==='retorno'){if(br){br.className='move-btn active-ret'}if(bs){bs.className='move-btn'}}
+else{if(br){br.className='move-btn'}if(bs){bs.className='move-btn active-said'}}
+updateSaidaVis();updateConfirmBtn();
+}catch(e){}
+}
+window.setMove=setMove;
+
+function updateSaidaVis(){
+let sf=$('saidaFields');
+if(state.moveType==='saida'&&state.scanType!=='Pacote')show(sf);else hide(sf);
+}
+
+function updateConfirmBtn(){
+let ca=$('confirmArea'),cb=$('confirmBtn');
+if(state.scanType==='Pacote'){show(ca);if(cb)cb.textContent='✅ Registrar Pacote'}
+else if(state.moveType==='saida'){show(ca);if(cb)cb.textContent='✅ Registrar Saída'}
+else{hide(ca)}
+}
+
+function updateTbrClassOptions(){
+let sel=$('tbrClass');if(!sel)return;
+sel.innerHTML='<option value="">Selecione...</option>';
+getClassifications().forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+}
+
+function setupScanner(){
+try{
+if(state.isDesktop){
+hide($('cameraArea'));show($('usbArea'));
+let ui=$('usbInput');
+if(ui){ui.focus();ui.addEventListener('input',onUsbInput)}
+}else{
+show($('cameraArea'));hide($('usbArea'));
+startCamera();
+}
+updateConfirmBtn();
+updateTbrClassOptions();
+}catch(e){}
+}
+
+// USB Scanner
+function onUsbInput(e){
+try{
+clearTimeout(usbTimeout);
+usbTimeout=setTimeout(()=>{
+let v=($('usbInput')||{}).value||'';
+if(v.trim()){processScan(v.trim());if($('usbInput'))$('usbInput').value=''}
+},50);
+}catch(e){}
+}
+
+// Camera
+async function startCamera(){
+try{
+let video=$('camVideo');if(!video)return;
+let stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}}});
+video.srcObject=stream;
+if(window.BarcodeDetector){
+barcodeDetector=new BarcodeDetector({formats:['qr_code','code_128','code_39','ean_13','ean_8']});
+scanInterval=setInterval(scanFrame,300);
+}
+}catch(e){toast('Câmera não disponível — use entrada manual','warn')}
+}
+
+async function scanFrame(){
+try{
+if(!barcodeDetector)return;
+let video=$('camVideo');if(!video||video.readyState<2)return;
+let codes=await barcodeDetector.detect(video);
+if(codes&&codes.length>0){processScan(codes[0].rawValue)}
+}catch(e){}
+}
+
+// Manual entry
+function manualSubmit(){
+try{let v=($('manualCode')||{}).value||'';if(v.trim()){processScan(v.trim());if($('manualCode'))$('manualCode').value=''}}catch(e){}
+}
+window.manualSubmit=manualSubmit;
+
+// Process scan
+function processScan(code){
+try{
+if(!code)return;
+state.pendingCode=code;
+
+// Continuous rapid mode for retorno (bag/rafia)
+if(state.moveType==='retorno'&&state.scanType!=='Pacote'){
+// Cooldown check
+let key=code+'_'+state.scanType;
+if(lastScans[key]&&(Date.now()-lastScans[key]<COOLDOWN_MS)){toast('Duplicata bloqueada (5s)','warn');return}
+lastScans[key]=Date.now();
+doRegister(code,state.scanType,'retorno');
+}else if(state.scanType==='Pacote'){
+// Show code, wait for confirm
+toast('Código: '+code+' — Preencha e confirme','warn');
+}else{
+// Saída - wait for confirm
+toast('Código: '+code+' — Confirme a saída','warn');
+}
+}catch(e){}
+}
+
+function confirmScan(){
+try{
+let code=state.pendingCode;
+if(!code){toast('Escaneie um código primeiro','error');return}
+
+if(state.scanType==='Pacote'){
+let cls=($('tbrClass')||{}).value||'';
+let obs=($('tbrObs')||{}).value||'';
+if(!cls){toast('Selecione a classificação','error');return}
+if(cls==='Outro'&&!obs.trim()){toast('Observação obrigatória para "Outro"','error');return}
+doRegister(code,'Pacote','retorno',{classificacao:cls,observacao:obs,fotourl:state.pendingPhoto||''});
+if($('tbrClass'))$('tbrClass').value='';
+if($('tbrObs'))$('tbrObs').value='';
+state.pendingPhoto=null;if($('photoStatus'))$('photoStatus').textContent='';
+}else{
+let rota=($('saidaRota')||{}).value||'';
+let mot=($('saidaMotorista')||{}).value||'';
+doRegister(code,state.scanType,'saida',{rota,motorista:mot});
+}
+state.pendingCode=null;
+}catch(e){toast('Erro ao confirmar','error')}
+}
+window.confirmScan=confirmScan;
+
+async function doRegister(code,tipo,movimento,extra){
+try{
+let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:state.regional,operador:state.user,timestamp:new Date().toISOString()};
+if(extra)Object.assign(params,extra);
+
+// Optimistic UI
+state.sessionCount++;
+if($('sessionCount'))$('sessionCount').textContent=state.sessionCount;
+let entry={code,tipo,movimento,time:new Date(),status:'ok'};
+state.recentScans.unshift(entry);
+if(state.recentScans.length>5)state.recentScans.pop();
+updateMiniLog();
+flash('green');beep(800,100);
+
+// API call
+let r=await apiCall('registrar',params);
+if(!r){entry.status='offline';updateMiniLog()}
+}catch(e){flash('red');beep(200,300)}
+}
+
+function updateMiniLog(){
+try{
+let ml=$('miniLog');if(!ml)return;
+if(!state.recentScans.length){ml.innerHTML='<p style="color:var(--gray3);text-align:center;font-size:12px">Nenhum scan ainda</p>';return}
+let html=state.recentScans.map(s=>'<div class="log-item"><span>'+s.code+'</span><span>'+s.tipo+' • '+s.movimento+'</span><span style="color:'+(s.status==='ok'?'var(--green)':'var(--orange)')+'">'+s.status+'</span></div>').join('');
+ml.innerHTML=html;
+}catch(e){}
+}
+
+// Photo
+function capturePhoto(){try{let pi=$('photoInput');if(pi)pi.click()}catch(e){}}
+window.capturePhoto=capturePhoto;
+
+try{
+let pi=$('photoInput');
+if(pi)pi.addEventListener('change',function(e){
+try{
+let file=e.target.files[0];if(!file)return;
+let reader=new FileReader();
+reader.onload=function(ev){state.pendingPhoto=ev.target.result;if($('photoStatus'))$('photoStatus').textContent='✅ Foto capturada'};
+reader.readAsDataURL(file);
+}catch(ex){}
+});
+}catch(e){}
+
+// ===== DASHBOARD =====
+function populateDashFilters(){
+try{
+let ds=$('dashDS');if(!ds)return;
+ds.innerHTML='<option value="">Todas DS</option>';
+getDS().forEach(d=>{let n=typeof d==='string'?d.split(':')[0]:d.ds;let o=document.createElement('option');o.value=n;o.textContent=n;ds.appendChild(o)});
+let reg=$('dashRegional');if(reg){
+reg.innerHTML='<option value="">Todas Regionais</option>';
+let regs=[...new Set(getDS().map(d=>typeof d==='string'?d.split(':')[1]:d.regional))];
+regs.forEach(r=>{let o=document.createElement('option');o.value=r;o.textContent=r;reg.appendChild(o)});
+}
+let td=today();if($('dashFrom'))$('dashFrom').value=td;if($('dashTo'))$('dashTo').value=td;
+}catch(e){}
+}
+
+async function loadDashboard(){
+try{
+let params={ds:($('dashDS')||{}).value,regional:($('dashRegional')||{}).value,tipo:($('dashTipo')||{}).value,from:($('dashFrom')||{}).value,to:($('dashTo')||{}).value};
+let envData=await apiCall('lerEnvios',params);
+let regData=await apiCall('lerRegistros',params);
+
+let saidas=0,retornos=0,tbrHoje=0,tbrSemana=0;
+let envArr=envData&&envData.data?envData.data:[];
+let regArr=regData&&regData.data?regData.data:[];
+
+saidas=envArr.length;
+retornos=regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').length;
+tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.timestamp&&r.timestamp.startsWith(today())).length;
+let weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+tbrSemana=regArr.filter(r=>r.tipo==='Pacote'&&new Date(r.timestamp)>=weekAgo).length;
+
+let pendentes=Math.max(0,saidas-retornos);
+let pct=saidas?Math.round((retornos/saidas)*100):0;
+
+if($('mSaidas'))$('mSaidas').textContent=saidas;
+if($('mRetornos'))$('mRetornos').textContent=retornos;
+if($('mPendentes'))$('mPendentes').textContent=pendentes;
+if($('mPctRetorno'))$('mPctRetorno').textContent=pct+'%';
+if($('mTbrHoje'))$('mTbrHoje').textContent=tbrHoje;
+if($('mTbrSemana'))$('mTbrSemana').textContent=tbrSemana;
+
+renderBarChart(envArr,regArr);
+renderRoutesChart(envArr,regArr);
+renderDonutChart(regArr);
+renderHubTable(envArr,regArr);
+}catch(e){
+// Render demo data
+if($('mSaidas'))$('mSaidas').textContent='—';
+renderBarChart([],[]);renderRoutesChart([],[]);renderDonutChart([]);renderHubTable([],[]);
+}
+}
+window.loadDashboard=loadDashboard;
+
+function renderBarChart(envArr,regArr){
+try{
+let container=$('chartBar');if(!container)return;
+let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
+let envByDay=days.map(d=>envArr.filter(e=>e.data===d||((e.timestamp||'').startsWith(d))).length);
+let retByDay=days.map(d=>regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote'&&((r.timestamp||'').startsWith(d))).length);
+let max=Math.max(...envByDay,...retByDay,1);
+let barW=28,gap=8,gW=(barW*2+gap)*7+60,gH=180;
+let svg='<svg viewBox="0 0 '+gW+' '+(gH+40)+'" xmlns="http://www.w3.org/2000/svg">';
+svg+='<rect width="100%" height="100%" fill="white"/>';
+days.forEach((d,i)=>{
+let x=40+i*(barW*2+gap+10);
+let hE=(envByDay[i]/max)*(gH-20);
+let hR=(retByDay[i]/max)*(gH-20);
+svg+='<rect x="'+x+'" y="'+(gH-hE)+'" width="'+barW+'" height="'+hE+'" fill="#FF9900" rx="3"/>';
+svg+='<rect x="'+(x+barW+2)+'" y="'+(gH-hR)+'" width="'+barW+'" height="'+hR+'" fill="#00A86B" rx="3"/>';
+svg+='<text x="'+(x+barW)+'" y="'+(gH+15)+'" text-anchor="middle" font-size="9" fill="#94a3b8">'+d.slice(5)+'</text>';
+});
+svg+='<text x="10" y="15" font-size="9" fill="#FF9900">■ Envios</text><text x="80" y="15" font-size="9" fill="#00A86B">■ Retornos</text>';
+svg+='</svg>';
+container.innerHTML=svg;
+}catch(e){}
+}
+
+function renderRoutesChart(envArr,regArr){
+try{
+let container=$('chartRoutes');if(!container)return;
+let routes={};
+envArr.forEach(e=>{let r=e.rota||'S/R';if(!routes[r])routes[r]={env:0,ret:0};routes[r].env++});
+regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').forEach(r=>{let rt=r.rota||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
+let sorted=Object.entries(routes).sort((a,b)=>b[1].env-a[1].env).slice(0,10);
+if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
+let max=Math.max(...sorted.map(s=>s[1].env),1);
+let h=sorted.length*32+20;
+let svg='<svg viewBox="0 0 400 '+h+'" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/>';
+sorted.forEach(([name,val],i)=>{
+let y=10+i*32;let wE=(val.ret/max)*260;let wP=((val.env-val.ret)/max)*260;
+svg+='<text x="5" y="'+(y+14)+'" font-size="10" fill="#0F2137">'+name.slice(0,8)+'</text>';
+svg+='<rect x="70" y="'+(y+2)+'" width="'+wE+'" height="18" fill="#00A86B" rx="3"/>';
+svg+='<rect x="'+(70+wE)+'" y="'+(y+2)+'" width="'+Math.max(wP,0)+'" height="18" fill="#E74C3C" rx="3"/>';
+svg+='<text x="'+(75+wE+Math.max(wP,0))+'" y="'+(y+14)+'" font-size="9" fill="#94a3b8">'+val.env+'</text>';
+});
+svg+='</svg>';
+container.innerHTML=svg;
+}catch(e){}
+}
+
+function renderDonutChart(regArr){
+try{
+let container=$('tbrClassBadges');if(!container)return;
+let tbrs=regArr.filter(function(r){return r.Tipo==='Pacote'});
+if(!tbrs.length){container.innerHTML='<span style="font-size:11px;color:var(--gray3)">Nenhum TBR registrado</span>';return}
+let counts={};
+tbrs.forEach(function(r){var c=r.Classificacao||'Sem class.';counts[c]=(counts[c]||0)+1});
+var colors=['#FF9900','#E74C3C','#00A86B','#3498DB','#9B59B6','#F39C12','#1ABC9C','#E91E63','#607D8B','#795548'];
+var html='';var i=0;
+Object.keys(counts).forEach(function(k){
+html+='<span style="display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;background:'+colors[i%colors.length]+'22;color:'+colors[i%colors.length]+';border:1px solid '+colors[i%colors.length]+'44">'+k+': '+counts[k]+'</span>';
+i++;
+});
+container.innerHTML=html;
+}catch(e){}
+}
+function renderHubTable(envArr,regArr){
+try{
+let container=$('chartTable');if(!container)return;
+let hubs={};
+envArr.forEach(e=>{let h=e.hub||e.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].env++});
+regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').forEach(r=>{let h=r.hub||r.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].ret++});
+let sorted=Object.entries(hubs).map(([n,v])=>({name:n,...v,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).sort((a,b)=>b.pend-a.pend).slice(0,10);
+if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
+let html='<table class="data-table"><thead><tr><th>Hub</th><th>Envios</th><th>Retornos</th><th>Pend.</th><th>%</th></tr></thead><tbody>';
+sorted.forEach(h=>{html+='<tr><td>'+h.name+'</td><td>'+h.env+'</td><td>'+h.ret+'</td><td style="color:var(--red)">'+h.pend+'</td><td>'+h.pct+'%</td></tr>'});
+html+='</tbody></table>';
+container.innerHTML=html;
+}catch(e){}
+}
+
+function exportReport(){
+try{
+let s=$('mSaidas'),r=$('mRetornos'),p=$('mPendentes'),pct=$('mPctRetorno');
+let text='📦 ScanTrack — Relatório\n';
+text+='DS: '+state.ds+' | Regional: '+state.regional+'\n';
+text+='Data: '+new Date().toLocaleDateString('pt-BR')+'\n\n';
+text+='📊 Resumo:\n';
+text+='• Saídas: '+(s?s.textContent:'?')+'\n';
+text+='• Retornos: '+(r?r.textContent:'?')+'\n';
+text+='• Pendentes: '+(p?p.textContent:'?')+'\n';
+text+='• % Retorno: '+(pct?pct.textContent:'?')+'\n';
+text+='\n— Gerado por ScanTrack v3.0';
+navigator.clipboard.writeText(text).then(()=>toast('Relatório copiado!','success')).catch(()=>toast('Erro ao copiar','error'));
+}catch(e){}
+}
+window.exportReport=exportReport;
+
+// ===== REGISTROS =====
+async function loadRegistros(){
+try{
+let r=await apiCall('lerRegistros',{ds:state.ds});
+state.registros=r&&r.data?r.data:[];
+state.regPage=1;
+renderRegistros();
+}catch(e){state.registros=[];renderRegistros()}
+}
+
+function filterRegistros(){
+try{state.regPage=1;renderRegistros()}catch(e){}
+}
+window.filterRegistros=filterRegistros;
+
+function renderRegistros(){
+try{
+let body=$('regBody');if(!body)return;
+let search=(($('regSearch')||{}).value||'').toLowerCase();
+let filtered=state.registros.filter(r=>{
+let s=(r.codigo||'')+(r.operador||'')+(r.ds||'')+(r.tipo||'');
+return s.toLowerCase().includes(search);
+});
+let pages=Math.ceil(filtered.length/20)||1;
+let start=(state.regPage-1)*20;
+let pageData=filtered.slice(start,start+20);
+body.innerHTML=pageData.map((r,i)=>'<tr onclick="toggleDetail(this)" style="cursor:pointer"><td>'+((r.codigo||'').slice(0,20))+'</td><td>'+( r.tipo||'')+'</td><td>'+(r.movimento||'')+'</td><td>'+(r.ds||'')+'</td><td>'+(fmtDate(r.timestamp))+'</td></tr><tr class="detail-row hidden" id="det'+i+'"><td colspan="5">Op: '+(r.operador||'')+' | Class: '+(r.classificacao||'—')+' | Obs: '+(r.observacao||'—')+(r.fotourl?' | 📷 Foto':'')+'</td></tr>').join('');
+let pag=$('regPagination');if(pag){
+let html='';for(let p=1;p<=pages;p++){html+='<button class="page-btn '+(p===state.regPage?'active':'')+'" onclick="goRegPage('+p+')">'+p+'</button>'}
+pag.innerHTML=html;
+}
+}catch(e){}
+}
+
+function goRegPage(p){state.regPage=p;renderRegistros()}
+window.goRegPage=goRegPage;
+
+function toggleDetail(tr){try{let next=tr.nextElementSibling;if(next)next.classList.toggle('hidden')}catch(e){}}
+window.toggleDetail=toggleDetail;
+
+function exportCSV(){
+try{
+let csv='Codigo,Tipo,Movimento,Classificacao,DS,Operador,DataHora,Observacao\n';
+state.registros.forEach(r=>{csv+='"'+(r.codigo||'')+'","'+(r.tipo||'')+'","'+(r.movimento||'')+'","'+(r.classificacao||'')+'","'+(r.ds||'')+'","'+(r.operador||'')+'","'+(r.timestamp||'')+'","'+(r.observacao||'')+'"\n'});
+let blob=new Blob([csv],{type:'text/csv'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='scantrack_registros_'+today()+'.csv';a.click();
+}catch(e){toast('Erro ao exportar','error')}
+}
+window.exportCSV=exportCSV;
+
+// ===== ENVIOS (DISPATCH) =====
+function setupUpload(){
+try{
+let zone=$('uploadZone');let fi=$('fileInput');
+if(zone){
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover')});
+zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');let f=e.dataTransfer.files[0];if(f)parseFile(f)});
+}
+if(fi)fi.addEventListener('change',e=>{let f=e.target.files[0];if(f)parseFile(f)});
+}catch(e){}
+}
+
+function parseFile(file){
+try{
+let ext=file.name.split('.').pop().toLowerCase();
+if((ext==='xlsx'||ext==='xlsm')&&typeof XLSX!=='undefined'&&XLSX){
+let reader=new FileReader();
+reader.onload=function(e){
+try{
+let data=new Uint8Array(e.target.result);
+let wb=XLSX.read(data,{type:'array'});
+let sheetName=wb.SheetNames.find(n=>n.includes('All Dispatch'))||wb.SheetNames[0];
+let ws=wb.Sheets[sheetName];
+let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,dateNF:'yyyy-mm-dd'});
+processDispatchRows(rows);
+}catch(ex){toast('Erro ao processar xlsx: '+ex.message,'error')}
+};
+reader.readAsArrayBuffer(file);
+}else if(ext==='csv'||ext==='txt'){
+let reader=new FileReader();
+reader.onload=function(e){
+try{parseCSVData(e.target.result)}catch(ex){toast('Erro ao ler CSV','error')}
+};
+reader.readAsText(file,'UTF-8');
+}else{
+toast('Formato não suportado. Use .xlsx, .xlsm ou .csv','error');
+}
+}catch(e){toast('Erro ao ler arquivo','error')}
+}
+
+function parseCSVFile(file){parseFile(file)}
+
+function parsePaste(){
+try{let data=($('pasteArea')||{}).value;if(data)parseCSVData(data)}catch(e){}
+}
+window.parsePaste=parsePaste;
+
+function parseCSVData(raw){
+try{
+let lines=raw.split(/\r?\n/);
+let records=[];
+let currentRoute='',currentDate='';
+
+for(let i=0;i<lines.length;i++){
+let cols=lines[i].split(/[\t,](?=(?:[^"]*"[^"]*")*[^"]*$)/);
+cols=cols.map(c=>c.replace(/^"|"$/g,'').trim());
+
+if(cols[0]==='Route'||cols[0]==='route'){
+currentRoute=cols[1]||'';
+if(cols[9])currentDate=cols[9];
+continue;
+}
+
+if(cols[0]&&/^\d/.test(cols[0])&&cols.length>6&&cols[6]){
+let labels=(cols[6]||'').split(/[,\n;]+/).map(l=>l.trim()).filter(l=>l);
+let hub=cols[2]||cols[1]||'';
+let addr=cols[1]||'';
+
+labels.forEach(label=>{
+let tipo='Bag';
+if(label.startsWith('DN-'))tipo='Rafia';
+else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
+else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
+records.push({codigo:label,tipo,rota:currentRoute,hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
+});
+}
+}
+
+if(!records.length){toast('Nenhum registro encontrado. Verifique o formato.','error');return}
+
+let bags=records.filter(r=>r.tipo==='Bag').length;
+let rafias=records.filter(r=>r.tipo==='Rafia').length;
+let rotas=[...new Set(records.map(r=>r.rota))].length;
+let date=currentDate||today();
+
+state.parsedDispatch=records;
+state.parsedDate=date;
+
+let prev=$('uploadPreview');if(!prev)return;
+show(prev);
+prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' Bags — '+rotas+' rotas — Data: '+date+' — DS: '+state.ds+'</h4><div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>'+records.slice(0,10).map(r=>'<tr><td>'+r.codigo+'</td><td>'+r.tipo+'</td><td>'+r.rota+'</td><td>'+r.hub+'</td></tr>').join('')+'</tbody></table></div>'+(records.length>10?'<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>':'')+'<button class="btn btn-success" style="width:100%;margin-top:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button></div>';
+
+// Anti-dup check
+let dupKey='lastupload_'+state.ds+'_'+date;
+if(ls(dupKey)){
+prev.innerHTML+='<div class="card" style="border:2px solid var(--orange);margin-top:8px"><p style="color:var(--orange);font-weight:600">⚠️ Já existe carga do dia '+date+' para '+state.ds+'. O envio irá sobrescrever.</p></div>';
+}
+}catch(e){toast('Erro no parse: '+e.message,'error')}
+}
+
+async function uploadDispatch(){
+try{
+let records=state.parsedDispatch;if(!records||!records.length)return;
+show($('uploadProgress'));
+let chunks=[];for(let i=0;i<records.length;i+=50){chunks.push(records.slice(i,i+50))}
+let done=0;
+for(let chunk of chunks){
+await apiCall('registrarBatch',{registros:chunk,tipo:'envio'});
+done+=chunk.length;
+let pct=Math.round((done/records.length)*100);
+let fill=$('progFill');if(fill)fill.style.width=pct+'%';
+let txt=$('progText');if(txt)txt.textContent='Enviando... '+done+'/'+records.length;
+}
+let dupKey='lastupload_'+state.ds+'_'+(state.parsedDate||today());
+ls(dupKey,{date:state.parsedDate,count:records.length,ts:Date.now()});
+saveRecentUpload(records);
+toast('✅ '+records.length+' registros enviados!','success');
+hide($('uploadProgress'));hide($('uploadPreview'));
+loadRecentUploads();
+}catch(e){toast('Erro no upload','error')}
+}
+window.uploadDispatch=uploadDispatch;
+
+function processDispatchRows(rows){
+try{
+var records=[];
+var currentRoute='',currentDate='';
+for(var i=0;i<rows.length;i++){
+var cols=(rows[i]||[]).map(function(c){return String(c==null?'':c).trim()});
+if(cols[0]==='Route'||cols[0]==='route'){
+currentRoute=cols[1]||'';
+if(cols[9]){
+var dv=cols[9];
+if(typeof dv==='number'){var d=new Date((dv-25569)*86400000);currentDate=d.toISOString().split('T')[0]}
+else{var ds=String(dv);if(ds.includes('T'))currentDate=ds.split('T')[0];else if(ds.match(/^\d{4}-\d{2}-\d{2}/))currentDate=ds.substring(0,10);else if(ds.match(/^\d{2}\/\d{2}\/\d{4}/)){var p=ds.split('/');currentDate=p[2]+'-'+p[1]+'-'+p[0]}else currentDate=ds}
+}
+continue;
+}
+if(cols[0]&&/^\d/.test(cols[0])&&cols.length>6&&cols[6]){
+var raw=String(cols[6]||'');
+var labels=raw.split(/[\n\r;]+/).map(function(l){return l.trim()}).filter(function(l){return l});
+var hub=(cols[2]||cols[1]||'').substring(0,50);
+var addr=(cols[1]||'').substring(0,80);
+for(var k=0;k<labels.length;k++){
+var label=labels[k];
+var tipo='Bag';
+if(label.indexOf('DN-')===0)tipo='Rafia';
+else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
+else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
+records.push({codigo:label,tipo:tipo,movimento:'Saída',rota:currentRoute,hub:hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
+}
+}
+}
+if(!records.length){toast('Nenhum registro encontrado no arquivo.','error');return}
+var bags=records.filter(function(r){return r.tipo==='Bag'}).length;
+var rafias=records.filter(function(r){return r.tipo==='Rafia'}).length;
+var rotas=[];records.forEach(function(r){if(rotas.indexOf(r.rota)<0)rotas.push(r.rota)});
+var date=currentDate||today();
+state.parsedDispatch=records;
+state.parsedDate=date;
+var prev=$('uploadPreview');if(!prev)return;
+show(prev);
+var html='<div class="card"><h4>📊 '+rafias+' Ráfias, '+bags+' Bags — '+rotas.length+' rotas — '+date+' — '+state.ds+'</h4>';
+html+='<div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>';
+for(var j=0;j<Math.min(records.length,10);j++){html+='<tr><td>'+records[j].codigo+'</td><td>'+records[j].tipo+'</td><td>'+records[j].rota+'</td><td>'+records[j].hub+'</td></tr>'}
+html+='</tbody></table></div>';
+if(records.length>10)html+='<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>';
+html+='<button class="btn btn-success" style="width:100%;margin-top:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button></div>';
+prev.innerHTML=html;
+}catch(e){toast('Erro: '+e.message,'error')}
+}
+window.processDispatchRows=processDispatchRows;
+
+
+function saveRecentUpload(records){
+try{
+let uploads=ls('recentUploads')||[];
+let bags=records.filter(r=>r.tipo==='Bag').length;
+let rafias=records.filter(r=>r.tipo==='Rafia').length;
+uploads.unshift({date:state.parsedDate||today(),ds:state.ds,bags,rafias,total:records.length,ts:new Date().toISOString()});
+if(uploads.length>5)uploads=uploads.slice(0,5);
+ls('recentUploads',uploads);
+}catch(e){}
+}
+
+function loadRecentUploads(){
+try{
+let el=$('recentUploads');if(!el)return;
+let uploads=ls('recentUploads')||[];
+if(!uploads.length){el.innerHTML='Nenhum upload registrado';return}
+el.innerHTML='<table class="data-table"><thead><tr><th>Data</th><th>DS</th><th>Bags</th><th>Ráfias</th><th>Total</th></tr></thead><tbody>'+uploads.map(u=>'<tr><td>'+u.date+'</td><td>'+u.ds+'</td><td>'+u.bags+'</td><td>'+u.rafias+'</td><td>'+u.total+'</td></tr>').join('')+'</tbody></table>';
+}catch(e){}
+}
+
+// ===== ADMIN =====
+function checkAdmin(){
+try{
+if(isAdmin()){hide($('adminLocked'));show($('adminContent'));renderAdmin()}
+else{show($('adminLocked'));hide($('adminContent'))}
+}catch(e){}
+}
+
+function renderAdmin(){
+try{
+if($('adminApiUrl'))$('adminApiUrl').value=getApiUrl();
+if($('currentPin'))$('currentPin').textContent=getPin();
+
+// DS list
+let dsList=$('adminDsList');if(dsList){
+dsList.innerHTML=getDS().map((d,i)=>{let n=typeof d==='string'?d:d.ds+':'+d.regional;return'<li>'+n+'<button onclick="removeDS('+i+')">✕</button></li>'}).join('');
+}
+// Classifications
+let clList=$('adminClassList');if(clList){
+clList.innerHTML=getClassifications().map((c,i)=>'<li>'+c+'<button onclick="removeClass('+i+')">✕</button></li>').join('');
+}
+// Admins
+let aList=$('adminAdminsList');if(aList){
+aList.innerHTML=getAdmins().map((a,i)=>'<li>'+a+'<button onclick="removeAdmin('+i+')">✕</button></li>').join('');
+}
+}catch(e){}
+}
+
+function saveApiUrl(){try{let v=($('adminApiUrl')||{}).value;ls('api_url',v);toast('URL salva','success')}catch(e){}}
+window.saveApiUrl=saveApiUrl;
+
+async function testApi(){
+try{
+if($('apiTestResult'))$('apiTestResult').textContent='Testando...';
+let r=await apiCall('lerConfig');
+if(r)if($('apiTestResult'))$('apiTestResult').textContent='✅ Conexão OK';
+else if($('apiTestResult'))$('apiTestResult').textContent='❌ Falha na conexão';
+}catch(e){if($('apiTestResult'))$('apiTestResult').textContent='❌ Erro: '+e.message}
+}
+window.testApi=testApi;
+
+function addDS(){try{let v=($('addDsInput')||{}).value;if(v){let cfg=state.config||{};let ds=getDS();ds.push(v);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});if($('addDsInput'))$('addDsInput').value=''}}catch(e){}}
+window.addDS=addDS;
+function removeDS(i){try{let cfg=state.config||{};let ds=getDS();ds.splice(i,1);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeDS=removeDS;
+function addClass(){try{let v=($('addClassInput')||{}).value;if(v){let cfg=state.config||{};let cl=getClassifications();cl.push(v);cfg.classifications=cl;state.config=cfg;ls('config',cfg);renderAdmin();updateTbrClassOptions();apiCall('setup',{config:cfg});if($('addClassInput'))$('addClassInput').value=''}}catch(e){}}
+window.addClass=addClass;
+function removeClass(i){try{let cfg=state.config||{};let cl=getClassifications();cl.splice(i,1);cfg.classifications=cl;state.config=cfg;ls('config',cfg);renderAdmin();updateTbrClassOptions();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeClass=removeClass;
+function addAdmin(){try{let v=($('addAdminInput')||{}).value;if(v){let cfg=state.config||{};let ad=getAdmins();ad.push(v.toLowerCase());cfg.admins=ad;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});if($('addAdminInput'))$('addAdminInput').value=''}}catch(e){}}
+window.addAdmin=addAdmin;
+function removeAdmin(i){try{let cfg=state.config||{};let ad=getAdmins();ad.splice(i,1);cfg.admins=ad;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeAdmin=removeAdmin;
+function changePin(){try{let v=($('newPinInput')||{}).value;if(v&&v.length===4){let cfg=state.config||{};cfg.pin=v;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});toast('PIN alterado','success');if($('newPinInput'))$('newPinInput').value=''}else{toast('PIN deve ter 4 dígitos','error')}}catch(e){}}
+window.changePin=changePin;
+
+// ===== COMO USAR =====
+function loadHelp(){try{renderHelp(state.lang)}catch(e){}}
+function setLang(l,btn){
+try{
+state.lang=l;
+document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+renderHelp(l);
+}catch(e){}
+}
+window.setLang=setLang;
+
+function renderHelp(lang){
+try{
+let el=$('helpContent');if(!el)return;
+if(lang==='pt'){
+el.innerHTML=`
+<div class="help-section"><h3>🔐 Login</h3><p>Informe seu alias Amazon (login), selecione a DS e digite o PIN de 4 dígitos. O PIN padrão é 1234.</p></div>
+<div class="help-section"><h3>📱 Escaneando (Mobile)</h3><p>A câmera abre automaticamente. Aponte para o código QR/barcode e aguarde a leitura automática.</p><ul><li>Modo RETORNO: scan contínuo, sem confirmação</li><li>Modo SAÍDA: preencha rota e motorista, depois confirme</li><li>Modo PACOTE: preencha classificação e observe, depois confirme</li></ul></div>
+<div class="help-section"><h3>🖥️ Escaneando (Desktop/USB)</h3><p>Em telas grandes sem touch, o modo USB é ativado. O cursor fica no campo de texto. Aponte o leitor USB e o código é enviado automaticamente.</p></div>
+<div class="help-section"><h3>📦 Tipos de Ativos</h3><ul><li><strong>Bag</strong>: Sacolas com 4 dígitos no código (ex: "ABC 1234")</li><li><strong>Ráfia</strong>: Sacos grandes, código com "DN-" ou 3 dígitos (ex: "DN-001" ou "XYZ 123")</li><li><strong>Pacote (TBR)</strong>: Pacotes individuais com problemas — avariado, etiqueta ilegível, etc.</li></ul></div>
+<div class="help-section"><h3>📤 Upload Dispatch</h3><p>Exporte a aba "All Dispatch Sheet" como CSV no Excel, depois faça upload aqui. Os dados são enviados para a API em lotes de 50.</p></div>
+<div class="help-section"><h3>📊 Dashboard</h3><p>Visualize métricas de envios vs retornos, pendências por rota/hub, e classificações de TBR. Use os filtros para refinar.</p></div>
+<div class="help-section"><h3>⚙️ Admin</h3><p>Apenas aliases na lista de admins podem acessar. Configure URL da API, DSs, classificações e PIN.</p></div>
+<div class="help-section"><h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O app funciona offline? <span>▸</span></div><div class="faq-a">Parcialmente. Scans são salvos em fila local e enviados quando a conexão voltar.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Posso usar em vários dispositivos? <span>▸</span></div><div class="faq-a">Sim! Cada dispositivo mantém sua sessão. Os dados vão para a mesma planilha via API.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é o cooldown de 5 segundos? <span>▸</span></div><div class="faq-a">Evita duplicatas acidentais. O mesmo código não pode ser escaneado duas vezes em 5 segundos.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como configurar a API? <span>▸</span></div><div class="faq-a">Na aba Admin, cole a URL do seu Google Apps Script publicado e clique "Salvar".</div></div>
+</div></div>`;
+}else{
+el.innerHTML=`
+<div class="help-section"><h3>🔐 Login</h3><p>Enter your Amazon alias (login), select the DS, and type the 4-digit PIN. Default PIN is 1234.</p></div>
+<div class="help-section"><h3>📱 Scanning (Mobile)</h3><p>Camera opens automatically. Point at QR/barcode and wait for auto-read.</p><ul><li>RETURN mode: continuous scan, no confirmation needed</li><li>DEPARTURE mode: fill route and driver, then confirm</li><li>PACKAGE mode: fill classification and notes, then confirm</li></ul></div>
+<div class="help-section"><h3>🖥️ Scanning (Desktop/USB)</h3><p>On large screens without touch, USB mode activates. Cursor stays in the text field. Point USB reader and code auto-submits.</p></div>
+<div class="help-section"><h3>📦 Asset Types</h3><ul><li><strong>Bag</strong>: Bags with 4-digit codes (e.g. "ABC 1234")</li><li><strong>Ráfia</strong>: Large sacks, code with "DN-" or 3 digits</li><li><strong>Package (TBR)</strong>: Individual packages with issues — damaged, unreadable label, etc.</li></ul></div>
+<div class="help-section"><h3>📤 Upload Dispatch</h3><p>Export "All Dispatch Sheet" tab as CSV in Excel, then upload here. Data is sent to API in batches of 50.</p></div>
+<div class="help-section"><h3>📊 Dashboard</h3><p>View send vs return metrics, pending by route/hub, and TBR classifications. Use filters to refine.</p></div>
+<div class="help-section"><h3>⚙️ Admin</h3><p>Only aliases in the admin list can access. Configure API URL, DSs, classifications, and PIN.</p></div>
+<div class="help-section"><h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Does it work offline? <span>▸</span></div><div class="faq-a">Partially. Scans queue locally and send when connection returns.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Can I use multiple devices? <span>▸</span></div><div class="faq-a">Yes! Each device keeps its session. Data goes to the same spreadsheet via API.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">What's the 5-second cooldown? <span>▸</span></div><div class="faq-a">Prevents accidental duplicates. Same code can't scan twice within 5 seconds.</div></div>
+</div></div>`;
+}
+}catch(e){}
+}
+
+// ===== MODAL =====
+function showModal(html){try{let o=$('modalOverlay'),c=$('modalContent');if(o&&c){c.innerHTML=html;show(o)}}catch(e){}}
+function hideModal(){try{hide($('modalOverlay'))}catch(e){}}
+window.showModal=showModal;window.hideModal=hideModal;
+
+// ===== INIT =====
+function init(){
+try{
+// Load offline queue
+state.offlineQueue=ls('offlineQueue')||[];
+
+// Try auto-login
+let u=ls('user'),d=ls('ds'),r=ls('regional');
+// Load config first
+populateLoginDS();
+if(u&&d){state.user=u;state.ds=d;state.regional=r||'';showApp()}
+try{loadConfig(false).then(()=>{populateLoginDS()}).catch(()=>{})}catch(e){}
+
+setupUpload();
+detectDesktop();
+
+// Enter key for manual entry
+let mc=$('manualCode');if(mc)mc.addEventListener('keydown',e=>{if(e.key==='Enter')manualSubmit()});
+// USB Enter
+let ui=$('usbInput');if(ui)ui.addEventListener('keydown',e=>{if(e.key==='Enter'){let v=ui.value.trim();if(v){processScan(v);ui.value=''}}});
+}catch(e){}
+}
+
+init();
+
+// Expose functions to global scope for onclick handlers
+window.addAdmin=addAdmin;
+window.addClass=addClass;
+window.addDS=addDS;
+window.capturePhoto=capturePhoto;
+window.changePin=changePin;
+window.confirmScan=confirmScan;
+window.doLogin=doLogin;
+window.doLogout=doLogout;
+window.exportCSV=exportCSV;
+window.exportReport=exportReport;
+window.goRegPage=goRegPage;
+window.loadDashboard=loadDashboard;
+window.manualSubmit=manualSubmit;
+window.parsePaste=parsePaste;
+window.removeAdmin=removeAdmin;
+window.removeClass=removeClass;
+window.removeDS=removeDS;
+window.saveApiUrl=saveApiUrl;
+window.setLang=setLang;
+window.setMove=setMove;
+window.setType=setType;
+window.switchTab=switchTab;
+window.testApi=testApi;
+window.toggleDetail=toggleDetail;
+window.uploadDispatch=uploadDispatch;
+})()}catch(e){}
+</script>
+
+
+</body></html>
