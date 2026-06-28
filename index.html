@@ -1059,11 +1059,11 @@ let saidas=0,retornos=0,tbrHoje=0,tbrSemana=0;
 let envArr=envData&&envData.data?envData.data:[];
 let regArr=regData&&regData.data?regData.data:[];
 
-saidas=envArr.length;
-retornos=regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').length;
-tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.timestamp&&r.timestamp.startsWith(today())).length;
+saidas=envArr.length+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')).length;
+retornos=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').length;
+tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.datahora&&r.datahora.startsWith(today())).length;
 let weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
-tbrSemana=regArr.filter(r=>r.tipo==='Pacote'&&new Date(r.timestamp)>=weekAgo).length;
+tbrSemana=regArr.filter(r=>r.tipo==='Pacote'&&new Date(r.datahora)>=weekAgo).length;
 
 let pendentes=Math.max(0,saidas-retornos);
 let pct=saidas?Math.round((retornos/saidas)*100):0;
@@ -1092,7 +1092,7 @@ try{
 let container=$('chartBar');if(!container)return;
 let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
 let envByDay=days.map(d=>envArr.filter(e=>e.data===d||((e.timestamp||'').startsWith(d))).length);
-let retByDay=days.map(d=>regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote'&&((r.timestamp||'').startsWith(d))).length);
+let retByDay=days.map(d=>regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote'&&((r.datahora||'').startsWith(d))).length);
 let max=Math.max(...envByDay,...retByDay,1);
 let barW=28,gap=8,gW=(barW*2+gap)*7+60,gH=180;
 let svg='<svg viewBox="0 0 '+gW+' '+(gH+40)+'" xmlns="http://www.w3.org/2000/svg">';
@@ -1208,7 +1208,7 @@ return s.toLowerCase().includes(search);
 let pages=Math.ceil(filtered.length/20)||1;
 let start=(state.regPage-1)*20;
 let pageData=filtered.slice(start,start+20);
-body.innerHTML=pageData.map((r,i)=>'<tr onclick="toggleDetail(this)" style="cursor:pointer"><td>'+((r.codigo||'').slice(0,20))+'</td><td>'+( r.tipo||'')+'</td><td>'+(r.movimento||'')+'</td><td>'+(r.ds||'')+'</td><td>'+(fmtDate(r.timestamp))+'</td></tr><tr class="detail-row hidden" id="det'+i+'"><td colspan="5">Op: '+(r.operador||'')+' | Class: '+(r.classificacao||'—')+' | Obs: '+(r.observacao||'—')+(r.fotourl?' | 📷 Foto':'')+'</td></tr>').join('');
+body.innerHTML=pageData.map((r,i)=>'<tr onclick="toggleDetail(this)" style="cursor:pointer"><td>'+((r.codigo||'').slice(0,20))+'</td><td>'+( r.tipo||'')+'</td><td>'+(r.movimento||'')+'</td><td>'+(r.ds||'')+'</td><td>'+(fmtDate(r.datahora))+'</td></tr><tr class="detail-row hidden" id="det'+i+'"><td colspan="5">Op: '+(r.operador||'')+' | Class: '+(r.classificacao||'—')+' | Obs: '+(r.observacao||'—')+(r.fotourl?' | 📷 Foto':'')+'</td></tr>').join('');
 let pag=$('regPagination');if(pag){
 let html='';for(let p=1;p<=pages;p++){html+='<button class="page-btn '+(p===state.regPage?'active':'')+'" onclick="goRegPage('+p+')">'+p+'</button>'}
 pag.innerHTML=html;
@@ -1225,7 +1225,7 @@ window.toggleDetail=toggleDetail;
 function exportCSV(){
 try{
 let csv='Codigo,Tipo,Movimento,Classificacao,DS,Operador,DataHora,Observacao\n';
-state.registros.forEach(r=>{csv+='"'+(r.codigo||'')+'","'+(r.tipo||'')+'","'+(r.movimento||'')+'","'+(r.classificacao||'')+'","'+(r.ds||'')+'","'+(r.operador||'')+'","'+(r.timestamp||'')+'","'+(r.observacao||'')+'"\n'});
+state.registros.forEach(r=>{csv+='"'+(r.codigo||'')+'","'+(r.tipo||'')+'","'+(r.movimento||'')+'","'+(r.classificacao||'')+'","'+(r.ds||'')+'","'+(r.operador||'')+'","'+(r.datahora||'')+'","'+(r.observacao||'')+'"\n'});
 let blob=new Blob([csv],{type:'text/csv'});
 let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='scantrack_registros_'+today()+'.csv';a.click();
 }catch(e){toast('Erro ao exportar','error')}
@@ -1318,7 +1318,7 @@ let rafias=records.filter(r=>r.tipo==='Rafia').length;
 let rotas=[...new Set(records.map(r=>r.rota))].length;
 let date=currentDate||today();
 
-state.parsedDispatch=records;
+state.parsedDispatch=records;state.parsedFilename=filename||'';
 state.parsedDate=date;
 
 let prev=$('uploadPreview');if(!prev)return;
@@ -1326,9 +1326,9 @@ show(prev);
 prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' Bags — '+rotas+' rotas — Data: '+date+' — DS: '+state.ds+'</h4><div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>'+records.slice(0,10).map(r=>'<tr><td>'+r.codigo+'</td><td>'+r.tipo+'</td><td>'+r.rota+'</td><td>'+r.hub+'</td></tr>').join('')+'</tbody></table></div>'+(records.length>10?'<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>':'')+'<button class="btn btn-success" style="width:100%;margin-top:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button></div>';
 
 // Anti-dup check
-let dupKey='lastupload_'+state.ds+'_'+date;
+let dupKey='lastupload_'+state.ds+'_'+(filename||date);
 if(ls(dupKey)){
-html='<div class="card" style="border:2px solid var(--red)"><p style="color:var(--red);font-weight:600">⚠️ Carga do dia '+date+' para '+state.ds+' já foi enviada!</p><p style="font-size:12px;margin-top:8px">'+records.length+' registros já existem. Para reenviar, clique abaixo:</p><button class="btn" style="background:var(--red);color:white;margin-top:8px;width:100%" onclick="forceUploadDispatch()">🔄 Sobrescrever carga</button></div>';
+html='<div class="card" style="border:2px solid var(--red)"><p style="color:var(--red);font-weight:600">⚠️ Este arquivo já foi enviado para '+state.ds+'!</p><p style="font-size:12px;margin-top:8px">Arquivo: '+(filename||'dispatch')+' ('+records.length+' registros). Para reenviar, clique abaixo:</p><button class="btn" style="background:var(--red);color:white;margin-top:8px;width:100%" onclick="forceUploadDispatch()">🔄 Sobrescrever carga</button></div>';
 prev.innerHTML=html;return;
 }
 }catch(e){toast('Erro no parse: '+e.message,'error')}
@@ -1348,7 +1348,7 @@ let pct=Math.round((done/records.length)*100);
 let fill=$('progFill');if(fill)fill.style.width=pct+'%';
 let txt=$('progText');if(txt)txt.textContent='Enviando... '+done+'/'+records.length;
 }
-let dupKey='lastupload_'+state.ds+'_'+(state.parsedDate||today());
+let dupKey='lastupload_'+state.ds+'_'+(state.parsedFilename||state.parsedDate||today());
 ls(dupKey,{date:state.parsedDate,count:records.length,ts:Date.now()});
 saveRecentUpload(records);
 toast('✅ '+records.length+' registros enviados!','success');
@@ -1359,6 +1359,17 @@ loadRecentUploads();
 window.uploadDispatch=uploadDispatch;
 function forceUploadDispatch(){uploadDispatch()}
 window.forceUploadDispatch=forceUploadDispatch;
+
+function clearUploadHistory(){
+try{
+var keys=Object.keys(localStorage);
+keys.forEach(function(k){if(k.startsWith('scantrack_lastupload_'))localStorage.removeItem(k)});
+toast('Histórico de uploads limpo!','success');
+loadRecentUploads();
+}catch(e){}
+}
+window.clearUploadHistory=clearUploadHistory;
+
 
 function processDispatchRows(rows,filename){
 try{
@@ -1429,7 +1440,7 @@ var bags=records.filter(function(r){return r.tipo==='Bag'}).length;
 var rafias=records.filter(function(r){return r.tipo==='Rafia'}).length;
 var rotas=[];records.forEach(function(r){if(rotas.indexOf(r.rota)<0)rotas.push(r.rota)});
 var date=currentDate||today();
-state.parsedDispatch=records;
+state.parsedDispatch=records;state.parsedFilename=filename||'';
 state.parsedDate=date;
 var prev=$('uploadPreview');if(!prev)return;
 show(prev);
@@ -1627,6 +1638,17 @@ window.toggleDetail=toggleDetail;
 window.uploadDispatch=uploadDispatch;
 function forceUploadDispatch(){uploadDispatch()}
 window.forceUploadDispatch=forceUploadDispatch;
+
+function clearUploadHistory(){
+try{
+var keys=Object.keys(localStorage);
+keys.forEach(function(k){if(k.startsWith('scantrack_lastupload_'))localStorage.removeItem(k)});
+toast('Histórico de uploads limpo!','success');
+loadRecentUploads();
+}catch(e){}
+}
+window.clearUploadHistory=clearUploadHistory;
+
 })()}catch(e){}
 </script>
 
