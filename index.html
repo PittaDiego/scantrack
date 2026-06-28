@@ -725,7 +725,7 @@ function flash(color){try{let f=document.createElement('div');f.className='flash
 function beep(freq,dur){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.value=0.3;o.start();setTimeout(()=>{try{o.stop()}catch(e){}},dur)}catch(e){}}
 function fmtDate(d){try{let dt=new Date(d);return dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return d||''}}
 function today(){return new Date().toISOString().split('T')[0]}
-function getApiUrl(){return ls('api_url')||''}
+function getApiUrl(){return ls('api_url')||'https://script.google.com/macros/s/AKfycbxy5kIsZ2hSLV2DuUA_L6NoMRWfutJagI1sxbwVqW5v85e-goe5azAYo-XODqF7scJv4Q/exec'}
 
 // ===== DETECT DESKTOP =====
 function detectDesktop(){let w=window.innerWidth>768;let noTouch=!('ontouchstart' in window)&&!navigator.maxTouchPoints;state.isDesktop=w&&noTouch}
