@@ -1248,7 +1248,7 @@ let data=new Uint8Array(e.target.result);
 let wb=XLSX.read(data,{type:'array'});
 let sheetName=wb.SheetNames.find(n=>n.includes('All Dispatch'))||wb.SheetNames[0];
 let ws=wb.Sheets[sheetName];
-let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,dateNF:'yyyy-mm-dd'});
 processDispatchRows(rows);
 }catch(ex){toast('Erro ao processar xlsx: '+ex.message,'error')}
 };
@@ -1356,7 +1356,11 @@ for(var i=0;i<rows.length;i++){
 var cols=(rows[i]||[]).map(function(c){return String(c==null?'':c).trim()});
 if(cols[0]==='Route'||cols[0]==='route'){
 currentRoute=cols[1]||'';
-if(cols[9])currentDate=String(cols[9]).split('T')[0];
+if(cols[9]){
+var dv=cols[9];
+if(typeof dv==='number'){var d=new Date((dv-25569)*86400000);currentDate=d.toISOString().split('T')[0]}
+else{var ds=String(dv);if(ds.includes('T'))currentDate=ds.split('T')[0];else if(ds.match(/^\d{4}-\d{2}-\d{2}/))currentDate=ds.substring(0,10);else if(ds.match(/^\d{2}\/\d{2}\/\d{4}/)){var p=ds.split('/');currentDate=p[2]+'-'+p[1]+'-'+p[0]}else currentDate=ds}
+}
 continue;
 }
 if(cols[0]&&/^\d/.test(cols[0])&&cols.length>6&&cols[6]){
@@ -1370,7 +1374,7 @@ var tipo='Bag';
 if(label.indexOf('DN-')===0)tipo='Rafia';
 else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
 else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
-records.push({codigo:label,tipo:tipo,rota:currentRoute,hub:hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
+records.push({codigo:label,tipo:tipo,movimento:'Saída',rota:currentRoute,hub:hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
 }
 }
 }
