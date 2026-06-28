@@ -630,6 +630,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <div class="card" style="margin-top:16px">
 <h4 style="font-size:13px;margin-bottom:8px">📜 Últimos Uploads</h4>
 <div id="recentUploads" style="font-size:12px;color:var(--gray3)">Nenhum upload registrado</div>
+<button style="margin-top:12px;padding:8px 16px;background:#E74C3C;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px" onclick="clearUploadHistory()">🗑️ Limpar histórico de envios</button>
 </div>
 </div>
 
@@ -1326,8 +1327,9 @@ show(prev);
 prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' Bags — '+rotas+' rotas — Data: '+date+' — DS: '+state.ds+'</h4><div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>'+records.slice(0,10).map(r=>'<tr><td>'+r.codigo+'</td><td>'+r.tipo+'</td><td>'+r.rota+'</td><td>'+r.hub+'</td></tr>').join('')+'</tbody></table></div>'+(records.length>10?'<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>':'')+'<button class="btn btn-success" style="width:100%;margin-top:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button></div>';
 
 // Anti-dup check
-let dupKey='lastupload_'+state.ds+'_'+(filename||date);
-if(ls(dupKey)){
+var dupKey='scantrack_dup_'+state.ds+'_'+(filename||date||'').replace(/[^a-zA-Z0-9-_]/g,'');
+var dupVal=null;try{dupVal=localStorage.getItem(dupKey)}catch(e){}
+if(dupVal){
 html='<div class="card" style="border:2px solid var(--red)"><p style="color:var(--red);font-weight:600">⚠️ Este arquivo já foi enviado para '+state.ds+'!</p><p style="font-size:12px;margin-top:8px">Arquivo: '+(filename||'dispatch')+' ('+records.length+' registros). Para reenviar, clique abaixo:</p><button class="btn" style="background:var(--red);color:white;margin-top:8px;width:100%" onclick="forceUploadDispatch()">🔄 Sobrescrever carga</button></div>';
 prev.innerHTML=html;return;
 }
@@ -1348,8 +1350,8 @@ let pct=Math.round((done/records.length)*100);
 let fill=$('progFill');if(fill)fill.style.width=pct+'%';
 let txt=$('progText');if(txt)txt.textContent='Enviando... '+done+'/'+records.length;
 }
-let dupKey='lastupload_'+state.ds+'_'+(state.parsedFilename||state.parsedDate||today());
-ls(dupKey,{date:state.parsedDate,count:records.length,ts:Date.now()});
+var dupSaveKey='scantrack_dup_'+state.ds+'_'+(state.parsedFilename||state.parsedDate||today()).replace(/[^a-zA-Z0-9-_]/g,'');
+try{localStorage.setItem(dupSaveKey,JSON.stringify({date:state.parsedDate,count:records.length,ts:Date.now()}))}catch(e){}
 saveRecentUpload(records);
 toast('✅ '+records.length+' registros enviados!','success');
 hide($('uploadProgress'));hide($('uploadPreview'));
@@ -1363,7 +1365,7 @@ window.forceUploadDispatch=forceUploadDispatch;
 function clearUploadHistory(){
 try{
 var keys=Object.keys(localStorage);
-keys.forEach(function(k){if(k.includes('lastupload'))localStorage.removeItem(k)});
+keys.forEach(function(k){if(k.includes('lastupload')||k.includes('scantrack_dup_'))localStorage.removeItem(k)});
 toast('Histórico de uploads limpo!','success');
 loadRecentUploads();
 }catch(e){}
@@ -1639,15 +1641,7 @@ window.uploadDispatch=uploadDispatch;
 function forceUploadDispatch(){uploadDispatch()}
 window.forceUploadDispatch=forceUploadDispatch;
 
-function clearUploadHistory(){
-try{
-var keys=Object.keys(localStorage);
-keys.forEach(function(k){if(k.includes('lastupload'))localStorage.removeItem(k)});
-toast('Histórico de uploads limpo!','success');
-loadRecentUploads();
-}catch(e){}
-}
-window.clearUploadHistory=clearUploadHistory;
+
 
 })()}catch(e){}
 </script>
