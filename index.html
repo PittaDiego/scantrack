@@ -991,7 +991,7 @@ window.confirmScan=confirmScan;
 
 async function doRegister(code,tipo,movimento,extra){
 try{
-let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:state.regional,operador:state.user,timestamp:new Date().toISOString()};
+let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:state.regional,operador:state.user,datahora:new Date().toISOString()};
 if(extra)Object.assign(params,extra);
 
 // Optimistic UI
@@ -1091,8 +1091,8 @@ function renderBarChart(envArr,regArr){
 try{
 let container=$('chartBar');if(!container)return;
 let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
-let envByDay=days.map(d=>envArr.filter(e=>e.data===d||((e.timestamp||'').startsWith(d))).length);
-let retByDay=days.map(d=>regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote'&&((r.datahora||'').startsWith(d))).length);
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||e.data||'').startsWith(d)).length);
+let retByDay=days.map(d=>regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote'&&((r.datahora||'').startsWith(d))).length);
 let max=Math.max(...envByDay,...retByDay,1);
 let barW=28,gap=8,gW=(barW*2+gap)*7+60,gH=180;
 let svg='<svg viewBox="0 0 '+gW+' '+(gH+40)+'" xmlns="http://www.w3.org/2000/svg">';
@@ -1115,8 +1115,8 @@ function renderRoutesChart(envArr,regArr){
 try{
 let container=$('chartRoutes');if(!container)return;
 let routes={};
-envArr.forEach(e=>{let r=e.rota||'S/R';if(!routes[r])routes[r]={env:0,ret:0};routes[r].env++});
-regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').forEach(r=>{let rt=r.rota||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
+envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{let r=e.rota||'S/R';if(!routes[r])routes[r]={env:0,ret:0};routes[r].env++});
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let rt=r.rota||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
 let sorted=Object.entries(routes).sort((a,b)=>b[1].env-a[1].env).slice(0,10);
 if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
 let max=Math.max(...sorted.map(s=>s[1].env),1);
@@ -1155,7 +1155,7 @@ try{
 let container=$('chartTable');if(!container)return;
 let hubs={};
 envArr.forEach(e=>{let h=e.hub||e.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].env++});
-regArr.filter(r=>r.movimento==='retorno'&&r.tipo!=='Pacote').forEach(r=>{let h=r.hub||r.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].ret++});
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let h=r.hub||r.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].ret++});
 let sorted=Object.entries(hubs).map(([n,v])=>({name:n,...v,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).sort((a,b)=>b.pend-a.pend).slice(0,10);
 if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
 let html='<table class="data-table"><thead><tr><th>Hub</th><th>Envios</th><th>Retornos</th><th>Pend.</th><th>%</th></tr></thead><tbody>';
@@ -1363,7 +1363,7 @@ window.forceUploadDispatch=forceUploadDispatch;
 function clearUploadHistory(){
 try{
 var keys=Object.keys(localStorage);
-keys.forEach(function(k){if(k.startsWith('scantrack_lastupload_'))localStorage.removeItem(k)});
+keys.forEach(function(k){if(k.includes('lastupload'))localStorage.removeItem(k)});
 toast('Histórico de uploads limpo!','success');
 loadRecentUploads();
 }catch(e){}
@@ -1642,7 +1642,7 @@ window.forceUploadDispatch=forceUploadDispatch;
 function clearUploadHistory(){
 try{
 var keys=Object.keys(localStorage);
-keys.forEach(function(k){if(k.startsWith('scantrack_lastupload_'))localStorage.removeItem(k)});
+keys.forEach(function(k){if(k.includes('lastupload'))localStorage.removeItem(k)});
 toast('Histórico de uploads limpo!','success');
 loadRecentUploads();
 }catch(e){}
