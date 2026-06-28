@@ -725,7 +725,15 @@ function hide(el){if(el)el.classList.add('hidden')}
 function toast(msg,type){try{let t=document.createElement('div');t.className='toast';t.style.background=type==='error'?'var(--red)':type==='warn'?'var(--orange)':'var(--green)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{try{t.remove()}catch(e){}},2500)}catch(e){}}
 function flash(color){try{let f=document.createElement('div');f.className='flash flash-'+color;document.body.appendChild(f);setTimeout(()=>{try{f.remove()}catch(e){}},250)}catch(e){}}
 function beep(freq,dur){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.value=0.3;o.start();setTimeout(()=>{try{o.stop()}catch(e){}},dur)}catch(e){}}
-function fmtDate(d){try{let dt=new Date(d);return dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}catch(e){return d||''}}
+function fmtDate(d){
+if(!d)return '-';
+var s=String(d);
+try{
+var m=s.match(/(\d{4})-(\d{2})-(\d{2})/);
+if(m){var time='';var t=s.match(/T(\d{2}):(\d{2})/);if(t)time=' '+t[1]+':'+t[2];return m[3]+'/'+m[2]+'/'+m[1]+time}
+m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);if(m)return s.split('T')[0];
+return s.substring(0,16).replace('T',' ');
+}catch(e){return s||'-'}}
 function today(){return new Date().toISOString().split('T')[0]}
 function getApiUrl(){return ls('api_url')||'https://script.google.com/macros/s/AKfycbxy5kIsZ2hSLV2DuUA_L6NoMRWfutJagI1sxbwVqW5v85e-goe5azAYo-XODqF7scJv4Q/exec'}
 
@@ -1249,7 +1257,7 @@ let wb=XLSX.read(data,{type:'array',cellDates:true});
 let sheetName=wb.SheetNames.find(n=>n.includes('All Dispatch'))||wb.SheetNames[0];
 let ws=wb.Sheets[sheetName];
 let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true});
-processDispatchRows(rows);
+processDispatchRows(rows,file.name);
 }catch(ex){toast('Erro ao processar xlsx: '+ex.message,'error')}
 };
 reader.readAsArrayBuffer(file);
@@ -1352,22 +1360,36 @@ window.uploadDispatch=uploadDispatch;
 function forceUploadDispatch(){uploadDispatch()}
 window.forceUploadDispatch=forceUploadDispatch;
 
-function processDispatchRows(rows){
+function processDispatchRows(rows,filename){
 try{
 var records=[];
-var currentRoute='',currentDate='';
+var currentRoute='',currentDate=extractDateFromFilename(filename)||'';
 
 function parseDate(val){
+try{
 if(!val)return '';
-if(val instanceof Date){try{return val.toISOString().split('T')[0]}catch(e){return ''}}
-if(typeof val==='number'){try{var d=new Date((val-25569)*86400000);return d.toISOString().split('T')[0]}catch(e){return ''}}
+if(val instanceof Date&&!isNaN(val.getTime()))return val.toISOString().split('T')[0];
+if(typeof val==='number'&&val>40000&&val<60000){var d=new Date((val-25569)*86400000);if(!isNaN(d.getTime()))return d.toISOString().split('T')[0]}
 var s=String(val).trim();
-if(s.match(/^\d{4}-\d{2}-\d{2}/))return s.substring(0,10);
-if(s.match(/^\d{4}\/\d{2}\/\d{2}/))return s.substring(0,10).replace(/\//g,'-');
-if(s.match(/^\d{2}\/\d{2}\/\d{4}/)){var p=s.split('/');return p[2]+'-'+p[1]+'-'+p[0]}
-if(s.match(/^\d{2}-\d{2}-\d{4}/)){var p=s.split('-');return p[2]+'-'+p[1]+'-'+p[0]}
-if(s.includes('T'))return s.split('T')[0];
-return s;
+var m;
+m=s.match(/(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+m=s.match(/(\d{4})\/(\d{2})\/(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);if(m)return m[3]+'-'+m[2]+'-'+m[1];
+m=s.match(/(\d{2})-(\d{2})-(\d{4})/);if(m)return m[3]+'-'+m[2]+'-'+m[1];
+if(s.includes('T')){var p=s.split('T')[0];if(p.match(/\d{4}-\d{2}-\d{2}/))return p}
+return '';
+}catch(e){return ''}
+}
+
+function extractDateFromFilename(name){
+try{
+if(!name)return '';
+var m=name.match(/(\d{4})-(\d{2})-(\d{2})/);
+if(m)return m[1]+'-'+m[2]+'-'+m[3];
+m=name.match(/(\d{2})-(\d{2})-(\d{4})/);
+if(m)return m[3]+'-'+m[2]+'-'+m[1];
+return '';
+}catch(e){return ''}
 }
 
 for(var i=0;i<rows.length;i++){
@@ -1398,7 +1420,7 @@ var tipo='Bag';
 if(label.indexOf('DN-')===0)tipo='Rafia';
 else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
 else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
-records.push({codigo:label,tipo:tipo,movimento:'Saida',rota:currentRoute,hub:hub,endereco:addr,data:currentDate||new Date().toISOString().split('T')[0],ds:state.ds,regional:state.regional||''});
+records.push({codigo:label,tipo:tipo,movimento:'Saida',rota:currentRoute,hub:hub,endereco:addr,data:currentDate||extractDateFromFilename(filename)||new Date().toISOString().split('T')[0],ds:state.ds,regional:state.regional||''});
 }
 }
 }
