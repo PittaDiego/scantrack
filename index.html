@@ -475,6 +475,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 .modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
 
 @media(max-width:480px){.metrics-grid{grid-template-columns:1fr 1fr}.filters-row{flex-direction:column}}
+
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:768px){.charts-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -580,8 +583,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <div class="metric-card"><div class="metric-value" id="mPctRetorno">0%</div><div class="metric-label">% Retorno</div></div>
 </div>
 <div class="chart-section"><h3>📋 Pendências Hubs</h3><div class="chart-container" id="chartTable"></div></div>
-<div class="chart-section"><h3>📊 Envios vs Retornos (7 dias)</h3><div class="chart-container" id="chartBar"></div></div>
-<div class="chart-section"><h3>❌ Principais Rotas s/ Devolução</h3><div class="chart-container" id="chartRoutes"></div></div>
+<div class="charts-row"><div class="chart-section"><h3 style="font-size:13px;margin-bottom:8px">📊 Envios vs Retornos (7d)</h3><div class="chart-container" id="chartBar" style="max-height:150px;overflow:hidden"></div></div>
+<div class="chart-section"><h3 style="font-size:13px;margin-bottom:8px">❌ Rotas s/ Devolução</h3><div class="chart-container" id="chartRoutes" style="max-height:200px;overflow:hidden"></div></div></div>
 <hr style="margin:20px 0;border:none;border-top:2px solid var(--gray1)">
 <div class="card" style="margin-bottom:12px">
 <h4 style="font-size:13px;margin-bottom:10px">📦 TBR por Classificação</h4>
@@ -1095,7 +1098,7 @@ let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days
 let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||e.data||'').startsWith(d)).length);
 let retByDay=days.map(d=>regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote'&&((r.datahora||'').startsWith(d))).length);
 let max=Math.max(...envByDay,...retByDay,1);
-let barW=28,gap=8,gW=(barW*2+gap)*7+60,gH=180;
+let barW=20,gap=4,gW=(barW*2+gap)*7+50,gH=120;
 let svg='<svg viewBox="0 0 '+gW+' '+(gH+40)+'" xmlns="http://www.w3.org/2000/svg">';
 svg+='<rect width="100%" height="100%" fill="white"/>';
 days.forEach((d,i)=>{
@@ -1116,12 +1119,12 @@ function renderRoutesChart(envArr,regArr){
 try{
 let container=$('chartRoutes');if(!container)return;
 let routes={};
-envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{let r=e.rota||'S/R';if(!routes[r])routes[r]={env:0,ret:0};routes[r].env++});
+envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{let r=e.rota||(e.observacao&&e.observacao.match(/Rota:([^|]+)/)?e.observacao.match(/Rota:([^|]+)/)[1].trim():'')||'S/R';if(!routes[r])routes[r]={env:0,ret:0};routes[r].env++});
 regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let rt=r.rota||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
 let sorted=Object.entries(routes).sort((a,b)=>b[1].env-a[1].env).slice(0,10);
 if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
 let max=Math.max(...sorted.map(s=>s[1].env),1);
-let h=sorted.length*32+20;
+let h=Math.min(sorted.length*28+20,200);
 let svg='<svg viewBox="0 0 400 '+h+'" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/>';
 sorted.forEach(([name,val],i)=>{
 let y=10+i*32;let wE=(val.ret/max)*260;let wP=((val.env-val.ret)/max)*260;
@@ -1155,7 +1158,7 @@ function renderHubTable(envArr,regArr){
 try{
 let container=$('chartTable');if(!container)return;
 let hubs={};
-envArr.forEach(e=>{let h=e.hub||e.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].env++});
+envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{let h=e.hub||(e.observacao&&e.observacao.match(/Hub:([^|]*)/)?e.observacao.match(/Hub:([^|]*)/)[1].trim():'')||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].env++});
 regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let h=r.hub||r.Hub||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].ret++});
 let sorted=Object.entries(hubs).map(([n,v])=>({name:n,...v,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).sort((a,b)=>b.pend-a.pend).slice(0,10);
 if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
@@ -1343,7 +1346,7 @@ show($('uploadProgress'));
 let chunks=[];for(let i=0;i<records.length;i+=50){chunks.push(records.slice(i,i+50))}
 let done=0;
 for(let chunk of chunks){
-var mapped=chunk.map(function(r){return{codigo:r.codigo,tipo:r.tipo,movimento:r.movimento||'Saida',classificacao:'',observacao:'',fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,operador:state.user||'',datahora:r.data?r.data+'T08:00:00Z':new Date().toISOString()}});
+var mapped=chunk.map(function(r){return{codigo:r.codigo,tipo:r.tipo,movimento:r.movimento||'Saida',classificacao:'',observacao:'Rota:'+( r.rota||'-')+' | Hub:'+(r.hub||'-'),fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,operador:state.user||'',datahora:r.data?r.data+'T08:00:00Z':new Date().toISOString()}});
 await apiCall('registrarBatch',{registros:mapped});
 done+=chunk.length;
 let pct=Math.round((done/records.length)*100);
