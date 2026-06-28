@@ -707,7 +707,7 @@ try{(function(){
 // ===== STATE =====
 const LS_PREFIX='scantrack_';
 const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt'};
-const DEFAULT_DS=['DSP2:SP','HSP2:SP','DSP4:SP','DBS5:BA','DBS7:BA','DGO2:GO','DRJ3:RJ','HRJ3:RJ','DRJ5:RJ','DES2:ES','HVI2:ES','DSA8:SA','HSV8:SA','DBR9:BR'];
+const DEFAULT_DS=['DSP2:HIGHEND','HSP2:HIGHEND','DSP4:EAGLES','DBS5:EAGLES','DBS7:EAGLES','DGO2:EAGLES','DRJ3:EAGLES','HRJ3:EAGLES','DRJ5:EAGLES','DES2:EAGLES','HVI2:EAGLES','DSA8:EAGLES','HSV8:EAGLES','DBR9:EAGLES'];
 const DEFAULT_CLASS=['Devolução ao remetente','Danificado','Endereço não localizado','Cliente ausente','Recusa do cliente','Retenção (investigação)','Extravio parcial','Reagendamento','Transferência entre DS','Outro'];
 const COOLDOWN_MS=5000;
 let lastScans={};
@@ -1320,7 +1320,8 @@ prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' 
 // Anti-dup check
 let dupKey='lastupload_'+state.ds+'_'+date;
 if(ls(dupKey)){
-prev.innerHTML+='<div class="card" style="border:2px solid var(--orange);margin-top:8px"><p style="color:var(--orange);font-weight:600">⚠️ Já existe carga do dia '+date+' para '+state.ds+'. O envio irá sobrescrever.</p></div>';
+html='<div class="card" style="border:2px solid var(--red)"><p style="color:var(--red);font-weight:600">⚠️ Carga do dia '+date+' para '+state.ds+' já foi enviada!</p><p style="font-size:12px;margin-top:8px">'+records.length+' registros já existem. Para reenviar, clique abaixo:</p><button class="btn" style="background:var(--red);color:white;margin-top:8px;width:100%" onclick="forceUploadDispatch()">🔄 Sobrescrever carga</button></div>';
+prev.innerHTML=html;return;
 }
 }catch(e){toast('Erro no parse: '+e.message,'error')}
 }
@@ -1332,7 +1333,8 @@ show($('uploadProgress'));
 let chunks=[];for(let i=0;i<records.length;i+=50){chunks.push(records.slice(i,i+50))}
 let done=0;
 for(let chunk of chunks){
-await apiCall('registrarBatch',{registros:chunk,tipo:'envio'});
+var mapped=chunk.map(function(r){return{codigo:r.codigo,tipo:r.tipo,movimento:r.movimento||'Saida',classificacao:'',observacao:'',fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,operador:state.user||'',datahora:r.data?r.data+'T08:00:00Z':new Date().toISOString()}});
+await apiCall('registrarBatch',{registros:mapped});
 done+=chunk.length;
 let pct=Math.round((done/records.length)*100);
 let fill=$('progFill');if(fill)fill.style.width=pct+'%';
@@ -1347,6 +1349,8 @@ loadRecentUploads();
 }catch(e){toast('Erro no upload','error')}
 }
 window.uploadDispatch=uploadDispatch;
+function forceUploadDispatch(){uploadDispatch()}
+window.forceUploadDispatch=forceUploadDispatch;
 
 function processDispatchRows(rows){
 try{
@@ -1599,6 +1603,8 @@ window.switchTab=switchTab;
 window.testApi=testApi;
 window.toggleDetail=toggleDetail;
 window.uploadDispatch=uploadDispatch;
+function forceUploadDispatch(){uploadDispatch()}
+window.forceUploadDispatch=forceUploadDispatch;
 })()}catch(e){}
 </script>
 
