@@ -604,7 +604,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <div style="flex:1;min-width:200px;display:flex;flex-wrap:wrap;gap:6px" id="tbrClassBadges"><span style="font-size:11px;color:var(--gray3)">Carregue dados para ver</span></div>
 </div>
 </div>
-<button class="btn btn-secondary" onclick="exportReport()" style="width:100%">📄 Exportar Relatório</button>
+<div style="display:flex;gap:8px;margin-top:4px">
+<button class="btn btn-secondary" onclick="exportReport()" style="flex:1">📄 Exportar Relatório</button>
+<button class="btn" onclick="exportPendentes()" style="flex:1;background:#0F2137;color:white;border-radius:8px;font-weight:600">📥 Pendentes (CSV)</button>
+</div>
 </div>
 
 <!-- Tab: Registros -->
@@ -720,7 +723,7 @@ window.onunhandledrejection=function(e){try{e.preventDefault()}catch(x){}};
 try{(function(){
 // ===== STATE =====
 const LS_PREFIX='scantrack_';
-const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt'};
+const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt',lastEnvArr:null,lastRegArr:null};
 const DEFAULT_DS=['DSP2:HIGHEND','HSP2:HIGHEND','DSP4:EAGLES','DBS5:EAGLES','DBS7:EAGLES','DGO2:EAGLES','DRJ3:EAGLES','HRJ3:EAGLES','DRJ5:EAGLES','DES2:EAGLES','HVI2:EAGLES','DSA8:EAGLES','HSV8:EAGLES','DBR9:EAGLES'];
 const DEFAULT_CLASS=['Devolução ao remetente','Danificado','Endereço não localizado','Cliente ausente','Recusa do cliente','Retenção (investigação)','Extravio parcial','Reagendamento','Transferência entre DS','Outro'];
 const COOLDOWN_MS=5000;
@@ -1111,6 +1114,7 @@ let regData=await apiCall('lerRegistros',params);
 let saidas=0,retornos=0,tbrHoje=0,tbrSemana=0;
 let envArr=envData&&envData.data?envData.data:[];
 let regArr=regData&&regData.data?regData.data:[];
+state.lastEnvArr=envArr;state.lastRegArr=regArr;
 
 saidas=envArr.length+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')).length;
 var allEnvCodes={};
@@ -1150,22 +1154,77 @@ function renderBarChart(envArr,regArr,retNormal){
 try{
 let container=$('chartBar');if(!container)return;
 let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
-let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||'').startsWith(d)).length);
-let retByDay=days.map(d=>(retNormal||[]).filter(r=>((r.datahora||'').startsWith(d))).length);
-let max=Math.max(...envByDay,...retByDay,1);
-let barW=20,gap=4,gW=(barW*2+gap)*7+50,gH=120;
-let svg='<svg viewBox="0 0 '+gW+' '+(gH+40)+'" xmlns="http://www.w3.org/2000/svg">';
-svg+='<rect width="100%" height="100%" fill="white"/>';
-days.forEach((d,i)=>{
-let x=40+i*(barW*2+gap+10);
-let hE=(envByDay[i]/max)*(gH-20);
-let hR=(retByDay[i]/max)*(gH-20);
-svg+='<rect x="'+x+'" y="'+(gH-hE)+'" width="'+barW+'" height="'+hE+'" fill="#FF9900" rx="3"/>';
-svg+='<rect x="'+(x+barW+2)+'" y="'+(gH-hR)+'" width="'+barW+'" height="'+hR+'" fill="#00A86B" rx="3"/>';
-svg+='<text x="'+(x+barW)+'" y="'+(gH+15)+'" text-anchor="middle" font-size="9" fill="#94a3b8">'+d.slice(5)+'</text>';
-});
-svg+='<text x="10" y="15" font-size="9" fill="#FF9900">■ Envios</text><text x="80" y="15" font-size="9" fill="#00A86B">■ Retornos</text>';
-svg+='</svg>';
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||'').startsWith(d)).length);
+let retByDay=days.map(d=>(retNormal||[]).filter(r=>(r.datahora||'').startsWith(d)).length);
+let maxV=Math.max(...envByDay,...retByDay,1);
+
+const W=400,H=155,PT=28,PR=16,PB=26,PL=38;
+const cW=W-PL-PR,cH=H-PT-PB;
+const xS=i=>PL+(i/6)*cW;
+const yS=v=>PT+cH-(v/maxV)*cH;
+
+const makePath=pts=>{
+if(!pts.length)return'';
+let d='M '+pts[0].x.toFixed(1)+' '+pts[0].y.toFixed(1);
+for(let i=0;i<pts.length-1;i++){
+let cx=((pts[i].x+pts[i+1].x)/2).toFixed(1);
+d+=' C '+cx+' '+pts[i].y.toFixed(1)+','+cx+' '+pts[i+1].y.toFixed(1)+','+pts[i+1].x.toFixed(1)+' '+pts[i+1].y.toFixed(1);
+}
+return d;
+};
+
+let envPts=days.map((_,i)=>({x:xS(i),y:yS(envByDay[i])}));
+let retPts=days.map((_,i)=>({x:xS(i),y:yS(retByDay[i])}));
+let baseY=(PT+cH).toFixed(1);
+let envLine=makePath(envPts);
+let retLine=makePath(retPts);
+let envArea=envLine+' L '+envPts[6].x.toFixed(1)+' '+baseY+' L '+envPts[0].x.toFixed(1)+' '+baseY+' Z';
+let retArea=retLine+' L '+retPts[6].x.toFixed(1)+' '+baseY+' L '+retPts[0].x.toFixed(1)+' '+baseY+' Z';
+
+let gridLines='';
+let steps=4;
+for(let g=1;g<=steps;g++){
+let gy=yS((maxV/steps)*g);
+gridLines+='<line x1="'+PL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+gy.toFixed(1)+'" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>';
+gridLines+='<text x="'+(PL-5)+'" y="'+(gy+3.5).toFixed(1)+'" text-anchor="end" font-size="8.5" fill="#94a3b8">'+Math.round((maxV/steps)*g)+'</text>';
+}
+
+let dateLabels=days.map((d,i)=>{
+let p=d.split('-');
+return '<text x="'+xS(i).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="9" fill="#94a3b8">'+p[2]+'/'+p[1]+'</text>';
+}).join('');
+
+let envDots=envPts.map(p=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="#FF9900" stroke="white" stroke-width="1.5"/>').join('');
+let retDots=retPts.map(p=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="#00A86B" stroke="white" stroke-width="1.5"/>').join('');
+
+let valLabelEnv=envByDay.map((v,i)=>v>0&&(i===0||v!==envByDay[i-1]||v!==envByDay[i+1])?'<text x="'+xS(i).toFixed(1)+'" y="'+(yS(v)-8).toFixed(1)+'" text-anchor="middle" font-size="8" fill="#FF9900" font-weight="600">'+v+'</text>':'').join('');
+let valLabelRet=retByDay.map((v,i)=>v>0&&(i===0||v!==retByDay[i-1]||v!==retByDay[i+1])?'<text x="'+xS(i).toFixed(1)+'" y="'+(yS(v)-8).toFixed(1)+'" text-anchor="middle" font-size="8" fill="#00A86B" font-weight="600">'+v+'</text>':'').join('');
+
+let hasEnv=envByDay.some(v=>v>0),hasRet=retByDay.some(v=>v>0);
+let noDataMsg=(!hasEnv&&!hasRet)?'<text x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle" font-size="12" fill="#94a3b8">Sem dados no período</text>':'';
+
+let svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'
++'<defs>'
++'<linearGradient id="gEnv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF9900" stop-opacity="0.22"/><stop offset="100%" stop-color="#FF9900" stop-opacity="0.01"/></linearGradient>'
++'<linearGradient id="gRet" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00A86B" stop-opacity="0.18"/><stop offset="100%" stop-color="#00A86B" stop-opacity="0.01"/></linearGradient>'
++'</defs>'
++'<rect width="100%" height="100%" fill="white"/>'
++gridLines
++(hasEnv?'<path d="'+envArea+'" fill="url(#gEnv)"/>'+'<path d="'+envLine+'" fill="none" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/>':'')
++(hasRet?'<path d="'+retArea+'" fill="url(#gRet)"/>'+'<path d="'+retLine+'" fill="none" stroke="#00A86B" stroke-width="2.5" stroke-linecap="round"/>':'')
++(hasEnv?envDots:'')
++(hasRet?retDots:'')
++(hasEnv?valLabelEnv:'')
++(hasRet?valLabelRet:'')
++dateLabels
++noDataMsg
++'<circle cx="'+(PL+8)+'" cy="14" r="4" fill="#FF9900"/>'
++'<text x="'+(PL+16)+'" y="18" font-size="10" fill="#334155" font-weight="600">Envios</text>'
++'<circle cx="'+(PL+70)+'" cy="14" r="4" fill="#00A86B"/>'
++'<text x="'+(PL+78)+'" y="18" font-size="10" fill="#334155" font-weight="600">Retornos</text>'
++'</svg>';
+
 container.innerHTML=svg;
 }catch(e){}
 }
@@ -1174,21 +1233,46 @@ function renderRoutesChart(envArr,regArr,retNormal){
 try{
 let container=$('chartRoutes');if(!container)return;
 let routes={};
-envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{let r=e.rota||(e.observacao&&e.observacao.match(/Rota:([^|]+)/)?e.observacao.match(/Rota:([^|]+)/)[1].trim():'')||'S/R';if(!routes[r])routes[r]={env:0,ret:0};routes[r].env++});
+let allEnvR=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+allEnvR.forEach(e=>{let rt=getRota(e)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].env++});
 regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let rt=getRota(r)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
-let sorted=Object.entries(routes).sort((a,b)=>b[1].env-a[1].env).slice(0,10);
-if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
-let max=Math.max(...sorted.map(s=>s[1].env),1);
-let h=Math.min(sorted.length*28+20,200);
-let svg='<svg viewBox="0 0 400 '+h+'" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="white"/>';
-sorted.forEach(([name,val],i)=>{
-let y=10+i*32;let wE=(val.ret/max)*260;let wP=((val.env-val.ret)/max)*260;
-svg+='<text x="5" y="'+(y+14)+'" font-size="10" fill="#0F2137">'+name.slice(0,8)+'</text>';
-svg+='<rect x="70" y="'+(y+2)+'" width="'+wE+'" height="18" fill="#00A86B" rx="3"/>';
-svg+='<rect x="'+(70+wE)+'" y="'+(y+2)+'" width="'+Math.max(wP,0)+'" height="18" fill="#E74C3C" rx="3"/>';
-svg+='<text x="'+(75+wE+Math.max(wP,0))+'" y="'+(y+14)+'" font-size="9" fill="#94a3b8">'+val.env+'</text>';
-});
-svg+='</svg>';
+
+let withPend=Object.entries(routes).filter(([n,v])=>v.env>v.ret);
+let sorted=withPend.sort((a,b)=>(b[1].env-b[1].ret)-(a[1].env-a[1].ret)).slice(0,8);
+
+if(!sorted.length){
+container.innerHTML='<div style="text-align:center;padding:28px 10px;color:var(--green);font-size:13px;font-weight:600">✅ Todas as rotas retornaram!</div>';
+return;
+}
+
+const W=380,rowH=34,PL=56,PR=10,legH=20;
+const barMaxW=W-PL-PR-50;
+const svgH=legH+sorted.length*rowH+6;
+
+let rows=sorted.map(([name,val],i)=>{
+let pend=val.env-val.ret;
+let pct=Math.round((val.ret/val.env)*100);
+let y=legH+i*rowH;
+let wRet=val.env?((val.ret/val.env)*barMaxW):0;
+let wPend=val.env?((pend/val.env)*barMaxW):barMaxW;
+let barY=y+8;
+return '<text x="'+(PL-6)+'" y="'+(y+21)+'" text-anchor="end" font-size="10.5" fill="#0F2137" font-weight="600">'+name.slice(0,8)+'</text>'
++(val.ret>0?'<rect x="'+PL+'" y="'+barY+'" width="'+wRet.toFixed(1)+'" height="20" fill="#00A86B" rx="0"/>'
++'<rect x="'+(PL+wRet).toFixed(1)+'" y="'+barY+'" width="'+wPend.toFixed(1)+'" height="20" fill="#E74C3C" rx="0 4 4 0"/>':
+'<rect x="'+PL+'" y="'+barY+'" width="'+wPend.toFixed(1)+'" height="20" fill="#E74C3C" rx="4"/>')
++'<text x="'+(PL+wRet+wPend+6).toFixed(1)+'" y="'+(barY+14)+'" font-size="10" fill="#64748b" font-weight="600">'+pend+' pend.</text>'
++(pct>0?'<text x="'+(PL+wRet-4).toFixed(1)+'" y="'+(barY+14)+'" text-anchor="end" font-size="9" fill="white" font-weight="700">'+pct+'%</text>':'');
+}).join('');
+
+let legend='<rect x="'+PL+'" y="4" width="10" height="10" fill="#00A86B" rx="2"/>'
++'<text x="'+(PL+13)+'" y="13" font-size="9" fill="#334155">Retornados</text>'
++'<rect x="'+(PL+75)+'" y="4" width="10" height="10" fill="#E74C3C" rx="2"/>'
++'<text x="'+(PL+88)+'" y="13" font-size="9" fill="#334155">Pendentes</text>';
+
+let svg='<svg viewBox="0 0 '+W+' '+svgH+'" xmlns="http://www.w3.org/2000/svg">'
++'<rect width="100%" height="100%" fill="white"/>'
++legend+rows
++'</svg>';
 container.innerHTML=svg;
 }catch(e){}
 }
@@ -1240,6 +1324,44 @@ navigator.clipboard.writeText(text).then(()=>toast('Relatório copiado!','succes
 }catch(e){}
 }
 window.exportReport=exportReport;
+
+async function exportPendentes(){
+try{
+toast('Buscando pendências...','warn');
+let envArr=state.lastEnvArr,regArr=state.lastRegArr;
+if(!envArr||!regArr){
+let ed=await apiCall('lerEnvios',{ds:state.ds});
+let rd=await apiCall('lerRegistros',{ds:state.ds});
+envArr=ed&&ed.data?ed.data:[];
+regArr=rd&&rd.data?rd.data:[];
+}
+let retSet={};
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{retSet[r.codigo]=r.datahora});
+let allSaidas=[];
+envArr.forEach(e=>allSaidas.push(Object.assign({},e)));
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')&&r.tipo!=='Pacote').forEach(r=>allSaidas.push(Object.assign({},r)));
+let pendentes=allSaidas.filter(e=>e.codigo&&!retSet[e.codigo]);
+// Remove duplicates (same code, keep earliest)
+let byCode={};
+pendentes.forEach(e=>{if(!byCode[e.codigo]||((e.datahora||'')<(byCode[e.codigo].datahora||'')))byCode[e.codigo]=e});
+pendentes=Object.values(byCode).sort((a,b)=>(a.datahora||'').localeCompare(b.datahora||''));
+if(!pendentes.length){toast('✅ Nenhuma pendência! Tudo retornou.','success');return}
+let todayStr=today();
+let rows=pendentes.map(e=>{
+let ds=(e.datahora||'').split('T')[0];
+let diasPend=0;try{let d0=new Date(ds),d1=new Date(todayStr);diasPend=Math.max(0,Math.round((d1-d0)/86400000))}catch(x){}
+let rota=getRota(e)||'—';let hub=getHub(e)||'—';
+return'"'+(e.codigo||'')+'","'+(e.tipo||'')+'","'+rota+'","'+hub+'","'+(e.ds||state.ds)+'","'+fmtDate(e.datahora)+'",'+diasPend+(diasPend>1?' ⚠️':'');
+});
+let bom='\uFEFF';
+let csv=bom+'Código,Tipo,Rota,Hub,DS,Data Saída,Dias Pendente\n'+rows.join('\n');
+let blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);
+a.download='pendentes_'+state.ds+'_'+todayStr+'.csv';a.click();
+toast('✅ '+pendentes.length+' pendências exportadas!','success');
+}catch(e){toast('Erro ao exportar pendentes','error')}
+}
+window.exportPendentes=exportPendentes;
 
 // ===== REGISTROS =====
 async function loadRegistros(){
@@ -1399,20 +1521,64 @@ async function uploadDispatch(){
 try{
 let records=state.parsedDispatch;if(!records||!records.length)return;
 show($('uploadProgress'));
+let txt=$('progText');
+
+// === AUTO-BAIXA: verifica pendências antes do upload ===
+if(txt)txt.textContent='Verificando pendências pendentes...';
+let autoRetornos=[];
+try{
+let envData=await apiCall('lerEnvios',{ds:state.ds});
+let regData=await apiCall('lerRegistros',{ds:state.ds});
+let prevEnv=envData&&envData.data?envData.data:[];
+let prevReg=regData&&regData.data?regData.data:[];
+// Códigos que já saíram
+let sentSet=new Set();
+prevEnv.forEach(e=>{if(e.codigo)sentSet.add(e.codigo)});
+prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('said')).forEach(r=>{if(r.codigo)sentSet.add(r.codigo)});
+// Códigos que já retornaram
+let retSet=new Set();
+prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{if(r.codigo)retSet.add(r.codigo)});
+// Pendentes = saíram mas não retornaram
+let pendSet=new Set([...sentSet].filter(c=>!retSet.has(c)));
+// Para cada novo registro que aparece como pendente → gera auto-retorno
+let seen=new Set();
+records.forEach(r=>{
+if(pendSet.has(r.codigo)&&!seen.has(r.codigo)){
+seen.add(r.codigo);
+autoRetornos.push({codigo:r.codigo,tipo:r.tipo,movimento:'Retorno',classificacao:'',
+observacao:'Auto-baixa: reenviado em novo despacho | Rota:'+(r.rota||'-')+' | Hub:'+(r.hub||'-'),
+fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,
+operador:state.user+'[auto]',datahora:(r.data||today())+'T07:59:00Z'});
+}
+});
+}catch(ex){}
+
+// Upload auto-retornos primeiro (se houver)
+if(autoRetornos.length>0){
+if(txt)txt.textContent='Auto-baixa: registrando '+autoRetornos.length+' retorno(s)...';
+let fill=$('progFill');if(fill)fill.style.width='10%';
+let retChunks=[];for(let i=0;i<autoRetornos.length;i+=50){retChunks.push(autoRetornos.slice(i,i+50))}
+for(let chunk of retChunks){await apiCall('registrarBatch',{registros:chunk})}
+}
+
+// Upload das saídas novas
 let chunks=[];for(let i=0;i<records.length;i+=50){chunks.push(records.slice(i,i+50))}
 let done=0;
 for(let chunk of chunks){
-var mapped=chunk.map(function(r){return{codigo:r.codigo,tipo:r.tipo,movimento:r.movimento||'Saida',classificacao:'',observacao:'Rota:'+( r.rota||'-')+' | Hub:'+(r.hub||'-'),fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,operador:state.user||'',datahora:r.data?r.data+'T08:00:00Z':new Date().toISOString()}});
+var mapped=chunk.map(function(r){return{codigo:r.codigo,tipo:r.tipo,movimento:r.movimento||'Saida',classificacao:'',observacao:'Rota:'+(r.rota||'-')+' | Hub:'+(r.hub||'-'),fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,operador:state.user||'',datahora:r.data?r.data+'T08:00:00Z':new Date().toISOString()}});
 await apiCall('registrarBatch',{registros:mapped});
 done+=chunk.length;
 let pct=Math.round((done/records.length)*100);
-let fill=$('progFill');if(fill)fill.style.width=pct+'%';
-let txt=$('progText');if(txt)txt.textContent='Enviando... '+done+'/'+records.length;
+let fill=$('progFill');if(fill)fill.style.width=(10+pct*0.9)+'%';
+if(txt)txt.textContent='Enviando saídas... '+done+'/'+records.length;
 }
+
 var dupSaveKey='scantrack_dup_'+state.ds+'_'+(state.parsedFilename||state.parsedDate||today()).replace(/[^a-zA-Z0-9-_]/g,'');
 try{localStorage.setItem(dupSaveKey,JSON.stringify({date:state.parsedDate,count:records.length,ts:Date.now()}))}catch(e){}
 saveRecentUpload(records);
-toast('✅ '+records.length+' registros enviados!','success');
+let msg='✅ '+records.length+' saídas enviadas!';
+if(autoRetornos.length>0)msg+=' ('+autoRetornos.length+' auto-baixa aplicada)';
+toast(msg,'success');
 hide($('uploadProgress'));hide($('uploadPreview'));
 loadRecentUploads();
 }catch(e){toast('Erro no upload','error')}
@@ -1630,33 +1796,217 @@ try{
 let el=$('helpContent');if(!el)return;
 if(lang==='pt'){
 el.innerHTML=`
-<div class="help-section"><h3>🔐 Login</h3><p>Informe seu alias Amazon (login), selecione a DS e digite o PIN de 4 dígitos. O PIN padrão é 1234.</p></div>
-<div class="help-section"><h3>📱 Escaneando (Mobile)</h3><p>A câmera abre automaticamente. Aponte para o código QR/barcode e aguarde a leitura automática.</p><ul><li>Modo RETORNO: scan contínuo, sem confirmação</li><li>Modo SAÍDA: preencha rota e motorista, depois confirme</li><li>Modo PACOTE: preencha classificação e observe, depois confirme</li></ul></div>
-<div class="help-section"><h3>🖥️ Escaneando (Desktop/USB)</h3><p>Em telas grandes sem touch, o modo USB é ativado. O cursor fica no campo de texto. Aponte o leitor USB e o código é enviado automaticamente.</p></div>
-<div class="help-section"><h3>📦 Tipos de Ativos</h3><ul><li><strong>Bag</strong>: Sacolas com 4 dígitos no código (ex: "ABC 1234")</li><li><strong>Ráfia</strong>: Sacos grandes, código com "DN-" ou 3 dígitos (ex: "DN-001" ou "XYZ 123")</li><li><strong>Pacote (TBR)</strong>: Pacotes individuais com problemas — avariado, etiqueta ilegível, etc.</li></ul></div>
-<div class="help-section"><h3>📤 Upload Dispatch</h3><p>Exporte a aba "All Dispatch Sheet" como CSV no Excel, depois faça upload aqui. Os dados são enviados para a API em lotes de 50.</p></div>
-<div class="help-section"><h3>📊 Dashboard</h3><p>Visualize métricas de envios vs retornos, pendências por rota/hub, e classificações de TBR. Use os filtros para refinar.</p></div>
-<div class="help-section"><h3>⚙️ Admin</h3><p>Apenas aliases na lista de admins podem acessar. Configure URL da API, DSs, classificações e PIN.</p></div>
-<div class="help-section"><h3>❓ FAQ</h3>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O app funciona offline? <span>▸</span></div><div class="faq-a">Parcialmente. Scans são salvos em fila local e enviados quando a conexão voltar.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Posso usar em vários dispositivos? <span>▸</span></div><div class="faq-a">Sim! Cada dispositivo mantém sua sessão. Os dados vão para a mesma planilha via API.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é o cooldown de 5 segundos? <span>▸</span></div><div class="faq-a">Evita duplicatas acidentais. O mesmo código não pode ser escaneado duas vezes em 5 segundos.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como configurar a API? <span>▸</span></div><div class="faq-a">Na aba Admin, cole a URL do seu Google Apps Script publicado e clique "Salvar".</div></div>
-</div></div>`;
+<div style="background:linear-gradient(135deg,#0F2137,#1a3a5c);color:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px">
+<strong style="font-size:15px">📦 ScanTrack v3.0</strong><br>
+<span style="opacity:.85">Sistema de rastreamento de Bags, Ráfias e Pacotes TBR — AMZL BR</span>
+</div>
+
+<div class="help-section">
+<h3>🔐 Login</h3>
+<p><strong>Alias</strong>: seu login Amazon (ex: <code>jsilva</code>) — sem espaços, sem acento. Fica salvo para a próxima vez.<br>
+<strong>DS</strong>: sua Delivery Station. A lista vem da API. Se não carregar, usa lista padrão.<br>
+<strong>PIN</strong>: 4 dígitos. PIN padrão é <strong>1234</strong> — configure no Admin antes de usar em produção.<br>
+<em>Sessão salva automaticamente. Feche e reabra sem precisar logar novamente.</em></p>
+</div>
+
+<div class="help-section">
+<h3>📷 Scanner — Tipos de ativo</h3>
+<p>Selecione o tipo antes de escanear. O app detecta automaticamente mas você pode corrigir:</p>
+<ul>
+<li><strong>🛍️ Bag</strong> → código com 4 dígitos: ex. <code>Black 0805</code>, <code>Red 1234</code></li>
+<li><strong>🧵 Ráfia</strong> → código com 3 dígitos ou começa com DN-: ex. <code>Black 805</code>, <code>DN-N-7507-007</code></li>
+<li><strong>📋 Pacote (TBR)</strong> → começa com TBR: ex. <code>TBR379054196</code></li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟢 Modo RETORNO (padrão — Bag/Ráfia)</h3>
+<p>Use para registrar bags/ráfias que <strong>voltaram</strong> com os DAs ao fim do dia.</p>
+<ul>
+<li>Scan contínuo sem confirmação — só apontar e vai</li>
+<li>Flash verde + beep confirma cada leitura</li>
+<li>Mesmo código bloqueado por 5 segundos (anti-duplicata acidental)</li>
+<li><strong>Mobile</strong>: câmera abre automático, usa BarcodeDetector nativo</li>
+<li><strong>Desktop/USB</strong>: campo de texto com foco automático. Apontar o leitor USB basta</li>
+<li>Digite na caixa "Código manual" se a câmera não ler</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟠 Modo SAÍDA (exceção — Bag/Ráfia)</h3>
+<p>Use para registrar <strong>manualmente</strong> uma saída que não foi pelo Dispatch. Exceção — o fluxo normal usa Upload Dispatch.</p>
+<ul>
+<li>Preencha Rota e Motorista, depois confirme com ✅</li>
+<li>O código fica visível no banner laranja antes de confirmar</li>
+<li>Botão ✖ Cancelar descarta sem registrar</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📋 Modo PACOTE (TBR)</h3>
+<p>Para registrar pacotes com ocorrências — avariado, endereço não localizado, etc.</p>
+<ul>
+<li>Escaneie o código TBR</li>
+<li>Selecione a <strong>Classificação</strong> (obrigatório)</li>
+<li>Se escolher "Outro" — o campo <strong>Observação é obrigatório</strong></li>
+<li>Foto é opcional — use 📸 para tirar com câmera</li>
+<li>Confirme com ✅ Registrar Pacote</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📤 Upload Dispatch</h3>
+<p><strong>Fluxo principal para registrar as saídas do dia.</strong></p>
+<ul>
+<li>Exporte a aba <strong>"All Dispatch Sheet"</strong> do Excel como <code>.xlsx</code> ou <code>.csv</code></li>
+<li>Arraste o arquivo ou clique na área de upload</li>
+<li>O sistema mostra preview: X Bags, Y Ráfias, Z rotas</li>
+<li>Clique <strong>📤 Enviar</strong> para registrar em lotes de 50</li>
+<li><strong>Anti-duplicata</strong>: o mesmo arquivo não pode ser enviado duas vezes. Se precisar, clique "Sobrescrever"</li>
+<li><strong>Auto-baixa automática</strong>: se uma bag/ráfia no Dispatch já estava pendente (saiu mas não voltou), o sistema automaticamente registra o retorno antes de lançar a nova saída. Isso corrige casos onde o scan de retorno foi pulado.</li>
+</ul>
+<p style="background:#fff3e0;border-radius:6px;padding:8px;margin-top:6px;font-size:12px">⚠️ Modo Colar: copie as linhas do Excel (Ctrl+A, Ctrl+C na aba dispatch) e cole na textarea. Clique "Processar".</p>
+</div>
+
+<div class="help-section">
+<h3>📊 Dashboard</h3>
+<p>Selecione DS, Regional, Tipo e período nos filtros. Clique 🔄 para atualizar.</p>
+<ul>
+<li><strong>Total Saídas</strong> (laranja): tudo que saiu no período</li>
+<li><strong>Total Retornos</strong> (verde): bags/ráfias que efetivamente voltaram E estavam nos envios</li>
+<li><strong>Pendentes</strong> (vermelho): Saídas − Retornos = o que ainda não voltou</li>
+<li><strong>% Retorno</strong>: colorido por faixa — verde ≥80%, amarelo ≥60%, vermelho &lt;60%</li>
+<li><strong>Retornos Adicionais</strong> (azul): itens escaneados como retorno que não estão nos envios do período (voltaram de dia anterior ou estoque). Não entra no %.</li>
+</ul>
+<p style="margin-top:6px"><strong>Pendências por Hub</strong>: tabela ordenada pelos que mais pendências têm. 🔴 = % &lt; 80%.<br>
+<strong>Gráfico de linha</strong>: envios vs retornos nos últimos 7 dias.<br>
+<strong>Rotas s/ Devolução</strong>: apenas rotas com itens ainda pendentes.</p>
+<p style="margin-top:6px"><strong>📥 Pendentes (CSV)</strong>: exporta lista detalhada com código, tipo, rota, hub, data saída e dias em aberto. Use para cobrar os DAs no detalhe.</p>
+</div>
+
+<div class="help-section">
+<h3>📋 Registros</h3>
+<p>Todos os registros da sua DS. Use a busca por código, operador ou DS. Clique em uma linha para expandir detalhes. Exporta CSV completo.</p>
+</div>
+
+<div class="help-section">
+<h3>⚙️ Admin (restrito)</h3>
+<p>Acessível apenas para aliases na lista de admins (padrão: <code>dpitta</code>).</p>
+<ul>
+<li><strong>Conexão API</strong>: URL do Google Apps Script. Salve e teste antes de usar</li>
+<li><strong>Delivery Stations</strong>: adicione/remova DSs no formato <code>CODIGO:REGIONAL</code></li>
+<li><strong>PIN</strong>: altere o PIN de acesso (4 dígitos)</li>
+<li><strong>Classificações TBR</strong>: lista de tipos de ocorrência para pacotes</li>
+<li><strong>Admins</strong>: aliases que têm acesso ao painel Admin</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O app funciona sem internet? <span>▸</span></div><div class="faq-a">Parcialmente. Scans são salvos em fila local e reenviados automaticamente quando a conexão voltar. O dashboard e upload precisam de conexão.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é "Retorno Adicional"? <span>▸</span></div><div class="faq-a">É uma bag/ráfia que foi escaneada como retorno hoje, mas não estava nos envios deste período (ou seja, já estava em estoque ou vinha de outro dia). Não impacta o % de retorno.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é Auto-baixa? <span>▸</span></div><div class="faq-a">Quando você faz upload de um Dispatch e um código já estava pendente (saiu antes e não voltou), o sistema automaticamente registra o retorno antes de lançar a nova saída. Evita acúmulo de pendências por scans pulados.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Por que o scan do RETORNO não pede confirmação? <span>▸</span></div><div class="faq-a">Para agilidade. O retorno é o fluxo mais frequente (dezenas de scans por dia), então vai rápido. Se errar, escaneie de novo — o registro fica na planilha e pode ser corrigido pelo Admin.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Câmera não abre no celular. O que fazer? <span>▸</span></div><div class="faq-a">Verifique se o site tem permissão de câmera no browser. Em Chrome: clique no cadeado na barra de endereço → Permissões → Câmera → Permitir. O campo "Código manual" sempre funciona como alternativa.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como exportar os pendentes para cobrar os DAs? <span>▸</span></div><div class="faq-a">No Dashboard, clique em "📥 Pendentes (CSV)". Abre um arquivo Excel com código, tipo, rota, hub, data que saiu e dias em aberto. Leve isso para a reunião diária.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como configurar a URL da API? <span>▸</span></div><div class="faq-a">Acesse a aba Admin → Conexão API → cole a URL do seu Google Apps Script publicado → Salvar → Testar Conexão. Se aparecer "✅ Conexão OK", está tudo certo.</div></div>
+</div>`;
 }else{
 el.innerHTML=`
-<div class="help-section"><h3>🔐 Login</h3><p>Enter your Amazon alias (login), select the DS, and type the 4-digit PIN. Default PIN is 1234.</p></div>
-<div class="help-section"><h3>📱 Scanning (Mobile)</h3><p>Camera opens automatically. Point at QR/barcode and wait for auto-read.</p><ul><li>RETURN mode: continuous scan, no confirmation needed</li><li>DEPARTURE mode: fill route and driver, then confirm</li><li>PACKAGE mode: fill classification and notes, then confirm</li></ul></div>
-<div class="help-section"><h3>🖥️ Scanning (Desktop/USB)</h3><p>On large screens without touch, USB mode activates. Cursor stays in the text field. Point USB reader and code auto-submits.</p></div>
-<div class="help-section"><h3>📦 Asset Types</h3><ul><li><strong>Bag</strong>: Bags with 4-digit codes (e.g. "ABC 1234")</li><li><strong>Ráfia</strong>: Large sacks, code with "DN-" or 3 digits</li><li><strong>Package (TBR)</strong>: Individual packages with issues — damaged, unreadable label, etc.</li></ul></div>
-<div class="help-section"><h3>📤 Upload Dispatch</h3><p>Export "All Dispatch Sheet" tab as CSV in Excel, then upload here. Data is sent to API in batches of 50.</p></div>
-<div class="help-section"><h3>📊 Dashboard</h3><p>View send vs return metrics, pending by route/hub, and TBR classifications. Use filters to refine.</p></div>
-<div class="help-section"><h3>⚙️ Admin</h3><p>Only aliases in the admin list can access. Configure API URL, DSs, classifications, and PIN.</p></div>
-<div class="help-section"><h3>❓ FAQ</h3>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Does it work offline? <span>▸</span></div><div class="faq-a">Partially. Scans queue locally and send when connection returns.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Can I use multiple devices? <span>▸</span></div><div class="faq-a">Yes! Each device keeps its session. Data goes to the same spreadsheet via API.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">What's the 5-second cooldown? <span>▸</span></div><div class="faq-a">Prevents accidental duplicates. Same code can't scan twice within 5 seconds.</div></div>
-</div></div>`;
+<div style="background:linear-gradient(135deg,#0F2137,#1a3a5c);color:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px">
+<strong style="font-size:15px">📦 ScanTrack v3.0</strong><br>
+<span style="opacity:.85">Bag, Rafia & TBR Package Tracking System — AMZL BR</span>
+</div>
+
+<div class="help-section">
+<h3>🔐 Login</h3>
+<p><strong>Alias</strong>: your Amazon login (e.g. <code>jsilva</code>) — no spaces. Saved for next time.<br>
+<strong>DS</strong>: your Delivery Station. List comes from API; falls back to defaults.<br>
+<strong>PIN</strong>: 4 digits. Default is <strong>1234</strong> — change in Admin before production.<br>
+<em>Session is auto-saved. Close and reopen without re-logging in.</em></p>
+</div>
+
+<div class="help-section">
+<h3>📷 Scanner — Asset Types</h3>
+<ul>
+<li><strong>🛍️ Bag</strong> → 4-digit code: e.g. <code>Black 0805</code></li>
+<li><strong>🧵 Rafia</strong> → 3-digit code or starts with DN-: e.g. <code>Black 805</code>, <code>DN-N-7507</code></li>
+<li><strong>📋 Package (TBR)</strong> → starts with TBR: e.g. <code>TBR379054196</code></li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟢 RETURN Mode (default — Bag/Rafia)</h3>
+<p>Register bags/rafias <strong>returning</strong> with DAs at end of day.</p>
+<ul>
+<li>Continuous scan — no confirmation needed, just point and shoot</li>
+<li>Green flash + beep confirms each read</li>
+<li>5-second cooldown per code (prevents accidental duplicates)</li>
+<li><strong>Mobile</strong>: camera opens automatically</li>
+<li><strong>Desktop/USB</strong>: text field with auto-focus. Just point USB reader</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟠 DEPARTURE Mode (exception — Bag/Rafia)</h3>
+<p>Manually register a departure not in the Dispatch. Use rarely.</p>
+<ul>
+<li>Fill Route and Driver, then confirm with ✅</li>
+<li>Code is shown in the orange banner before confirming</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📋 PACKAGE Mode (TBR)</h3>
+<ul>
+<li>Scan the TBR barcode</li>
+<li>Select Classification (required)</li>
+<li>"Other" requires a note in Observation</li>
+<li>Photo is optional</li>
+<li>Confirm with ✅ Register Package</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📤 Upload Dispatch</h3>
+<p><strong>Main flow to register daily departures.</strong></p>
+<ul>
+<li>Export <strong>"All Dispatch Sheet"</strong> tab as <code>.xlsx</code> or <code>.csv</code></li>
+<li>Drag & drop or click to select</li>
+<li>Preview shows counts: Bags, Rafias, Routes</li>
+<li>Click <strong>📤 Send</strong> to upload in batches of 50</li>
+<li><strong>Anti-duplicate</strong>: same file can't be sent twice. Use "Overwrite" if needed</li>
+<li><strong>Auto-return</strong>: if a bag/rafia in the Dispatch was already pending (sent but not returned), the system auto-registers its return before recording the new departure</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📊 Dashboard</h3>
+<ul>
+<li><strong>Total Departures</strong> (orange): everything that left in the period</li>
+<li><strong>Total Returns</strong> (green): items that came back AND were in the dispatch</li>
+<li><strong>Pending</strong> (red): Departures − Returns = what hasn't come back</li>
+<li><strong>% Return</strong>: color-coded — green ≥80%, orange ≥60%, red &lt;60%</li>
+<li><strong>Additional Returns</strong> (blue): items returned that weren't in this period's dispatch. Doesn't affect %.</li>
+</ul>
+<p><strong>📥 Pending (CSV)</strong>: exports detailed list with code, type, route, hub, departure date and days pending.</p>
+</div>
+
+<div class="help-section">
+<h3>⚙️ Admin (restricted)</h3>
+<ul>
+<li>API Connection, DS management, PIN change, TBR classifications, Admin aliases</li>
+<li>Only aliases in the admin list can access</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Does it work offline? <span>▸</span></div><div class="faq-a">Partially. Scans queue locally and auto-send when connection returns. Dashboard and upload require connection.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">What is Auto-return? <span>▸</span></div><div class="faq-a">When you upload a Dispatch and a code was already pending (sent before, never returned), the system auto-registers a return before recording the new departure. Prevents fake pending accumulation.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Camera won't open on mobile. <span>▸</span></div><div class="faq-a">Check camera permission: tap the lock icon in address bar → Permissions → Camera → Allow. The manual code field always works as backup.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">How to export pending items? <span>▸</span></div><div class="faq-a">On Dashboard, click "📥 Pending (CSV)". Opens a spreadsheet with code, type, route, hub, departure date and days pending. Use it in your daily meeting.</div></div>
+</div>`;
 }
 }catch(e){}
 }
@@ -1703,6 +2053,7 @@ window.confirmScan=confirmScan;
 window.doLogin=doLogin;
 window.doLogout=doLogout;
 window.exportCSV=exportCSV;
+window.exportPendentes=exportPendentes;
 window.exportReport=exportReport;
 window.filterRegistros=filterRegistros;
 window.goRegPage=goRegPage;
