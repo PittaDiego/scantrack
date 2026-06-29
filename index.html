@@ -476,8 +476,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 
 @media(max-width:480px){.metrics-grid{grid-template-columns:1fr 1fr}.filters-row{flex-direction:column}}
 
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 @media(max-width:768px){.charts-row{grid-template-columns:1fr}}
+.chart-container svg{width:100%;height:auto;display:block}
 </style>
 </head>
 <body>
@@ -593,8 +594,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 </div>
 </div>
 <div class="chart-section"><h3>📋 Pendências Hubs</h3><div class="chart-container" id="chartTable"></div></div>
-<div class="charts-row"><div class="chart-section"><h3 style="font-size:13px;margin-bottom:8px">📊 Envios vs Retornos (7d)</h3><div class="chart-container" id="chartBar" style="max-height:150px;overflow:hidden"></div></div>
-<div class="chart-section"><h3 style="font-size:13px;margin-bottom:8px">❌ Rotas s/ Devolução</h3><div class="chart-container" id="chartRoutes" style="max-height:200px;overflow:hidden"></div></div></div>
+<div class="charts-row">
+<div class="chart-section"><h3 style="font-size:13px;margin-bottom:6px">📊 Envios vs Retornos — 7 dias</h3><div class="chart-container" id="chartBar" style="padding:8px"></div></div>
+<div class="chart-section"><h3 style="font-size:13px;margin-bottom:6px">❌ Rotas com Pendências</h3><div class="chart-container" id="chartRoutes" style="padding:8px"></div></div>
+</div>
 <hr style="margin:20px 0;border:none;border-top:2px solid var(--gray2)">
 <div class="card" style="margin-bottom:12px">
 <h4 style="font-size:13px;margin-bottom:10px">📦 TBR por Classificação</h4>
@@ -1153,78 +1156,81 @@ window.loadDashboard=loadDashboard;
 function renderBarChart(envArr,regArr,retNormal){
 try{
 let container=$('chartBar');if(!container)return;
-let days=[];for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
+let days=[];
+for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
 let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
 let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||'').startsWith(d)).length);
 let retByDay=days.map(d=>(retNormal||[]).filter(r=>(r.datahora||'').startsWith(d)).length);
 let maxV=Math.max(...envByDay,...retByDay,1);
+let totalEnv=envByDay.reduce((a,b)=>a+b,0);
+let totalRet=retByDay.reduce((a,b)=>a+b,0);
+let pctTotal=totalEnv?Math.round((totalRet/totalEnv)*100):0;
+let todayStr=today();
 
-const W=400,H=155,PT=28,PR=16,PB=26,PL=38;
+const W=520,H=170,PT=36,PR=14,PB=28,PL=36;
 const cW=W-PL-PR,cH=H-PT-PB;
-const xS=i=>PL+(i/6)*cW;
-const yS=v=>PT+cH-(v/maxV)*cH;
+const slotW=cW/7;
+const barW=Math.max(8,Math.floor(slotW*0.3));
+const baseY=PT+cH;
 
-const makePath=pts=>{
-if(!pts.length)return'';
-let d='M '+pts[0].x.toFixed(1)+' '+pts[0].y.toFixed(1);
-for(let i=0;i<pts.length-1;i++){
-let cx=((pts[i].x+pts[i+1].x)/2).toFixed(1);
-d+=' C '+cx+' '+pts[i].y.toFixed(1)+','+cx+' '+pts[i+1].y.toFixed(1)+','+pts[i+1].x.toFixed(1)+' '+pts[i+1].y.toFixed(1);
-}
-return d;
-};
-
-let envPts=days.map((_,i)=>({x:xS(i),y:yS(envByDay[i])}));
-let retPts=days.map((_,i)=>({x:xS(i),y:yS(retByDay[i])}));
-let baseY=(PT+cH).toFixed(1);
-let envLine=makePath(envPts);
-let retLine=makePath(retPts);
-let envArea=envLine+' L '+envPts[6].x.toFixed(1)+' '+baseY+' L '+envPts[0].x.toFixed(1)+' '+baseY+' Z';
-let retArea=retLine+' L '+retPts[6].x.toFixed(1)+' '+baseY+' L '+retPts[0].x.toFixed(1)+' '+baseY+' Z';
-
-let gridLines='';
-let steps=4;
-for(let g=1;g<=steps;g++){
-let gy=yS((maxV/steps)*g);
-gridLines+='<line x1="'+PL+'" y1="'+gy.toFixed(1)+'" x2="'+(W-PR)+'" y2="'+gy.toFixed(1)+'" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,3"/>';
-gridLines+='<text x="'+(PL-5)+'" y="'+(gy+3.5).toFixed(1)+'" text-anchor="end" font-size="8.5" fill="#94a3b8">'+Math.round((maxV/steps)*g)+'</text>';
+// Grid lines + axis
+let grid='<line x1="'+PL+'" y1="'+baseY+'" x2="'+(W-PR)+'" y2="'+baseY+'" stroke="#cbd5e1" stroke-width="1.5"/>';
+let nGridY=4;
+for(let g=1;g<=nGridY;g++){
+let gv=Math.ceil((maxV/nGridY)*g);
+let gy=(PT+cH-((Math.min(gv,maxV)/maxV)*cH)).toFixed(1);
+grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#f1f5f9" stroke-width="1"/>';
+grid+='<text x="'+(PL-5)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8" fill="#94a3b8">'+Math.min(gv,maxV)+'</text>';
 }
 
-let dateLabels=days.map((d,i)=>{
-let p=d.split('-');
-return '<text x="'+xS(i).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="9" fill="#94a3b8">'+p[2]+'/'+p[1]+'</text>';
-}).join('');
+// Today column highlight — clamp so it doesn't exceed viewBox
+let todayX=(PL+(6/6)*cW);
+let todayHlW=slotW-2;
+let todayHlX=Math.max(PL,todayX-todayHlW/2);
+let todayHlRight=Math.min(W-PR,todayHlX+todayHlW);
+grid+='<rect x="'+todayHlX.toFixed(1)+'" y="'+PT+'" width="'+(todayHlRight-todayHlX).toFixed(1)+'" height="'+cH+'" fill="#FF9900" fill-opacity="0.06" rx="4"/>';
 
-let envDots=envPts.map(p=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="#FF9900" stroke="white" stroke-width="1.5"/>').join('');
-let retDots=retPts.map(p=>'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="#00A86B" stroke="white" stroke-width="1.5"/>').join('');
+let bars='',valLabels='',dateLabels='';
+days.forEach((d,i)=>{
+let cx=(PL+(i/6)*cW);
+let isToday=(d===todayStr);
+let hE=envByDay[i]>0?Math.max((envByDay[i]/maxV)*cH,4):0;
+let hR=retByDay[i]>0?Math.max((retByDay[i]/maxV)*cH,4):0;
+let xE=(cx-barW-1.5).toFixed(1);
+let xR=(cx+1.5).toFixed(1);
+// Envios bar
+if(hE>0){
+bars+='<rect x="'+xE+'" y="'+(baseY-hE).toFixed(1)+'" width="'+barW+'" height="'+hE.toFixed(1)+'" fill="#FF9900" rx="3"/>';
+valLabels+='<text x="'+(cx-barW/2-1.5).toFixed(1)+'" y="'+(baseY-hE-5).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#FF9900" font-weight="700">'+envByDay[i]+'</text>';
+}else{
+bars+='<rect x="'+xE+'" y="'+(baseY-2)+'" width="'+barW+'" height="2" fill="#f1f5f9" rx="1"/>';
+}
+// Retornos bar
+if(hR>0){
+bars+='<rect x="'+xR+'" y="'+(baseY-hR).toFixed(1)+'" width="'+barW+'" height="'+hR.toFixed(1)+'" fill="#00A86B" rx="3"/>';
+valLabels+='<text x="'+(cx+barW/2+1.5).toFixed(1)+'" y="'+(baseY-hR-5).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#00A86B" font-weight="700">'+retByDay[i]+'</text>';
+}else{
+bars+='<rect x="'+xR+'" y="'+(baseY-2)+'" width="'+barW+'" height="2" fill="#f1f5f9" rx="1"/>';
+}
+let parts=d.split('-');
+dateLabels+='<text x="'+cx.toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9" fill="'+(isToday?'#0F2137':'#94a3b8')+'" font-weight="'+(isToday?'700':'400')+'">'+parts[2]+'/'+parts[1]+'</text>';
+if(isToday)dateLabels+='<text x="'+cx.toFixed(1)+'" y="'+(H-6-11)+'" text-anchor="middle" font-size="7" fill="#FF9900" font-weight="700" letter-spacing="0.5">HOJE</text>';
+});
 
-let valLabelEnv=envByDay.map((v,i)=>v>0&&(i===0||v!==envByDay[i-1]||v!==envByDay[i+1])?'<text x="'+xS(i).toFixed(1)+'" y="'+(yS(v)-8).toFixed(1)+'" text-anchor="middle" font-size="8" fill="#FF9900" font-weight="600">'+v+'</text>':'').join('');
-let valLabelRet=retByDay.map((v,i)=>v>0&&(i===0||v!==retByDay[i-1]||v!==retByDay[i+1])?'<text x="'+xS(i).toFixed(1)+'" y="'+(yS(v)-8).toFixed(1)+'" text-anchor="middle" font-size="8" fill="#00A86B" font-weight="600">'+v+'</text>':'').join('');
+let pctColor=pctTotal>=80?'#00A86B':pctTotal>=60?'#FF9900':'#E74C3C';
+let legend='<circle cx="'+(PL+6)+'" cy="17" r="4.5" fill="#FF9900"/>'
++'<text x="'+(PL+14)+'" y="21" font-size="10" fill="#334155" font-weight="600">Envios</text>'
++'<circle cx="'+(PL+65)+'" cy="17" r="4.5" fill="#00A86B"/>'
++'<text x="'+(PL+73)+'" y="21" font-size="10" fill="#334155" font-weight="600">Retornos</text>';
+let summary='<rect x="'+(W-PR-70)+'" y="8" width="70" height="18" fill="'+pctColor+'" fill-opacity="0.1" rx="9"/>'
++'<text x="'+(W-PR-35)+'" y="21" text-anchor="middle" font-size="10" fill="'+pctColor+'" font-weight="700">'+totalRet+'/'+totalEnv+' ('+pctTotal+'%)</text>';
 
-let hasEnv=envByDay.some(v=>v>0),hasRet=retByDay.some(v=>v>0);
-let noDataMsg=(!hasEnv&&!hasRet)?'<text x="'+(W/2)+'" y="'+(H/2)+'" text-anchor="middle" font-size="12" fill="#94a3b8">Sem dados no período</text>':'';
+let noData=(!totalEnv&&!totalRet)?'<text x="'+(W/2)+'" y="'+(H/2+4)+'" text-anchor="middle" font-size="12" fill="#94a3b8">Nenhum dado no período</text>':'';
 
 let svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'
-+'<defs>'
-+'<linearGradient id="gEnv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF9900" stop-opacity="0.22"/><stop offset="100%" stop-color="#FF9900" stop-opacity="0.01"/></linearGradient>'
-+'<linearGradient id="gRet" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00A86B" stop-opacity="0.18"/><stop offset="100%" stop-color="#00A86B" stop-opacity="0.01"/></linearGradient>'
-+'</defs>'
 +'<rect width="100%" height="100%" fill="white"/>'
-+gridLines
-+(hasEnv?'<path d="'+envArea+'" fill="url(#gEnv)"/>'+'<path d="'+envLine+'" fill="none" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/>':'')
-+(hasRet?'<path d="'+retArea+'" fill="url(#gRet)"/>'+'<path d="'+retLine+'" fill="none" stroke="#00A86B" stroke-width="2.5" stroke-linecap="round"/>':'')
-+(hasEnv?envDots:'')
-+(hasRet?retDots:'')
-+(hasEnv?valLabelEnv:'')
-+(hasRet?valLabelRet:'')
-+dateLabels
-+noDataMsg
-+'<circle cx="'+(PL+8)+'" cy="14" r="4" fill="#FF9900"/>'
-+'<text x="'+(PL+16)+'" y="18" font-size="10" fill="#334155" font-weight="600">Envios</text>'
-+'<circle cx="'+(PL+70)+'" cy="14" r="4" fill="#00A86B"/>'
-+'<text x="'+(PL+78)+'" y="18" font-size="10" fill="#334155" font-weight="600">Retornos</text>'
++grid+bars+valLabels+dateLabels+legend+summary+noData
 +'</svg>';
-
 container.innerHTML=svg;
 }catch(e){}
 }
@@ -1237,42 +1243,59 @@ let allEnvR=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().inclu
 allEnvR.forEach(e=>{let rt=getRota(e)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].env++});
 regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let rt=getRota(r)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
 
-let withPend=Object.entries(routes).filter(([n,v])=>v.env>v.ret);
-let sorted=withPend.sort((a,b)=>(b[1].env-b[1].ret)-(a[1].env-a[1].ret)).slice(0,8);
+// Only routes with pending items, sorted by most pending first
+let sorted=Object.entries(routes).map(([n,v])=>({name:n,env:v.env,ret:v.ret,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).filter(r=>r.pend>0).sort((a,b)=>b.pend-a.pend).slice(0,8);
 
 if(!sorted.length){
-container.innerHTML='<div style="text-align:center;padding:28px 10px;color:var(--green);font-size:13px;font-weight:600">✅ Todas as rotas retornaram!</div>';
+container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:24px 0;color:#00A86B;font-size:13px;font-weight:700">✅ Todas as rotas retornaram!</div>';
 return;
 }
 
-const W=380,rowH=34,PL=56,PR=10,legH=20;
-const barMaxW=W-PL-PR-50;
-const svgH=legH+sorted.length*rowH+6;
+const W=520,rowH=40,PL=52,PR=12,legH=24,trackW=W-PL-PR-80;
+const svgH=legH+sorted.length*rowH+8;
 
-let rows=sorted.map(([name,val],i)=>{
-let pend=val.env-val.ret;
-let pct=Math.round((val.ret/val.env)*100);
+let legend='<rect x="'+PL+'" y="6" width="10" height="10" fill="#00A86B" rx="2"/>'
++'<text x="'+(PL+13)+'" y="15" font-size="9" fill="#334155">Retornados</text>'
++'<rect x="'+(PL+78)+'" y="6" width="10" height="10" fill="#E74C3C" rx="2"/>'
++'<text x="'+(PL+91)+'" y="15" font-size="9" fill="#334155">Pendentes</text>';
+
+let rows=sorted.map((r,i)=>{
 let y=legH+i*rowH;
-let wRet=val.env?((val.ret/val.env)*barMaxW):0;
-let wPend=val.env?((pend/val.env)*barMaxW):barMaxW;
-let barY=y+8;
-return '<text x="'+(PL-6)+'" y="'+(y+21)+'" text-anchor="end" font-size="10.5" fill="#0F2137" font-weight="600">'+name.slice(0,8)+'</text>'
-+(val.ret>0?'<rect x="'+PL+'" y="'+barY+'" width="'+wRet.toFixed(1)+'" height="20" fill="#00A86B" rx="0"/>'
-+'<rect x="'+(PL+wRet).toFixed(1)+'" y="'+barY+'" width="'+wPend.toFixed(1)+'" height="20" fill="#E74C3C" rx="0 4 4 0"/>':
-'<rect x="'+PL+'" y="'+barY+'" width="'+wPend.toFixed(1)+'" height="20" fill="#E74C3C" rx="4"/>')
-+'<text x="'+(PL+wRet+wPend+6).toFixed(1)+'" y="'+(barY+14)+'" font-size="10" fill="#64748b" font-weight="600">'+pend+' pend.</text>'
-+(pct>0?'<text x="'+(PL+wRet-4).toFixed(1)+'" y="'+(barY+14)+'" text-anchor="end" font-size="9" fill="white" font-weight="700">'+pct+'%</text>':'');
-}).join('');
+let barY=y+11;
+let barH=18;
+let wRet=r.env>0?(r.ret/r.env)*trackW:0;
+let wPend=r.env>0?(r.pend/r.env)*trackW:trackW;
 
-let legend='<rect x="'+PL+'" y="4" width="10" height="10" fill="#00A86B" rx="2"/>'
-+'<text x="'+(PL+13)+'" y="13" font-size="9" fill="#334155">Retornados</text>'
-+'<rect x="'+(PL+75)+'" y="4" width="10" height="10" fill="#E74C3C" rx="2"/>'
-+'<text x="'+(PL+88)+'" y="13" font-size="9" fill="#334155">Pendentes</text>';
+// Route label
+let out='<text x="'+(PL-6)+'" y="'+(y+22)+'" text-anchor="end" font-size="11" fill="#0F2137" font-weight="700">'+r.name.slice(0,8)+'</text>';
+
+// Background track
+out+='<rect x="'+PL+'" y="'+barY+'" width="'+trackW+'" height="'+barH+'" fill="#f1f5f9" rx="5"/>';
+
+// Green (returned) segment
+if(wRet>4){
+out+='<rect x="'+PL+'" y="'+barY+'" width="'+wRet.toFixed(1)+'" height="'+barH+'" fill="#00A86B" rx="'+(wRet>=trackW?'5':'5 0 0 5')+'"/>';
+if(wRet>30)out+='<text x="'+(PL+wRet/2).toFixed(1)+'" y="'+(barY+12)+'" text-anchor="middle" font-size="9" fill="white" font-weight="700">'+r.pct+'%</text>';
+}
+
+// Red (pending) segment
+let rx2=wRet<=2?'5':'0 5 5 0';
+out+='<rect x="'+(PL+wRet).toFixed(1)+'" y="'+barY+'" width="'+(wPend>0?wPend.toFixed(1):'0')+'" height="'+barH+'" fill="#E74C3C" rx="'+rx2+'"/>';
+
+// Right labels
+let rightX=PL+trackW+8;
+out+='<text x="'+rightX+'" y="'+(barY+8)+'" font-size="10" fill="#E74C3C" font-weight="700">'+r.pend+' pend.</text>';
+if(r.ret>0)out+='<text x="'+rightX+'" y="'+(barY+20)+'" font-size="8.5" fill="#64748b">'+r.ret+' vol.</text>';
+
+// Divider
+if(i<sorted.length-1)out+='<line x1="'+PL+'" y1="'+(y+rowH)+'" x2="'+(W-PR)+'" y2="'+(y+rowH)+'" stroke="#f1f5f9" stroke-width="1"/>';
+
+return out;
+}).join('');
 
 let svg='<svg viewBox="0 0 '+W+' '+svgH+'" xmlns="http://www.w3.org/2000/svg">'
 +'<rect width="100%" height="100%" fill="white"/>'
-+legend+rows
-+'</svg>';
++legend+rows+'</svg>';
 container.innerHTML=svg;
 }catch(e){}
 }
