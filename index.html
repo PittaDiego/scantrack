@@ -726,7 +726,7 @@ window.onunhandledrejection=function(e){try{e.preventDefault()}catch(x){}};
 try{(function(){
 // ===== STATE =====
 const LS_PREFIX='scantrack_';
-const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt',lastEnvArr:null,lastRegArr:null};
+const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt',lastEnvArr:null,lastRegArr:null,todayScans:{}};
 const DEFAULT_DS=['DSP2:HIGHEND','HSP2:HIGHEND','DSP4:EAGLES','DBS5:EAGLES','DBS7:EAGLES','DGO2:EAGLES','DRJ3:EAGLES','HRJ3:EAGLES','DRJ5:EAGLES','DES2:EAGLES','HVI2:EAGLES','DSA8:EAGLES','HSV8:EAGLES','DBR9:EAGLES'];
 const DEFAULT_CLASS=['Devolução ao remetente','Danificado','Endereço não localizado','Cliente ausente','Recusa do cliente','Retenção (investigação)','Extravio parcial','Reagendamento','Transferência entre DS','Outro'];
 const COOLDOWN_MS=5000;
@@ -759,6 +759,56 @@ function today(){return new Date().toISOString().split('T')[0]}
 function getRota(r){try{if(r.rota)return r.rota;var m=(r.observacao||'').match(/Rota:([^|]+)/);return m?m[1].trim():''}catch(e){return ''}}
 function getHub(r){try{if(r.hub)return r.hub;var m=(r.observacao||'').match(/Hub:([^|]*)/);return m?m[1].trim():''}catch(e){return ''}}
 
+// ===== CODE NORMALIZATION (DE-PARA) =====
+// Regra real: separador define o tipo
+//   RÁFIA → usa traços: qualquer prefixo + NNNN-NNN-COR  (ex: 7584-584-RED, N-7584-584-RED, DN-N-7584-584-RED)
+//   BAG   → usa underscores: qualquer prefixo + NNNN_COR  (ex: 7970_BLK, EU_ST_AO_7970_BLK, BR_7970_BLK)
+//   Dispatch (curto): Black 584 = ráfia, Black 7970 = bag
+function detectTipo(code){
+try{
+if(!code)return'Bag';
+var c=String(code).trim();
+if(/^TBR/i.test(c))return'Pacote';
+// Formatos curtos do dispatch: Cor + 3 dígitos = Ráfia, Cor + 4 dígitos = Bag
+if(/^[A-Za-z]+\s+\d{3}$/.test(c))return'Rafia';
+if(/^[A-Za-z]+\s+\d{4}$/.test(c))return'Bag';
+// Formato longo: separador determina tipo
+// Underscore presente → BAG (NNNN_COR ou prefixo_NNNN_COR)
+if(/_/.test(c)){var pU=c.split('_');var h4=pU.some(function(p){return/^\d{4}$/.test(p)});return h4?'Bag':'Bag';}
+// Só traços → RÁFIA (NNNN-NNN-COR ou prefixo-NNNN-NNN-COR)
+if(/-/.test(c)){var pD=c.split('-');var h3=pD.some(function(p){return/^\d{3}$/.test(p)});return h3?'Rafia':'Bag';}
+return'Bag';
+}catch(e){return'Bag'}
+}
+
+// Normaliza para chave canônica de matching cross-formato:
+// 7584-584-RED → R584 | Black 584 → R584 (mesmo item)
+// 7970_BLK    → B7970 | Black 7970 → B7970 (mesmo item)
+function codeKey(code){
+try{
+if(!code)return'';
+var c=String(code).trim().toUpperCase();
+if(c.startsWith('TBR'))return c;
+// Curto: "BLACK 584" → R584
+var m=c.match(/^[A-Z]+\s+(\d{3})$/);if(m)return'R'+m[1];
+// Curto: "BLACK 7970" → B7970
+m=c.match(/^[A-Z]+\s+(\d{4})$/);if(m)return'B'+m[1];
+// Longo underscore → BAG: pega o segmento de 4 dígitos
+if(c.includes('_')){
+var pu=c.split('_');
+var k4=null;for(var i=0;i<pu.length;i++){if(/^\d{4}$/.test(pu[i])){k4=pu[i];break;}}
+return k4?('B'+k4):c;
+}
+// Longo traço → RÁFIA: pega o segmento de 3 dígitos (não o de 4)
+if(c.includes('-')){
+var pd=c.split('-');
+var k3=null;for(var j=0;j<pd.length;j++){if(/^\d{3}$/.test(pd[j])){k3=pd[j];break;}}
+return k3?('R'+k3):c;
+}
+return c;
+}catch(e){return String(code||'')}
+}
+
 function getApiUrl(){return ls('api_url')||'https://script.google.com/macros/s/AKfycbxy5kIsZ2hSLV2DuUA_L6NoMRWfutJagI1sxbwVqW5v85e-goe5azAYo-XODqF7scJv4Q/exec'}
 
 // ===== DETECT DESKTOP =====
@@ -787,6 +837,40 @@ for(let item of queue){
 try{await apiCall(item.action,item.params)}catch(e){state.offlineQueue.push(item)}
 }
 ls('offlineQueue',state.offlineQueue);
+}
+
+// ===== ANTI-DUPLICATA DIÁRIA GLOBAL =====
+// Carrega todos os scans de hoje da API para bloquear reescaneamentos
+async function loadTodayScans(){
+try{
+let r=await apiCall('lerRegistros',{ds:state.ds,from:today(),to:today()});
+let arr=r&&r.data?r.data:[];
+state.todayScans={};
+arr.forEach(function(reg){
+if(!reg.codigo)return;
+state.todayScans[reg.codigo]=reg.datahora||'?';
+var k=codeKey(reg.codigo);
+if(k&&k!==reg.codigo)state.todayScans[k]=reg.datahora||'?';
+});
+}catch(e){}
+}
+
+function isDuplicateToday(code){
+try{
+if(!code)return false;
+if(state.todayScans[code])return state.todayScans[code];
+var k=codeKey(code);
+if(k&&state.todayScans[k])return state.todayScans[k];
+return false;
+}catch(e){return false}
+}
+
+function markScannedToday(code,datahora){
+try{
+state.todayScans[code]=datahora||today();
+var k=codeKey(code);
+if(k&&k!==code)state.todayScans[k]=datahora||today();
+}catch(e){}
 }
 
 // ===== CONFIG =====
@@ -852,6 +936,7 @@ loadHelp();
 checkAdmin();
 loadRecentUploads();
 flushQueue();
+loadTodayScans();// Carrega scans do dia para anti-duplicata global
 }catch(e){}
 }
 
@@ -866,6 +951,7 @@ state.currentTab=tabId;
 if(tabId==='tabDashboard')loadDashboard();
 if(tabId==='tabRegistros')loadRegistros();
 if(tabId==='tabAdmin')checkAdmin();
+if(tabId==='tabScanner')loadTodayScans();// Atualiza lista de duplicatas ao voltar ao scanner
 }catch(e){}
 }
 window.switchTab=switchTab;
@@ -972,13 +1058,26 @@ try{
 if(!code)return;
 state.pendingCode=code;
 
+// ── ANTI-DUPLICATA DIÁRIA GLOBAL ──
+// Bloqueia o mesmo código sendo bipado mais de uma vez no mesmo dia (qualquer operador)
+let dupTime=isDuplicateToday(code);
+if(dupTime){
+let t=String(dupTime).match(/T(\d{2}):(\d{2})/);
+let ht=t?(t[1]+':'+t[2]):'hoje';
+flash('red');beep(200,300);
+toast('⚠️ Já registrado hoje às '+ht+' — duplicata bloqueada','error');
+return;
+}
+
 // Continuous rapid mode for retorno (bag/rafia)
 if(state.moveType==='retorno'&&state.scanType!=='Pacote'){
-// Cooldown check
-let key=code+'_'+state.scanType;
+// Cooldown de sessão (5s) — proteção extra contra scan duplo acidental
+let key=code+'_ret';
 if(lastScans[key]&&(Date.now()-lastScans[key]<COOLDOWN_MS)){toast('Duplicata bloqueada — aguarde 5s','warn');return}
 lastScans[key]=Date.now();
-doRegister(code,state.scanType,'retorno');
+// AUTO-DETECTA o tipo pelo padrão do código (ignora o seletor)
+let tipoAuto=detectTipo(code);
+doRegister(code,tipoAuto,'retorno');
 }else if(state.scanType==='Pacote'){
 showPendingCode(code);
 toast('📌 '+code+' — preencha e confirme','warn');
@@ -1039,8 +1138,12 @@ window.confirmScan=confirmScan;
 
 async function doRegister(code,tipo,movimento,extra){
 try{
-let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:state.regional,operador:state.user,datahora:new Date().toISOString()};
+let now=new Date().toISOString();
+let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:state.regional,operador:state.user,datahora:now};
 if(extra)Object.assign(params,extra);
+
+// Marca como escaneado hoje IMEDIATAMENTE (antes da resposta da API)
+markScannedToday(code,now);
 
 // Optimistic UI
 state.sessionCount++;
@@ -1120,11 +1223,16 @@ let regArr=regData&&regData.data?regData.data:[];
 state.lastEnvArr=envArr;state.lastRegArr=regArr;
 
 saidas=envArr.length+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')).length;
+// Monta set de códigos enviados — indexa TANTO código bruto QUANTO chave normalizada
 var allEnvCodes={};
-envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{allEnvCodes[e.codigo]=true});
+envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{
+allEnvCodes[e.codigo]=true;
+var k=codeKey(e.codigo);if(k&&k!==e.codigo)allEnvCodes[k]=true;
+});
 var retAll=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
-var retNormal=retAll.filter(r=>allEnvCodes[r.codigo]);
-var retAdicional=retAll.filter(r=>!allEnvCodes[r.codigo]);
+// Retorno normal: código bruto OU chave normalizada bate com envio
+var retNormal=retAll.filter(r=>allEnvCodes[r.codigo]||allEnvCodes[codeKey(r.codigo)]);
+var retAdicional=retAll.filter(r=>!allEnvCodes[r.codigo]&&!allEnvCodes[codeKey(r.codigo)]);
 retornos=retNormal.length;
 tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.datahora&&r.datahora.startsWith(today())).length;
 var weekAgoD=new Date();weekAgoD.setDate(weekAgoD.getDate()-7);
@@ -1359,11 +1467,15 @@ envArr=ed&&ed.data?ed.data:[];
 regArr=rd&&rd.data?rd.data:[];
 }
 let retSet={};
-regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{retSet[r.codigo]=r.datahora});
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{
+if(!r.codigo)return;
+retSet[r.codigo]=r.datahora;
+let k=codeKey(r.codigo);if(k&&k!==r.codigo&&!retSet[k])retSet[k]=r.datahora;
+});
 let allSaidas=[];
 envArr.forEach(e=>allSaidas.push(Object.assign({},e)));
 regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')&&r.tipo!=='Pacote').forEach(r=>allSaidas.push(Object.assign({},r)));
-let pendentes=allSaidas.filter(e=>e.codigo&&!retSet[e.codigo]);
+let pendentes=allSaidas.filter(e=>e.codigo&&!retSet[e.codigo]&&!retSet[codeKey(e.codigo)]);
 // Remove duplicates (same code, keep earliest)
 let byCode={};
 pendentes.forEach(e=>{if(!byCode[e.codigo]||((e.datahora||'')<(byCode[e.codigo].datahora||'')))byCode[e.codigo]=e});
@@ -1506,10 +1618,8 @@ let hub=cols[2]||cols[1]||'';
 let addr=cols[1]||'';
 
 labels.forEach(label=>{
-let tipo='Bag';
-if(label.startsWith('DN-'))tipo='Rafia';
-else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
-else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
+let tipo=detectTipo(label);
+if(tipo==='Pacote')tipo='Bag';
 records.push({codigo:label,tipo,rota:currentRoute,hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
 });
 }
@@ -1547,28 +1657,30 @@ show($('uploadProgress'));
 let txt=$('progText');
 
 // === AUTO-BAIXA: verifica pendências antes do upload ===
-if(txt)txt.textContent='Verificando pendências pendentes...';
+if(txt)txt.textContent='Verificando pendências...';
 let autoRetornos=[];
 try{
 let envData=await apiCall('lerEnvios',{ds:state.ds});
 let regData=await apiCall('lerRegistros',{ds:state.ds});
 let prevEnv=envData&&envData.data?envData.data:[];
 let prevReg=regData&&regData.data?regData.data:[];
-// Códigos que já saíram
-let sentSet=new Set();
-prevEnv.forEach(e=>{if(e.codigo)sentSet.add(e.codigo)});
-prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('said')).forEach(r=>{if(r.codigo)sentSet.add(r.codigo)});
-// Códigos que já retornaram
-let retSet=new Set();
-prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{if(r.codigo)retSet.add(r.codigo)});
-// Pendentes = saíram mas não retornaram
-let pendSet=new Set([...sentSet].filter(c=>!retSet.has(c)));
-// Para cada novo registro que aparece como pendente → gera auto-retorno
+// Índice de códigos enviados — inclui chave normalizada (de-para)
+let sentKeys=new Set();
+prevEnv.forEach(e=>{if(e.codigo){sentKeys.add(e.codigo);let k=codeKey(e.codigo);if(k)sentKeys.add(k);}});
+prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('said')).forEach(r=>{if(r.codigo){sentKeys.add(r.codigo);let k=codeKey(r.codigo);if(k)sentKeys.add(k);}});
+// Índice de códigos retornados — inclui chave normalizada
+let retKeys=new Set();
+prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{if(r.codigo){retKeys.add(r.codigo);let k=codeKey(r.codigo);if(k)retKeys.add(k);}});
+// Pendentes = enviados sem retorno (chave normalizada)
+let pendKeys=new Set([...sentKeys].filter(c=>!retKeys.has(c)));
+// Para cada novo registro no dispatch que está pendente → auto-retorno
 let seen=new Set();
 records.forEach(r=>{
-if(pendSet.has(r.codigo)&&!seen.has(r.codigo)){
-seen.add(r.codigo);
-autoRetornos.push({codigo:r.codigo,tipo:r.tipo,movimento:'Retorno',classificacao:'',
+let rKey=codeKey(r.codigo)||r.codigo;
+let isPend=pendKeys.has(r.codigo)||pendKeys.has(rKey);
+if(isPend&&!seen.has(rKey)){
+seen.add(rKey);
+autoRetornos.push({codigo:r.codigo,tipo:detectTipo(r.codigo),movimento:'Retorno',classificacao:'',
 observacao:'Auto-baixa: reenviado em novo despacho | Rota:'+(r.rota||'-')+' | Hub:'+(r.hub||'-'),
 fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,
 operador:state.user+'[auto]',datahora:(r.data||today())+'T07:59:00Z'});
@@ -1689,10 +1801,8 @@ var hub=String(cols[2]||cols[1]||'').substring(0,50);
 var addr=String(cols[1]||'').substring(0,80);
 for(var k=0;k<labels.length;k++){
 var label=labels[k];
-var tipo='Bag';
-if(label.indexOf('DN-')===0)tipo='Rafia';
-else if(/^[A-Za-z]+\s\d{3}$/.test(label))tipo='Rafia';
-else if(/^[A-Za-z]+\s\d{4}$/.test(label))tipo='Bag';
+var tipo=detectTipo(label);
+if(tipo==='Pacote')tipo='Bag';// TBR não entra no dispatch
 records.push({codigo:label,tipo:tipo,movimento:'Saida',rota:currentRoute,hub:hub,endereco:addr,data:currentDate||extractDateFromFilename(filename)||new Date().toISOString().split('T')[0],ds:state.ds,regional:state.regional||''});
 }
 }
@@ -1827,8 +1937,8 @@ el.innerHTML=`
 <div class="help-section">
 <h3>🔐 Login</h3>
 <p><strong>Alias</strong>: seu login Amazon (ex: <code>jsilva</code>) — sem espaços, sem acento. Fica salvo para a próxima vez.<br>
-<strong>DS</strong>: sua Delivery Station. A lista vem da API. Se não carregar, usa lista padrão.<br>
-<strong>PIN</strong>: 4 dígitos. PIN padrão é <strong>1234</strong> — configure no Admin antes de usar em produção.<br>
+<strong>DS</strong>: sua Delivery Station. A lista vem da configuração da estação.<br>
+<strong>PIN</strong>: 4 dígitos fornecidos pelo responsável da operação.<br>
 <em>Sessão salva automaticamente. Feche e reabra sem precisar logar novamente.</em></p>
 </div>
 
@@ -1836,7 +1946,7 @@ el.innerHTML=`
 <h3>📷 Scanner — Tipos de ativo</h3>
 <p>Selecione o tipo antes de escanear. O app detecta automaticamente mas você pode corrigir:</p>
 <ul>
-<li><strong>🛍️ Bag</strong> → código com 4 dígitos: ex. <code>Black 0805</code>, <code>Red 1234</code></li>
+<li><strong>🛍️ Bag</strong> → código com 4 dígitos: ex. <code>Black 0805</code>, <code>Red 0921</code></li>
 <li><strong>🧵 Ráfia</strong> → código com 3 dígitos ou começa com DN-: ex. <code>Black 805</code>, <code>DN-N-7507-007</code></li>
 <li><strong>📋 Pacote (TBR)</strong> → começa com TBR: ex. <code>TBR379054196</code></li>
 </ul>
@@ -1913,15 +2023,8 @@ el.innerHTML=`
 </div>
 
 <div class="help-section">
-<h3>⚙️ Admin (restrito)</h3>
-<p>Acessível apenas para aliases na lista de admins (padrão: <code>dpitta</code>).</p>
-<ul>
-<li><strong>Conexão API</strong>: URL do Google Apps Script. Salve e teste antes de usar</li>
-<li><strong>Delivery Stations</strong>: adicione/remova DSs no formato <code>CODIGO:REGIONAL</code></li>
-<li><strong>PIN</strong>: altere o PIN de acesso (4 dígitos)</li>
-<li><strong>Classificações TBR</strong>: lista de tipos de ocorrência para pacotes</li>
-<li><strong>Admins</strong>: aliases que têm acesso ao painel Admin</li>
-</ul>
+<h3>⚙️ Config</h3>
+<p>Área restrita para o responsável técnico da operação. Acesso via credenciais fornecidas pela equipe de implantação.</p>
 </div>
 
 <div class="help-section">
@@ -1929,10 +2032,10 @@ el.innerHTML=`
 <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O app funciona sem internet? <span>▸</span></div><div class="faq-a">Parcialmente. Scans são salvos em fila local e reenviados automaticamente quando a conexão voltar. O dashboard e upload precisam de conexão.</div></div>
 <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é "Retorno Adicional"? <span>▸</span></div><div class="faq-a">É uma bag/ráfia que foi escaneada como retorno hoje, mas não estava nos envios deste período (ou seja, já estava em estoque ou vinha de outro dia). Não impacta o % de retorno.</div></div>
 <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é Auto-baixa? <span>▸</span></div><div class="faq-a">Quando você faz upload de um Dispatch e um código já estava pendente (saiu antes e não voltou), o sistema automaticamente registra o retorno antes de lançar a nova saída. Evita acúmulo de pendências por scans pulados.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Por que o scan do RETORNO não pede confirmação? <span>▸</span></div><div class="faq-a">Para agilidade. O retorno é o fluxo mais frequente (dezenas de scans por dia), então vai rápido. Se errar, escaneie de novo — o registro fica na planilha e pode ser corrigido pelo Admin.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Por que meu scan foi bloqueado hoje? <span>▸</span></div><div class="faq-a">O sistema bloqueia o mesmo código sendo bipado mais de uma vez no mesmo dia, mesmo por operadores diferentes. Isso evita contagem dupla de retornos. Se houver um engano, o admin pode corrigir direto na planilha.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Por que o scan do RETORNO não pede confirmação? <span>▸</span></div><div class="faq-a">Para agilidade. O retorno é o fluxo mais frequente (dezenas de scans por dia), então vai rápido. Se errar, o admin corrige na planilha.</div></div>
 <div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Câmera não abre no celular. O que fazer? <span>▸</span></div><div class="faq-a">Verifique se o site tem permissão de câmera no browser. Em Chrome: clique no cadeado na barra de endereço → Permissões → Câmera → Permitir. O campo "Código manual" sempre funciona como alternativa.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como exportar os pendentes para cobrar os DAs? <span>▸</span></div><div class="faq-a">No Dashboard, clique em "📥 Pendentes (CSV)". Abre um arquivo Excel com código, tipo, rota, hub, data que saiu e dias em aberto. Leve isso para a reunião diária.</div></div>
-<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como configurar a URL da API? <span>▸</span></div><div class="faq-a">Acesse a aba Admin → Conexão API → cole a URL do seu Google Apps Script publicado → Salvar → Testar Conexão. Se aparecer "✅ Conexão OK", está tudo certo.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como exportar os pendentes para cobrar os DAs? <span>▸</span></div><div class="faq-a">No Dashboard, clique em "📥 Pendentes (CSV)". Abre um arquivo com código, tipo, rota, hub, data que saiu e dias em aberto.</div></div>
 </div>`;
 }else{
 el.innerHTML=`
@@ -1945,7 +2048,7 @@ el.innerHTML=`
 <h3>🔐 Login</h3>
 <p><strong>Alias</strong>: your Amazon login (e.g. <code>jsilva</code>) — no spaces. Saved for next time.<br>
 <strong>DS</strong>: your Delivery Station. List comes from API; falls back to defaults.<br>
-<strong>PIN</strong>: 4 digits. Default is <strong>1234</strong> — change in Admin before production.<br>
+<strong>PIN</strong>: 4 digits provided by the station manager.<br>
 <em>Session is auto-saved. Close and reopen without re-logging in.</em></p>
 </div>
 
@@ -2016,11 +2119,8 @@ el.innerHTML=`
 </div>
 
 <div class="help-section">
-<h3>⚙️ Admin (restricted)</h3>
-<ul>
-<li>API Connection, DS management, PIN change, TBR classifications, Admin aliases</li>
-<li>Only aliases in the admin list can access</li>
-</ul>
+<h3>⚙️ Config</h3>
+<p>Restricted area for the technical team. Access via credentials provided by the implementation team.</p>
 </div>
 
 <div class="help-section">
