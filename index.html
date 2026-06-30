@@ -781,29 +781,44 @@ return'Bag';
 }catch(e){return'Bag'}
 }
 
-// Normaliza para chave canônica de matching cross-formato:
-// 7584-584-RED → R584 | Black 584 → R584 (mesmo item)
-// 7970_BLK    → B7970 | Black 7970 → B7970 (mesmo item)
+// Mapa de cores: normaliza palavra completa (dispatch) ou abreviação (scan) para forma canônica de 3 letras
+var COLOR_MAP={BLACK:'BLK',BLK:'BLK',GRAY:'GRY',GREY:'GRY',GRY:'GRY',RED:'RED',
+PINK:'PNK',PNK:'PNK',YELLOW:'YLW',YLW:'YLW',GREEN:'GRN',GRN:'GRN',
+NAVY:'NVY',NVY:'NVY',ORANGE:'ORG',ORG:'ORG',BLUE:'BLU',BLU:'BLU',
+WHITE:'WHT',WHT:'WHT',PURPLE:'PUR',PUR:'PUR',BROWN:'BRN',BRN:'BRN',
+SILVER:'SLV',SLV:'SLV',GOLD:'GLD',GLD:'GLD',TEAL:'TEL',TEL:'TEL'};
+function colorAbbrev(w){
+try{
+var u=String(w||'').toUpperCase();
+if(COLOR_MAP[u])return COLOR_MAP[u];
+return u.slice(0,3);
+}catch(e){return''}
+}
+
+// Normaliza para chave canônica de matching cross-formato — INCLUI A COR para evitar
+// colisão entre itens físicos diferentes que só compartilham os 3/4 dígitos finais.
+// 7584-584-RED → R584-RED | Black 584 → R584-BLK (cores diferentes = itens diferentes!)
+// 7970_BLK    → B7970-BLK | Black 7970 → B7970-BLK (mesmo item)
 function codeKey(code){
 try{
 if(!code)return'';
 var c=String(code).trim().toUpperCase();
 if(c.startsWith('TBR'))return c;
-// Curto: "BLACK 584" → R584
-var m=c.match(/^[A-Z]+\s+(\d{3})$/);if(m)return'R'+m[1];
-// Curto: "BLACK 7970" → B7970
-m=c.match(/^[A-Z]+\s+(\d{4})$/);if(m)return'B'+m[1];
-// Longo underscore → BAG: pega o segmento de 4 dígitos
+// Curto: "BLACK 584" → R584-BLK
+var m=c.match(/^([A-Z]+)\s+(\d{3})$/);if(m)return'R'+m[2]+'-'+colorAbbrev(m[1]);
+// Curto: "BLACK 7970" → B7970-BLK
+m=c.match(/^([A-Z]+)\s+(\d{4})$/);if(m)return'B'+m[2]+'-'+colorAbbrev(m[1]);
+// Longo underscore → BAG: pega o segmento de 4 dígitos + cor (último segmento)
 if(c.includes('_')){
 var pu=c.split('_');
 var k4=null;for(var i=0;i<pu.length;i++){if(/^\d{4}$/.test(pu[i])){k4=pu[i];break;}}
-return k4?('B'+k4):c;
+return k4?('B'+k4+'-'+colorAbbrev(pu[pu.length-1])):c;
 }
-// Longo traço → RÁFIA: pega o segmento de 3 dígitos (não o de 4)
+// Longo traço → RÁFIA: pega o segmento de 3 dígitos + cor (último segmento)
 if(c.includes('-')){
 var pd=c.split('-');
 var k3=null;for(var j=0;j<pd.length;j++){if(/^\d{3}$/.test(pd[j])){k3=pd[j];break;}}
-return k3?('R'+k3):c;
+return k3?('R'+k3+'-'+colorAbbrev(pd[pd.length-1])):c;
 }
 return c;
 }catch(e){return String(code||'')}
