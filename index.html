@@ -747,14 +747,40 @@ function flash(color){try{let f=document.createElement('div');f.className='flash
 function beep(freq,dur){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.value=0.3;o.start();setTimeout(()=>{try{o.stop()}catch(e){}},dur)}catch(e){}}
 function fmtDate(d){
 if(!d)return '-';
-var s=String(d);
 try{
+var s0=String(d);
+// Já está em DD/MM/YYYY — retorna direto, sem reinterpretar
+var already=s0.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+if(already)return s0;
+var dt=new Date(d);
+if(isNaN(dt.getTime())){
+var s=String(d);
 var m=s.match(/(\d{4})-(\d{2})-(\d{2})/);
-if(m){var time='';var t=s.match(/T(\d{2}):(\d{2})/);if(t)time=' '+t[1]+':'+t[2];return m[3]+'/'+m[2]+'/'+m[1]+time}
-m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);if(m)return s.split('T')[0];
+if(m)return m[3]+'/'+m[2]+'/'+m[1];
 return s.substring(0,16).replace('T',' ');
-}catch(e){return s||'-'}}
-function today(){return new Date().toISOString().split('T')[0]}
+}
+// Usa getters LOCAIS do Date (não a string UTC crua) — converte automaticamente
+// para o fuso horário do navegador (Brasil = UTC-3), corrigindo a hora exibida.
+var dd=String(dt.getDate()).padStart(2,'0');
+var mm=String(dt.getMonth()+1).padStart(2,'0');
+var yy=dt.getFullYear();
+var hh=String(dt.getHours()).padStart(2,'0');
+var mi=String(dt.getMinutes()).padStart(2,'0');
+var hasTime=/T\d{2}:\d{2}/.test(String(d));
+return dd+'/'+mm+'/'+yy+(hasTime?(' '+hh+':'+mi):'');
+}catch(e){return String(d||'-')}
+}
+// Retorna data no formato YYYY-MM-DD usando o fuso LOCAL do navegador (não UTC).
+// Crítico: toISOString() usa UTC — no Brasil (UTC-3), entre 21h e 23h59 locais,
+// o dia em UTC já virou o dia seguinte, o que fazia today() retornar a data errada.
+function localDateStr(d){
+d=d||new Date();
+var yy=d.getFullYear();
+var mm=String(d.getMonth()+1).padStart(2,'0');
+var dd=String(d.getDate()).padStart(2,'0');
+return yy+'-'+mm+'-'+dd;
+}
+function today(){return localDateStr()}
 
 function getRota(r){try{if(r.rota)return r.rota;var m=(r.observacao||'').match(/Rota:([^|]+)/);return m?m[1].trim():''}catch(e){return ''}}
 function getHub(r){try{if(r.hub)return r.hub;var m=(r.observacao||'').match(/Hub:([^|]*)/);return m?m[1].trim():''}catch(e){return ''}}
@@ -1116,8 +1142,11 @@ let movKind=(state.scanType==='Pacote')?'retorno':state.moveType;
 // Uma saída de hoje NUNCA bloqueia o retorno de hoje — são buckets separados.
 let dupTime=isDuplicateToday(code,movKind);
 if(dupTime){
-let t=String(dupTime).match(/T(\d{2}):(\d{2})/);
-let ht=t?(t[1]+':'+t[2]):'hoje';
+let ht='hoje';
+try{
+let dtd=new Date(dupTime);
+if(!isNaN(dtd.getTime()))ht=String(dtd.getHours()).padStart(2,'0')+':'+String(dtd.getMinutes()).padStart(2,'0');
+}catch(ex){}
 let acao=movKind==='retorno'?'retorno':'saída';
 flash('red');beep(200,300);
 toast('⚠️ '+acao.charAt(0).toUpperCase()+acao.slice(1)+' já registrado(a) hoje às '+ht+' — duplicata bloqueada','error');
@@ -1291,7 +1320,7 @@ var retAdicional=retAll.filter(r=>!allEnvCodes[r.codigo]&&!allEnvCodes[codeKey(r
 retornos=retNormal.length;
 tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.datahora&&r.datahora.startsWith(today())).length;
 var weekAgoD=new Date();weekAgoD.setDate(weekAgoD.getDate()-7);
-var weekAgoStr=weekAgoD.toISOString().split('T')[0];
+var weekAgoStr=localDateStr(weekAgoD);
 tbrSemana=regArr.filter(r=>{try{if(r.tipo!=='Pacote')return false;var ds=(r.datahora||'').split('T')[0];return ds>=weekAgoStr}catch(e){return false}}).length;
 
 let pendentes=Math.max(0,saidas-retornos);
@@ -1320,7 +1349,7 @@ function renderBarChart(envArr,regArr,retNormal){
 try{
 let container=$('chartBar');if(!container)return;
 let days=[];
-for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0])}
+for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(localDateStr(d))}
 let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
 let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||'').startsWith(d)).length);
 let retByDay=days.map(d=>(retNormal||[]).filter(r=>(r.datahora||'').startsWith(d)).length);
@@ -1858,7 +1887,7 @@ for(var k=0;k<labels.length;k++){
 var label=labels[k];
 var tipo=detectTipo(label);
 if(tipo==='Pacote')tipo='Bag';// TBR não entra no dispatch
-records.push({codigo:label,tipo:tipo,movimento:'Saida',rota:currentRoute,hub:hub,endereco:addr,data:currentDate||extractDateFromFilename(filename)||new Date().toISOString().split('T')[0],ds:state.ds,regional:state.regional||''});
+records.push({codigo:label,tipo:tipo,movimento:'Saida',rota:currentRoute,hub:hub,endereco:addr,data:currentDate||extractDateFromFilename(filename)||today(),ds:state.ds,regional:state.regional||''});
 }
 }
 }
