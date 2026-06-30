@@ -726,7 +726,7 @@ window.onunhandledrejection=function(e){try{e.preventDefault()}catch(x){}};
 try{(function(){
 // ===== STATE =====
 const LS_PREFIX='scantrack_';
-const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt',lastEnvArr:null,lastRegArr:null,todayScans:{}};
+const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt',lastEnvArr:null,lastRegArr:null,todayScans:{retorno:{},saida:{}}};
 const DEFAULT_DS=['DSP2:HIGHEND','HSP2:HIGHEND','DSP4:EAGLES','DBS5:EAGLES','DBS7:EAGLES','DGO2:EAGLES','DRJ3:EAGLES','HRJ3:EAGLES','DRJ5:EAGLES','DES2:EAGLES','HVI2:EAGLES','DSA8:EAGLES','HSV8:EAGLES','DBR9:EAGLES'];
 const DEFAULT_CLASS=['Devolução ao remetente','Danificado','Endereço não localizado','Cliente ausente','Recusa do cliente','Retenção (investigação)','Extravio parcial','Reagendamento','Transferência entre DS','Outro'];
 const COOLDOWN_MS=5000;
@@ -855,37 +855,59 @@ ls('offlineQueue',state.offlineQueue);
 }
 
 // ===== ANTI-DUPLICATA DIÁRIA GLOBAL =====
-// Carrega todos os scans de hoje da API para bloquear reescaneamentos
+// Carrega os scans de hoje da API, SEPARADOS por movimento (saída ≠ retorno)
+// Crítico: uma saída de hoje (dispatch) NUNCA pode bloquear o retorno do mesmo item hoje —
+// são eventos diferentes. Só bloqueamos duplicata DENTRO do mesmo tipo de movimento.
+function normMov(m){return(m||'').toLowerCase().includes('retorn')?'retorno':'saida'}
+
 async function loadTodayScans(){
 try{
 let r=await apiCall('lerRegistros',{ds:state.ds,from:today(),to:today()});
 let arr=r&&r.data?r.data:[];
-state.todayScans={};
+state.todayScans={retorno:{},saida:{}};
 arr.forEach(function(reg){
 if(!reg.codigo)return;
-state.todayScans[reg.codigo]=reg.datahora||'?';
+var bucket=state.todayScans[normMov(reg.movimento)];
+bucket[reg.codigo]=reg.datahora||'?';
 var k=codeKey(reg.codigo);
-if(k&&k!==reg.codigo)state.todayScans[k]=reg.datahora||'?';
+if(k&&k!==reg.codigo)bucket[k]=reg.datahora||'?';
 });
 }catch(e){}
 }
 
-function isDuplicateToday(code){
+function isDuplicateToday(code,movimento){
 try{
 if(!code)return false;
-if(state.todayScans[code])return state.todayScans[code];
+let bucket=state.todayScans[normMov(movimento)]||{};
+if(bucket[code])return bucket[code];
 var k=codeKey(code);
-if(k&&state.todayScans[k])return state.todayScans[k];
+if(k&&bucket[k])return bucket[k];
 return false;
 }catch(e){return false}
 }
 
-function markScannedToday(code,datahora){
+function markScannedToday(code,datahora,movimento){
 try{
-state.todayScans[code]=datahora||today();
+let bucket=state.todayScans[normMov(movimento)];
+if(!bucket)return;
+bucket[code]=datahora||today();
 var k=codeKey(code);
-if(k&&k!==code)state.todayScans[k]=datahora||today();
+if(k&&k!==code)bucket[k]=datahora||today();
 }catch(e){}
+}
+
+// ===== VALIDAÇÃO DE CÓDIGO =====
+// Rejeita entradas acidentais (tecla solta, leitura parcial) antes de processar.
+// Todo código real (Bag/Ráfia/TBR, qualquer prefixo de estação) tem ao menos 4
+// caracteres E contém dígito — uma letra isolada nunca passa nesse filtro.
+function isValidCode(code){
+try{
+if(!code)return false;
+let c=String(code).trim();
+if(c.length<4)return false;
+if(!/\d/.test(c))return false;
+return true;
+}catch(e){return false}
 }
 
 // ===== CONFIG =====
@@ -1029,13 +1051,16 @@ updateTbrClassOptions();
 }
 
 // USB Scanner
+// Leitores de código de barra reais enviam todos os caracteres em poucos milissegundos.
+// 300ms é suficiente para distinguir uma leitura completa de uma pausa humana ao digitar
+// (evita que uma tecla solta vire um "código" sozinha — reforçado também por isValidCode).
 function onUsbInput(e){
 try{
 clearTimeout(usbTimeout);
 usbTimeout=setTimeout(()=>{
 let v=($('usbInput')||{}).value||'';
 if(v.trim()){processScan(v.trim());if($('usbInput'))$('usbInput').value=''}
-},50);
+},300);
 }catch(e){}
 }
 
@@ -1071,16 +1096,31 @@ window.manualSubmit=manualSubmit;
 function processScan(code){
 try{
 if(!code)return;
+code=String(code).trim();
+
+// ── VALIDAÇÃO DE FORMATO ──
+// Rejeita entradas acidentais (tecla solta, leitura parcial da câmera) antes de processar
+if(!isValidCode(code)){
+toast('⚠️ Leitura inválida ignorada: "'+code+'"','warn');
+return;
+}
+
 state.pendingCode=code;
 
+// Determina o "movimento" que este scan representaria, para checar duplicata no bucket certo.
+// TBR (Pacote) é registrado internamente como 'retorno' — então usa o bucket retorno também.
+let movKind=(state.scanType==='Pacote')?'retorno':state.moveType;
+
 // ── ANTI-DUPLICATA DIÁRIA GLOBAL ──
-// Bloqueia o mesmo código sendo bipado mais de uma vez no mesmo dia (qualquer operador)
-let dupTime=isDuplicateToday(code);
+// Bloqueia o MESMO tipo de movimento sendo bipado 2x no mesmo dia (qualquer operador).
+// Uma saída de hoje NUNCA bloqueia o retorno de hoje — são buckets separados.
+let dupTime=isDuplicateToday(code,movKind);
 if(dupTime){
 let t=String(dupTime).match(/T(\d{2}):(\d{2})/);
 let ht=t?(t[1]+':'+t[2]):'hoje';
+let acao=movKind==='retorno'?'retorno':'saída';
 flash('red');beep(200,300);
-toast('⚠️ Já registrado hoje às '+ht+' — duplicata bloqueada','error');
+toast('⚠️ '+acao.charAt(0).toUpperCase()+acao.slice(1)+' já registrado(a) hoje às '+ht+' — duplicata bloqueada','error');
 return;
 }
 
@@ -1158,7 +1198,7 @@ let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:s
 if(extra)Object.assign(params,extra);
 
 // Marca como escaneado hoje IMEDIATAMENTE (antes da resposta da API)
-markScannedToday(code,now);
+markScannedToday(code,now,movimento);
 
 // Optimistic UI
 state.sessionCount++;
