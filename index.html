@@ -543,17 +543,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 </div>
 
 <!-- Camera / USB -->
-<div id="cameraArea" class="camera-container">
-<video id="camVideo" autoplay="" playsinline="" webkit-playsinline="" muted=""></video>
-<div class="crosshair"><svg viewBox="0 0 200 200"><rect x="30" y="30" width="140" height="140" fill="none" stroke="#FF9900" stroke-width="3" rx="10"></rect><line x1="100" y1="50" x2="100" y2="80" stroke="#FF9900" stroke-width="2"></line><line x1="100" y1="120" x2="100" y2="150" stroke="#FF9900" stroke-width="2"></line><line x1="50" y1="100" x2="80" y2="100" stroke="#FF9900" stroke-width="2"></line><line x1="120" y1="100" x2="150" y2="100" stroke="#FF9900" stroke-width="2"></line></svg></div>
-<div id="camStatus" style="position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,0.85);text-shadow:0 1px 3px #000;padding:2px 8px;pointer-events:none"></div>
-</div>
-<!-- Botão iOS: usa câmera nativa via file input — contorna limitações do WebRTC no iOS -->
+<!-- Html5Qrcode injeta o video aqui automaticamente -->
+<div id="reader" style="width:100%;border-radius:12px;overflow:hidden;background:#000;min-height:220px"></div>
+<div id="camStatus" style="text-align:center;font-size:12px;color:var(--gray3);padding:4px 0 2px"></div>
+<!-- Fallback: captura de foto pelo browser (opção secundária) -->
 <input type="file" id="iosCapture" accept="image/*" capture="environment" style="display:none">
-<button id="iosCaptureBtn" style="display:none;width:100%;padding:18px;background:var(--navy);color:white;border:none;border-radius:12px;font-size:16px;font-weight:700;margin-bottom:10px;cursor:pointer" onclick="document.getElementById('iosCapture').click()">
-  📸 Tap aqui para escanear
+<button id="iosCaptureBtn" style="display:none;width:100%;padding:14px;background:var(--navy);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;margin-bottom:10px;cursor:pointer" onclick="document.getElementById('iosCapture').click()">
+  📸 Alternativa: tirar foto para escanear
 </button>
-<button id="camRestart" class="btn btn-sm" onclick="restartCamera()" style="width:100%;margin-bottom:8px;background:#1a3a5c;color:white;display:none">🔄 Reiniciar Câmera</button>
 <div id="usbArea" class="usb-mode hidden card">
 <p style="font-size:13px;color:var(--gray3);margin-bottom:12px">🔌 Modo Scanner USB — Aponte o leitor para o código</p>
 <input type="text" id="usbInput" placeholder="Aguardando leitura..." autofocus="">
@@ -726,7 +723,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 </div>
 
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.mini.min.js" onerror="window.XLSX=null"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 window.onerror=function(){return true};
 window.onunhandledrejection=function(e){try{e.preventDefault()}catch(x){}};
@@ -1019,12 +1016,12 @@ document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
 let tab=$(tabId);if(tab)tab.classList.add('active');
 if(btn)btn.classList.add('active');
 state.currentTab=tabId;
-if(tabId==='tabDashboard'){loadDashboard();if(!state.isDesktop)stopCamera()}
-if(tabId==='tabRegistros'){loadRegistros();if(!state.isDesktop)stopCamera()}
-if(tabId==='tabAdmin'){checkAdmin();if(!state.isDesktop)stopCamera()}
-if(tabId==='tabHelp'){if(!state.isDesktop)stopCamera()}
+if(tabId==='tabDashboard'){loadDashboard();stopCamera()}
+if(tabId==='tabRegistros'){loadRegistros();stopCamera()}
+if(tabId==='tabAdmin'){checkAdmin();stopCamera()}
+if(tabId==='tabHelp'){stopCamera()}
 if(tabId==='tabScanner'){loadTodayScans();if(!state.isDesktop)startCamera()}
-if(tabId==='tabEnvios'){if(!state.isDesktop)stopCamera()}
+if(tabId==='tabEnvios'){stopCamera()}
 }catch(e){}
 }
 window.switchTab=switchTab;
@@ -1074,16 +1071,13 @@ getClassifications().forEach(c=>{let o=document.createElement('option');o.value=
 function setupScanner(){
 try{
 if(state.isDesktop){
-hide($('cameraArea'));show($('usbArea'));
-hide($('iosCaptureBtn'));
+hide($('reader'));hide($('camStatus'));hide($('iosCaptureBtn'));
+show($('usbArea'));
 let ui=$('usbInput');
-if(ui){ui.focus();ui.addEventListener('input',onUsbInput)}
+if(ui){ui.focus();if(!ui._bound){ui._bound=true;ui.addEventListener('input',onUsbInput)}}
 }else{
-// Mobile: botão de captura SEMPRE visível — não depende de detecção iOS/Android
-// O vídeo contínuo é tentado em paralelo; se funcionar, é um bônus
-let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
+show($('reader'));show($('camStatus'));hide($('usbArea'));
 setupIOSCapture();
-show($('cameraArea'));hide($('usbArea'));
 startCamera();
 }
 updateConfirmBtn();
@@ -1105,31 +1099,28 @@ if(v.trim()){processScan(v.trim());if($('usbInput'))$('usbInput').value=''}
 }catch(e){}
 }
 
-// ===== CÂMERA =====
-let jsQRCanvas=null,jsQRCtx=null;
-
-function isIOS(){return/iPad|iPhone|iPod/i.test(navigator.userAgent)&&!window.MSStream}
+// ===== CÂMERA — Html5Qrcode =====
+// Biblioteca que funcionou na versão anterior do scanner — suporte nativo iOS/Android/Desktop
+let html5QrCode=null;
 
 function setCamStatus(msg,isError){
 try{
 let s=$('camStatus');if(!s)return;
 s.textContent=msg;
-s.style.color=isError?'#ff6b6b':'rgba(255,255,255,0.85)';
-let btn=$('camRestart');if(btn)btn.style.display=isError?'block':'none';
+s.style.color=isError?'#E74C3C':'var(--gray3)';
 }catch(e){}
 }
 
 function stopCamera(){
 try{
+if(html5QrCode){
+html5QrCode.stop().then(()=>{html5QrCode.clear();html5QrCode=null}).catch(()=>{html5QrCode=null});
+}
 if(scanInterval){clearInterval(scanInterval);scanInterval=null}
-barcodeDetector=null;jsQRCanvas=null;jsQRCtx=null;
-let v=$('camVideo');
-if(v&&v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}
-}catch(e){}
+}catch(e){html5QrCode=null}
 }
 
-// iOS: processa imagem tirada pela câmera nativa (via <input file>)
-// Funciona em QUALQUER iOS/browser — contorna as restrições do WebRTC/canvas no WebKit
+// Fallback: file input para browsers que bloqueiem getUserMedia
 function setupIOSCapture(){
 try{
 let inp=$('iosCapture');if(!inp||inp._bound)return;
@@ -1137,130 +1128,44 @@ inp._bound=true;
 inp.addEventListener('change',function(e){
 let file=e.target.files&&e.target.files[0];
 if(!file)return;
-setCamStatus('⏳ Lendo código...',false);
-let img=new Image();
-let url=URL.createObjectURL(file);
-img.onload=function(){
-try{
-let c=document.createElement('canvas');
-c.width=img.naturalWidth;c.height=img.naturalHeight;
-let ctx=c.getContext('2d',{willReadFrequently:true});
-ctx.drawImage(img,0,0);
-let imgData=ctx.getImageData(0,0,c.width,c.height);
-let result=window.jsQR&&window.jsQR(imgData.data,imgData.width,imgData.height,{inversionAttempts:'attemptBoth'});
-if(result&&result.data){
-setCamStatus('',false);
-processScan(result.data);
-}else{
-setCamStatus('',false);
-toast('Código não encontrado — tente novamente mais perto','warn');
+// Html5Qrcode consegue processar imagens também
+if(html5QrCode){
+html5QrCode.scanFile(file,true).then(decoded=>{
+processScan(decoded);
+}).catch(()=>{toast('Código não encontrado — tente mais perto','warn')});
 }
-URL.revokeObjectURL(url);
 inp.value='';
-}catch(ex){URL.revokeObjectURL(url);inp.value='';}
-};
-img.onerror=function(){URL.revokeObjectURL(url);inp.value='';};
-img.src=url;
 });
 }catch(e){}
 }
 
-async function startCamera(){
+function startCamera(){
 stopCamera();
 try{
-let video=$('camVideo');if(!video)return;
-
-let stream=await navigator.mediaDevices.getUserMedia({
-video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
-});
-video.srcObject=stream;
-video.setAttribute('playsinline','true');
-video.setAttribute('webkit-playsinline','true');
-
-// Aguarda vídeo ficar pronto
-await new Promise(res=>{
-let done=false;
-function tryRes(){if(!done){done=true;res()}}
-video.addEventListener('canplay',tryRes,{once:true});
-video.addEventListener('playing',tryRes,{once:true});
-video.onloadedmetadata=()=>video.play().then(tryRes).catch(tryRes);
-setTimeout(tryRes,4000);
-});
-
-// Motor 1: BarcodeDetector nativo (Chrome Android, Safari 17.4+)
-if(typeof BarcodeDetector!=='undefined'){
-try{
-let supported=await BarcodeDetector.getSupportedFormats().catch(()=>[]);
-let want=['qr_code','code_128','code_39','ean_13','ean_8'];
-let formats=supported.length?want.filter(f=>supported.includes(f)):want;
-if(!formats.length)formats=['qr_code','code_128'];
-barcodeDetector=new BarcodeDetector({formats});
-scanInterval=setInterval(scanFrame,250);
-setCamStatus('🟢 Câmera ativa — aponte para o código',false);
-return;
-}catch(ex){/* cai para jsQR */}
-}
-
-// Motor 2: jsQR — testa se canvas consegue ler pixels do vídeo
-// (falha silenciosa no iOS WebKit — canvas retorna zeros)
-if(typeof jsQR!=='undefined'){
-try{
-jsQRCanvas=document.createElement('canvas');
-jsQRCtx=jsQRCanvas.getContext('2d',{willReadFrequently:true});
-// Aguarda um frame antes de testar
-await new Promise(r=>setTimeout(r,800));
-jsQRCanvas.width=video.videoWidth||320;
-jsQRCanvas.height=video.videoHeight||240;
-jsQRCtx.drawImage(video,0,0,jsQRCanvas.width,jsQRCanvas.height);
-let test=jsQRCtx.getImageData(0,0,4,4);
-let allZero=test.data.every(v=>v===0);
-if(!allZero){
-// Canvas tem dados reais — jsQR funciona (Android/desktop)
-scanInterval=setInterval(()=>scanFrameJsQR(video),250);
-setCamStatus('🟢 Câmera ativa — aponte para o código',false);
-}else{
-// Canvas zerado = WebKit bloqueou (iOS) — silencioso, botão de captura já está lá
+if(!$('reader'))return;
 setCamStatus('',false);
-}
-}catch(ex){setCamStatus('',false);}
-return;
-}
-
-// Nenhum motor disponível — silencioso
+html5QrCode=new Html5Qrcode("reader");
+html5QrCode.start(
+{facingMode:"environment"},
+{fps:10,qrbox:{width:220,height:220},aspectRatio:1.0},
+function(decodedText){processScan(decodedText)},
+function(err){}// Silencioso: câmera ativa mas nenhum código visível no frame
+).then(function(){
 setCamStatus('',false);
+}).catch(function(err){
+setCamStatus('',false);
+let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
+if(err&&err.toString().includes('NotAllowed')){
+toast('Permissão de câmera negada — use o botão alternativo abaixo','warn');
+}
+});
 }catch(e){
-// Câmera indisponível ou permissão negada — silencioso, botão de captura resolve
 setCamStatus('',false);
-if(e.name==='NotAllowedError'){
-toast('Câmera sem permissão — use o botão 📸 ou o campo manual abaixo','warn');
-}
+let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
 }
 }
 
-async function scanFrame(){
-try{
-if(!barcodeDetector)return;
-let video=$('camVideo');if(!video||!video.videoWidth||video.paused)return;
-let codes=await barcodeDetector.detect(video);
-if(codes&&codes.length>0&&codes[0].rawValue){processScan(codes[0].rawValue)}
-}catch(e){}
-}
-
-function scanFrameJsQR(video){
-try{
-if(!window.jsQR||!jsQRCanvas||!jsQRCtx)return;
-if(!video||!video.videoWidth)return;
-jsQRCanvas.width=video.videoWidth;
-jsQRCanvas.height=video.videoHeight;
-jsQRCtx.drawImage(video,0,0,jsQRCanvas.width,jsQRCanvas.height);
-let imgData=jsQRCtx.getImageData(0,0,jsQRCanvas.width,jsQRCanvas.height);
-if(!imgData||imgData.data.every(v=>v===0))return;// canvas zerado = iOS bloqueou
-let result=window.jsQR(imgData.data,imgData.width,imgData.height,{inversionAttempts:'dontInvert'});
-if(result&&result.data){processScan(result.data)}
-}catch(e){}
-}
-
-function restartCamera(){try{startCamera()}catch(e){}}
+function restartCamera(){try{stopCamera();setTimeout(startCamera,300)}catch(e){}}
 window.restartCamera=restartCamera;
 
 // Manual entry
