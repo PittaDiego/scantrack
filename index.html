@@ -1075,9 +1075,14 @@ function setupScanner(){
 try{
 if(state.isDesktop){
 hide($('cameraArea'));show($('usbArea'));
+hide($('iosCaptureBtn'));
 let ui=$('usbInput');
 if(ui){ui.focus();ui.addEventListener('input',onUsbInput)}
 }else{
+// Mobile: botão de captura SEMPRE visível — não depende de detecção iOS/Android
+// O vídeo contínuo é tentado em paralelo; se funcionar, é um bônus
+let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
+setupIOSCapture();
 show($('cameraArea'));hide($('usbArea'));
 startCamera();
 }
@@ -1164,15 +1169,6 @@ async function startCamera(){
 stopCamera();
 try{
 let video=$('camVideo');if(!video)return;
-setCamStatus('⏳ Aguardando câmera...',false);
-
-// iOS: sempre mostra o botão de captura nativa além do vídeo contínuo
-if(isIOS()){
-let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
-setupIOSCapture();
-// Esconde o viewfinder no iOS — a câmera nativa substitui
-let ca=$('cameraArea');if(ca)ca.style.display='none';
-}
 
 let stream=await navigator.mediaDevices.getUserMedia({
 video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
@@ -1181,7 +1177,7 @@ video.srcObject=stream;
 video.setAttribute('playsinline','true');
 video.setAttribute('webkit-playsinline','true');
 
-// Aguarda vídeo ficar pronto — com fallback por timeout
+// Aguarda vídeo ficar pronto
 await new Promise(res=>{
 let done=false;
 function tryRes(){if(!done){done=true;res()}}
@@ -1200,47 +1196,44 @@ let formats=supported.length?want.filter(f=>supported.includes(f)):want;
 if(!formats.length)formats=['qr_code','code_128'];
 barcodeDetector=new BarcodeDetector({formats});
 scanInterval=setInterval(scanFrame,250);
-if(!isIOS()){let ca=$('cameraArea');if(ca)ca.style.display='';setCamStatus('',false);}
+setCamStatus('🟢 Câmera ativa — aponte para o código',false);
 return;
 }catch(ex){/* cai para jsQR */}
 }
 
-// Motor 2: jsQR via canvas (Android sem BarcodeDetector, desktop)
-// NOTA: no iOS este caminho NÃO funciona (canvas+video retorna zeros no WebKit) —
-// por isso iOS usa o botão de captura nativa acima em vez deste loop.
-if(!isIOS()&&typeof jsQR!=='undefined'){
-startJsQR(video);
-return;
-}
-
-// iOS sem BarcodeDetector: botão de captura já está visível, nada mais a fazer
-if(isIOS()){setCamStatus('',false);return;}
-
-setCamStatus('⚠️ Leitura automática indisponível — use o campo manual',true);
-}catch(e){
-if(isIOS()){
-// No iOS, falha do getUserMedia não impede o botão de captura
-let ca=$('cameraArea');if(ca)ca.style.display='none';
-let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
-setupIOSCapture();
-setCamStatus('',false);
-}else if(e.name==='NotAllowedError'){
-setCamStatus('❌ Permissão de câmera negada — use o campo manual',true);
-}else{
-setCamStatus('❌ Câmera não disponível — use o campo manual',true);
-}
-}
-}
-
-function startJsQR(video){
+// Motor 2: jsQR — testa se canvas consegue ler pixels do vídeo
+// (falha silenciosa no iOS WebKit — canvas retorna zeros)
+if(typeof jsQR!=='undefined'){
 try{
 jsQRCanvas=document.createElement('canvas');
 jsQRCtx=jsQRCanvas.getContext('2d',{willReadFrequently:true});
+// Aguarda um frame antes de testar
+await new Promise(r=>setTimeout(r,800));
+jsQRCanvas.width=video.videoWidth||320;
+jsQRCanvas.height=video.videoHeight||240;
+jsQRCtx.drawImage(video,0,0,jsQRCanvas.width,jsQRCanvas.height);
+let test=jsQRCtx.getImageData(0,0,4,4);
+let allZero=test.data.every(v=>v===0);
+if(!allZero){
+// Canvas tem dados reais — jsQR funciona (Android/desktop)
 scanInterval=setInterval(()=>scanFrameJsQR(video),250);
-let ca=$('cameraArea');if(ca)ca.style.display='';
+setCamStatus('🟢 Câmera ativa — aponte para o código',false);
+}else{
+// Canvas zerado = WebKit bloqueou (iOS) — silencioso, botão de captura já está lá
+setCamStatus('',false);
+}
+}catch(ex){setCamStatus('',false);}
+return;
+}
+
+// Nenhum motor disponível — silencioso
 setCamStatus('',false);
 }catch(e){
-setCamStatus('⚠️ Leitura automática indisponível — use o campo manual',true);
+// Câmera indisponível ou permissão negada — silencioso, botão de captura resolve
+setCamStatus('',false);
+if(e.name==='NotAllowedError'){
+toast('Câmera sem permissão — use o botão 📸 ou o campo manual abaixo','warn');
+}
 }
 }
 
