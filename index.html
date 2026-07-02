@@ -1180,6 +1180,13 @@ try{
 if(!code)return;
 code=String(code).trim();
 
+// ── DEBOUNCE DE CÂMERA ──
+// Html5Qrcode escaneia a ~10fps — sem isso, o mesmo código dispara dezenas de vezes
+// enquanto ainda estiver visível na câmera. 3s é suficiente para 1 scan por passagem.
+let debounceKey=code+'_cam';
+if(lastScans[debounceKey]&&(Date.now()-lastScans[debounceKey])<3000)return;// silencioso
+lastScans[debounceKey]=Date.now();
+
 // ── VALIDAÇÃO DE FORMATO ──
 // Rejeita entradas acidentais (tecla solta, leitura parcial da câmera) antes de processar
 if(!isValidCode(code)){
