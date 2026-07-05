@@ -1881,8 +1881,68 @@ toast('✅ Matriz exportada','success');
 window.exportHubPerf=exportHubPerf;
 
 // ===== PROJEÇÃO DE ESTOQUE =====
-function getStockEntries(){return ls('stockEntries')||[]}
-function saveStockEntries(e){ls('stockEntries',e)}
+// ===== ESTOQUE VIA API (Google Sheets) =====
+// Fonte de verdade = planilha aba "Estoque". localStorage = cache de performance.
+// Qualquer dispositivo que abre o dashboard vê os mesmos dados.
+
+async function lerEstoqueAPI(){
+try{
+let r=await apiCall('lerEstoque',{});
+if(r&&r.success&&Array.isArray(r.data)){
+ls('stockEntries',r.data);// atualiza cache local
+return r.data;
+}
+}catch(e){}
+return ls('stockEntries')||[];// fallback cache
+}
+
+function getStockEntries(){return ls('stockEntries')||[]}// leitura sync do cache
+
+async function salvarEstoqueAPI(entry){
+try{
+let r=await apiCall('salvarEstoque',entry);
+if(r&&r.success){
+// Atualiza cache local com id retornado pela API
+entry.id=r.id||entry.id;
+let all=getStockEntries().filter(e=>e.id!==entry.id);
+all.push(entry);
+ls('stockEntries',all);
+return true;
+}
+}catch(e){}
+// Fallback: salva só no cache se API falhou
+let all=getStockEntries().filter(e=>e.id!==entry.id);
+all.push(entry);
+ls('stockEntries',all);
+return false;
+}
+
+async function editarEstoqueAPI(entry){
+try{
+let r=await apiCall('editarEstoque',entry);
+if(r&&r.success){
+let all=getStockEntries().map(e=>e.id===entry.id?entry:e);
+ls('stockEntries',all);
+return true;
+}
+}catch(e){}
+// Fallback cache
+let all=getStockEntries().map(e=>e.id===entry.id?entry:e);
+ls('stockEntries',all);
+return false;
+}
+
+async function deletarEstoqueAPI(id){
+try{
+let r=await apiCall('deletarEstoque',{id});
+if(r&&r.success){
+ls('stockEntries',getStockEntries().filter(e=>String(e.id)!==String(id)));
+return true;
+}
+}catch(e){}
+ls('stockEntries',getStockEntries().filter(e=>String(e.id)!==String(id)));
+return false;
+}
 
 // Calcula média diária SEM Domingos — domingos usam 40% da média semanal na projeção
 function weekdayAvgFor(arr,tipoCb,days){
@@ -1910,59 +1970,87 @@ return d.getDay()===0?wkAvg*sundayFactor:wkAvg;
 }catch(e){return wkAvg}
 }
 
-function showStockEntryForm(){
+function showStockEntryForm(editEntry){
+// editEntry = null (novo lançamento) ou objeto da entrada existente (editar)
 try{
+let isEdit=!!editEntry;
 let dsList=[];
 try{let c=state.config;if(c&&c.dsList)dsList=c.dsList;else if(c&&c.ds)dsList=[c.ds]}catch(x){}
 if(!dsList.length)dsList=[state.ds||'DSP2'];
-let dsOpts=dsList.map(d=>'<option value="'+d+'"'+(d===state.ds?' selected':'')+'>'+d+'</option>').join('');
-let html='<div style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">'
-+'<div class="card" style="width:100%;max-width:380px">'
-+'<h4 style="margin-bottom:12px">📦 Lançar Entrada de Material</h4>'
+let dsOpts=dsList.map(d=>'<option value="'+d+'"'+((isEdit?editEntry.ds:state.ds)===d?' selected':'')+'>'+d+'</option>').join('');
+let html='<div id="stockFormOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">'
++'<div class="card" style="width:100%;max-width:400px">'
++'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
++'<h4 style="margin:0">'+(isEdit?'✏️ Editar Entrada':'📦 Lançar Entrada de Material')+'</h4>'
++'<button onclick="document.getElementById(\'stockFormOverlay\').remove()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--gray3)">✕</button>'
++'</div>'
++(isEdit?'<div style="background:#fef9c3;border-radius:6px;padding:8px 10px;font-size:11px;color:#92400e;margin-bottom:12px">📝 Você está editando uma entrada já registrada. Altere apenas o que precisa e salve.</div>':'')
 +'<label style="font-size:12px;display:block;margin-bottom:4px">DS / Estação</label>'
 +'<select id="seDs" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'+dsOpts+'</select>'
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Data da chegada</label>'
-+'<input type="date" id="seData" value="'+today()+'" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
++'<input type="date" id="seData" value="'+(isEdit?editEntry.data:today())+'" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Material</label>'
 +'<select id="seTipo" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
-+'<option value="rafia">🧵 Ráfia</option>'
-+'<option value="enforca">🪢 Enforca Gato (ráfia + bag)</option>'
++'<option value="rafia"'+(isEdit&&editEntry.tipo==='rafia'?' selected':'')+'>🧵 Ráfia</option>'
++'<option value="enforca"'+(isEdit&&editEntry.tipo==='enforca'?' selected':'')+'>🪢 Enforca Gato (ráfia + bag)</option>'
 +'</select>'
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Quantidade</label>'
-+'<input type="number" id="seQtd" min="1" placeholder="ex: 5000" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:14px;font-size:14px">'
++'<input type="number" id="seQtd" min="1" value="'+(isEdit?editEntry.qtd:'')+'" placeholder="ex: 5000" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:14px;font-size:14px">'
++'<input type="hidden" id="seEditId" value="'+(isEdit?editEntry.id:'')+'">'
 +'<div style="display:flex;gap:8px">'
-+'<button onclick="saveStockEntry()" class="btn btn-success" style="flex:1">✅ Salvar</button>'
-+'<button onclick="this.closest(\'div[style*=fixed]\').remove()" class="btn" style="background:var(--gray);color:var(--navy)">Cancelar</button>'
++'<button onclick="saveStockEntry()" class="btn btn-success" style="flex:1">'+(isEdit?'💾 Salvar alterações':'✅ Salvar')+'</button>'
++'<button onclick="document.getElementById(\'stockFormOverlay\').remove()" class="btn" style="background:var(--gray);color:var(--navy)">Cancelar</button>'
 +'</div></div></div>';
 document.body.insertAdjacentHTML('beforeend',html);
 }catch(e){}
 }
 window.showStockEntryForm=showStockEntryForm;
 
-function saveStockEntry(){
+async function saveStockEntry(){
 try{
 let ds=($('seDs')||{}).value||state.ds;
 let data=($('seData')||{}).value;
 let tipo=($('seTipo')||{}).value;
 let qtd=parseInt(($('seQtd')||{}).value||'0');
+let editId=($('seEditId')||{}).value||'';
 if(!data||!qtd||qtd<1){toast('Preencha todos os campos','warn');return}
 let d=new Date(data+'T12:00:00');d.setDate(d.getDate()+1);
 let usoInicio=localDateStr(d);
-let entries=getStockEntries();
-entries.push({id:Date.now(),data,tipo,qtd,usoInicio,operador:state.user||'admin',ds:ds||state.ds});
-saveStockEntries(entries);
-let overlay=document.querySelector('div[style*="position:fixed"]');if(overlay)overlay.remove();
-toast('✅ Entrada registrada: '+qtd.toLocaleString('pt-BR')+' '+tipo,'success');
+let overlay=document.getElementById('stockFormOverlay');if(overlay)overlay.remove();
+if(editId){
+// EDITAR entrada existente
+let existing=getStockEntries().find(e=>String(e.id)===String(editId))||{};
+let entry={...existing,id:editId,data,tipo,qtd,usoInicio,ds:ds||state.ds,operador:state.user||'admin'};
+toast('Salvando...','warn');
+let ok=await editarEstoqueAPI(entry);
+toast(ok?'✅ Entrada atualizada na planilha!':'✅ Atualizado (cache local — API indisponível)','success');
+}else{
+// NOVO lançamento
+let entry={id:Date.now(),data,tipo,qtd,usoInicio,operador:state.user||'admin',ds:ds||state.ds};
+toast('Salvando...','warn');
+let ok=await salvarEstoqueAPI(entry);
+toast(ok?'✅ Entrada salva na planilha!':'✅ Salvo (cache local — API indisponível)','success');
+}
 renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
 }catch(e){toast('Erro ao salvar','error')}
 }
 window.saveStockEntry=saveStockEntry;
 
-function renderStockProjection(envArr,regArr){
+function editStockEntry(id){
+try{
+let entry=getStockEntries().find(e=>String(e.id)===String(id));
+if(!entry){toast('Entrada não encontrada','warn');return}
+showStockEntryForm(entry);
+}catch(e){}
+}
+window.editStockEntry=editStockEntry;
+
+async function renderStockProjection(envArr,regArr){
 try{
 let container=$('stockProjectionContent');if(!container)return;
+// Carrega entradas da API (atualiza cache automaticamente)
+let entries=await lerEstoqueAPI();
 let cfg=getStockConfig();
-let entries=getStockEntries();
 let todayStr=today();
 
 // Filtra entradas por DS ativa
@@ -2051,10 +2139,11 @@ html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 
 +'</div>';
 html+='</div>';
 
-// === GRÁFICOS ===
-html+=buildStockSVG('🧵 Ráfia — Projeção 30 dias',rafPess,rafReal,null,cfg.leadTimeRafia,'#10B981','#EF4444',futureEntries.filter(e=>e.tipo==='rafia'));
-html+='<div style="margin-top:10px"></div>';
+// === GRÁFICOS (lado a lado) ===
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+html+=buildStockSVG('🧵 Ráfia — Projeção 30 dias',rafPess,rafReal,null,cfg.leadTimeRafia,'#EF4444','#10B981',futureEntries.filter(e=>e.tipo==='rafia'));
 html+=buildStockSVG('🪢 Enforca Gato — Projeção 30 dias',enfArr,null,null,cfg.leadTimeEnforca,'#3B82F6',null,futureEntries.filter(e=>e.tipo==='enforca'));
+html+='</div>';
 
 // === LISTA DE ENTRADAS ===
 html+='<div style="margin-top:14px;background:#f8fafc;border-radius:10px;padding:10px">'
@@ -2063,11 +2152,14 @@ let sortedE=[...entries].sort((a,b)=>a.data.localeCompare(b.data));
 if(!sortedE.length){html+='<div style="font-size:12px;color:#94a3b8">Nenhuma entrada registrada</div>';}
 sortedE.forEach(e=>{
 let mine=!e.ds||e.ds===dsFilter;
-html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #e2e8f0;font-size:11px'+(mine?'':';opacity:0.45')+'">'
+html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:11px'+(mine?'':';opacity:0.45')+'">'
 +'<span>'+(e.tipo==='rafia'?'🧵':'🪢')+' <strong>'+e.qtd.toLocaleString('pt-BR')+'</strong> '+e.tipo
 +' — chegou '+fmtDate(e.data+'T12:00:00')
 +(e.ds?' <span style="background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:1px 5px;font-size:10px">'+e.ds+'</span>':'')+'</span>'
-+'<button onclick="deleteStockEntry('+e.id+')" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px">✕</button>'
++'<div style="display:flex;gap:4px">'
++(mine?'<button onclick="editStockEntry('+JSON.stringify(e.id)+')" title="Editar" style="border:none;background:#f1f5f9;color:#475569;cursor:pointer;font-size:12px;padding:3px 7px;border-radius:5px">✏️</button>':'')
++'<button onclick="deleteStockEntry('+JSON.stringify(e.id)+')" title="Remover" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px">✕</button>'
++'</div>'
 +'</div>';
 });
 html+='</div>';
@@ -2075,104 +2167,127 @@ container.innerHTML=html;
 }catch(ex){console.error(ex);let c=$('stockProjectionContent');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados suficientes para projeção</p>';}
 }
 
-// Gráfico de linha com área — estilo DA_HUB (área gradiente + polyline + labels dias)
+// ===== GRÁFICO DE ESTOQUE — Motor scrollável com todos os dias visíveis =====
+// Largura auto: N dias × SLOT px → scroll horizontal no mobile e desktop
 function buildStockSVG(title,line1,line2,line3,leadDays,col1,col2,futEntries){
 try{
-const W=520,H=160,PT=24,PR=20,PB=26,PL=46;
-const cW=W-PL-PR,cH=H-PT-PB;
-const N=line1.length;
+const SLOT=26,N=31;
+const PT=16,PR=20,PB=48,PL=42;
+const W=N*SLOT+PL+PR;
+const cW=W-PL-PR,cH=120;
+const H=cH+PT+PB;
+const xS=i=>PL+(i/30)*cW;
+const yS=v=>PT+cH-(Math.max(0,Math.min(v,maxV))/maxV)*cH;
 const maxV=Math.max(...line1,...(line2||[]),...(line3||[]),1);
-const xS=i=>PL+(i/(N-1))*cW;
-const yS=v=>PT+cH-(Math.min(v,maxV)/maxV)*cH;
 
-// Grid lines (4 levels)
-let grid='';
-[0.25,0.5,0.75,1].forEach(f=>{
-let gv=Math.round(maxV*f);let gy=yS(gv).toFixed(1);
-grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#E2E8F0" stroke-width="1"/>';
-grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8.5" fill="#94A3B8">'+Math.round(gv/1000)+'k</text>';
+// Datasets
+let datasets=[];
+if(line1&&line1.length)datasets.push({id:'l1',color:col1||'#EF4444',values:line1,dashed:!!line2,width:line2?2:2.5});
+if(line2&&line2.length)datasets.push({id:'l2',color:col2||'#10B981',values:line2,dashed:false,width:2.5});
+
+// Defs (gradientes)
+let defs='<defs>';
+datasets.forEach(d=>{
+defs+='<linearGradient id="sg'+d.id+'" x1="0" y1="0" x2="0" y2="1">'
++'<stop offset="0%" stop-color="'+d.color+'" stop-opacity=".15"/>'
++'<stop offset="100%" stop-color="'+d.color+'" stop-opacity="0"/>'
++'</linearGradient>';
 });
-grid+='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#CBD5E1" stroke-width="1.5"/>';
+defs+='</defs>';
 
-// "Pedir até" vertical dashed line
-let leadX=xS(Math.min(leadDays,N-1));
-grid+='<line x1="'+leadX.toFixed(1)+'" y1="'+PT+'" x2="'+leadX.toFixed(1)+'" y2="'+(PT+cH)+'" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3"/>';
-grid+='<text x="'+(leadX+3).toFixed(1)+'" y="'+(PT+9)+'" font-size="8" fill="#F59E0B" font-weight="700">Pedir</text>';
+// Grid horizontal
+let grid='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#CBD5E1" stroke-width="1.5"/>';
+[0.33,0.66,1].forEach(f=>{
+let gv=Math.round(maxV*f);
+let gy=yS(gv).toFixed(1);
+grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#F1F5F9" stroke-width="1"/>';
+let lbl=gv>=1000?(gv/1000).toFixed(gv%500===0?0:1)+'k':String(gv);
+grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8.5" fill="#64748b">'+lbl+'</text>';
+});
 
-// Future stock entries markers
+// "Pedir até" dashed vertical
+let leadX=xS(Math.min(leadDays,30));
+grid+='<rect x="'+(leadX-0.5)+'" y="'+PT+'" width="1.5" height="'+cH+'" fill="#F59E0B" opacity=".6" mask="url(#dash)"/>';
+grid+='<line x1="'+leadX.toFixed(1)+'" y1="'+PT+'" x2="'+leadX.toFixed(1)+'" y2="'+(PT+cH)+'" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5 4"/>';
+grid+='<text x="'+(leadX+3)+'" y="'+(PT+10)+'" font-size="8.5" fill="#F59E0B" font-weight="700">Pedir</text>';
+
+// Entrada futura (diamante)
 (futEntries||[]).forEach(e=>{
-let d=new Date();let target=new Date(e.usoInicio+'T12:00:00');
-let idx=Math.round((target-d)/86400000);
-if(idx>=0&&idx<N){
-let mx=xS(idx).toFixed(1),my=(PT+cH-16).toFixed(1);
-grid+='<polygon points="'+mx+','+(PT+cH)+' '+(parseFloat(mx)-5)+','+my+' '+(parseFloat(mx)+5)+','+my+'" fill="#7C3AED" opacity=".8"/>';
-grid+='<text x="'+(parseFloat(mx))+'" y="'+(parseFloat(my)-4)+'" text-anchor="middle" font-size="8" fill="#7C3AED" font-weight="700">+'+Math.round(e.qtd/1000)+'k</text>';
+let d=new Date();let t=new Date(e.usoInicio+'T12:00:00');
+let idx=Math.max(0,Math.round((t-d)/86400000));
+if(idx<31){
+let fx=xS(idx),fy=PT+10;
+grid+='<polygon points="'+fx+','+(fy+5)+' '+(fx-5)+','+fy+' '+fx+','+(fy-5)+' '+(fx+5)+','+fy+'" fill="#7C3AED" opacity=".9"/>';
+grid+='<text x="'+(fx+8)+'" y="'+(fy+3.5)+'" font-size="8.5" fill="#7C3AED" font-weight="700">+'+Math.round(e.qtd/1000)+'k</text>';
 }
 });
 
-// Build polyline points
-let pts1=line1.map((v,i)=>xS(i).toFixed(1)+','+yS(v).toFixed(1)).join(' ');
-let pts2=line2?line2.map((v,i)=>xS(i).toFixed(1)+','+yS(v).toFixed(1)).join(' '):'';
-
-// Area polygon for line1
-let area1=pts1+' '+xS(N-1).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH);
-
-// SVG defs for gradients
-let defs='<defs>'
-+'<linearGradient id="g1_'+col1.replace('#','')+'" x1="0" y1="0" x2="0" y2="1">'
-+'<stop offset="0%" stop-color="'+col1+'" stop-opacity=".18"/>'
-+'<stop offset="100%" stop-color="'+col1+'" stop-opacity=".01"/>'
-+'</linearGradient>'
-+(line2?'<linearGradient id="g2_'+col2.replace('#','')+'" x1="0" y1="0" x2="0" y2="1">'
-+'<stop offset="0%" stop-color="'+col2+'" stop-opacity=".12"/>'
-+'<stop offset="100%" stop-color="'+col2+'" stop-opacity=".01"/>'
-+'</linearGradient>':'')
-+'</defs>';
-
-// Day labels (today, every 7 days)
+// Eixo X: TODOS os dias, rotacionados -45°, fonte preta
 let dayLabels='';
-for(let i=0;i<N;i+=7){
+for(let i=0;i<N;i++){
 let d=new Date();d.setDate(d.getDate()+i);
-let lbl=i===0?'Hoje':d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0');
+let isToday=i===0;
 let isSun=d.getDay()===0;
-dayLabels+='<text x="'+xS(i).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8.5" fill="'+(i===0?col1:'#94A3B8')+'" font-weight="'+(i===0?'700':'400')+'">'+(isSun?'☀ ':'')+lbl+'</text>';
+let isNewMonth=d.getDate()===1&&i>0;
+let x=xS(i);
+let baseY=PT+cH;
+let lbl=isToday?'Hoje':isNewMonth?(d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')):String(d.getDate()).padStart(2,'0');
+let color=isToday?(datasets[0]?datasets[0].color:'#EF4444'):isSun?'#94A3B8':'#1E293B';
+let weight=isToday||isNewMonth?'700':'500';
+let tickH=isToday||isNewMonth?6:4;
+dayLabels+='<line x1="'+x.toFixed(1)+'" y1="'+baseY+'" x2="'+x.toFixed(1)+'" y2="'+(baseY+tickH)+'" stroke="'+(isToday?color:'#E2E8F0')+'" stroke-width="'+(isToday?2:1)+'"/>';
+dayLabels+='<text transform="translate('+x.toFixed(1)+','+(baseY+12)+') rotate(-45)" text-anchor="end" font-size="8.5" fill="'+color+'" font-weight="'+weight+'">'+lbl+'</text>';
+if(isSun&&!isToday)dayLabels+='<circle cx="'+x.toFixed(1)+'" cy="'+(baseY+3)+'" r="2" fill="#CBD5E1"/>';
 }
-// Last day
-dayLabels+='<text x="'+xS(N-1).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8.5" fill="#94A3B8">+30d</text>';
 
-// Legend
-let legend='<circle cx="'+(PL)+'" cy="14" r="4" fill="'+col1+'"/>'
-+'<text x="'+(PL+8)+'" y="17.5" font-size="9" fill="#334155">'+(line2?'Pessimista':'Projeção')+'</text>'
-+(line2?'<circle cx="'+(PL+80)+'" cy="14" r="4" fill="'+col2+'"/>'
-+'<text x="'+(PL+88)+'" y="17.5" font-size="9" fill="#334155">Realista</text>':'')
-+'<line x1="'+(PL+(line2?160:90))+'" y1="11" x2="'+(PL+(line2?175:105))+'" y2="11" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3"/>'
-+'<text x="'+(PL+(line2?178:108))+'" y="15" font-size="9" fill="#F59E0B">Pedir até</text>';
+// Pontos de label de dados (hoje + cada 7 dias)
+const dotIdxs=[0,7,14,21,28,30];
+
+// Áreas + linhas + pontos + labels
+let areas='',paths='',dotsLbl='';
+datasets.forEach(d=>{
+let pts=d.values.slice(0,N).map((v,i)=>({x:xS(i),y:yS(v),v:Math.max(0,v)}));
+let poly=pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+areas+='<polygon points="'+poly+' '+xS(30).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH)+'" fill="url(#sg'+d.id+')" />';
+paths+='<polyline points="'+poly+'" fill="none" stroke="'+d.color+'" stroke-width="'+d.width+'" stroke-linecap="round" stroke-linejoin="round"'+(d.dashed?' stroke-dasharray="6 4"':'')+'/>';
+dotIdxs.forEach(i=>{
+if(i>=N)return;
+let p=pts[i];
+let lv=p.v>=1000?(p.v/1000).toFixed(1)+'k':Math.round(p.v);
+let ly=p.y-9;if(ly<PT+5)ly=p.y+15;
+dotsLbl+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(i===0?5:3.5)+'" fill="'+d.color+'" stroke="white" stroke-width="1.5"/>';
+dotsLbl+='<text x="'+p.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="9" fill="'+d.color+'" font-weight="700">'+lv+'</text>';
+});
+});
+
+// Legenda compacta no topo
+let leg='';
+if(line2){
+leg+='<circle cx="'+(PL)+'" cy="12" r="3.5" fill="'+col1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Pessimista</text>'
++'<circle cx="'+(PL+72)+'" cy="12" r="3.5" fill="'+col2+'"/><text x="'+(PL+79)+'" y="15.5" font-size="9" fill="#475569">Realista</text>'
++'<line x1="'+(PL+145)+'" y1="10" x2="'+(PL+160)+'" y2="10" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 3"/><text x="'+(PL+163)+'" y="14" font-size="9" fill="#F59E0B">Pedir até</text>';
+}else{
+leg+='<circle cx="'+(PL)+'" cy="12" r="3.5" fill="'+col1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Projeção</text>'
++'<line x1="'+(PL+66)+'" y1="10" x2="'+(PL+81)+'" y2="10" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 3"/><text x="'+(PL+84)+'" y="14" font-size="9" fill="#F59E0B">Pedir até</text>';
+}
 
 let svg='<div style="background:#fff;border-radius:12px;padding:14px 12px 8px;box-shadow:0 1px 3px rgba(0,0,0,.08)">'
 +'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:8px">'+title+'</div>'
-+'<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
-+defs
-+grid
-+'<polygon points="'+area1+'" fill="url(#g1_'+col1.replace('#','')+')" />'
-+(line2?'<polygon points="'+pts2+' '+xS(N-1).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH)+'" fill="url(#g2_'+col2.replace('#','')+')" />':'')
-+(line2?'<polyline points="'+pts2+'" fill="none" stroke="'+col2+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>':'')
-+'<polyline points="'+pts1+'" fill="none" stroke="'+col1+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'
-+'<circle cx="'+xS(0).toFixed(1)+'" cy="'+yS(line1[0]).toFixed(1)+'" r="4" fill="'+col1+'" stroke="white" stroke-width="1.5"/>'
-+'<circle cx="'+xS(N-1).toFixed(1)+'" cy="'+yS(line1[N-1]).toFixed(1)+'" r="4" fill="'+col1+'" stroke="white" stroke-width="1.5"/>'
-+(line2?'<circle cx="'+xS(0).toFixed(1)+'" cy="'+yS(line2[0]).toFixed(1)+'" r="3.5" fill="'+col2+'" stroke="white" stroke-width="1.5"/>'
-+'<circle cx="'+xS(N-1).toFixed(1)+'" cy="'+yS(line2[N-1]).toFixed(1)+'" r="3.5" fill="'+col2+'" stroke="white" stroke-width="1.5"/>':'')
-+dayLabels+legend
-+'</svg></div>';
-return svg;
-}catch(e){return'<div style="font-size:12px;color:var(--gray3)">Erro no gráfico</div>'}
-}
++'<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">'
++'<svg width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
++defs+grid+areas+paths+dotsLbl+dayLabels
++'<g>'+leg+'</g>'
++'</svg></div></div>';
 
-function deleteStockEntry(id){
+return svg;
+}catch(e){return'<div style="font-size:12px;color:var(--gray3);padding:12px">Sem dados para gráfico</div>'}
+}
+async function deleteStockEntry(id){
 try{
 if(!confirm('Remover esta entrada de estoque?'))return;
-let entries=getStockEntries().filter(e=>e.id!==id);
-saveStockEntries(entries);
-toast('Entrada removida','success');
+toast('Removendo...','warn');
+let ok=await deletarEstoqueAPI(id);
+toast(ok?'✅ Removido da planilha':'✅ Removido (cache local)','success');
 renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
 }catch(e){}
 }
