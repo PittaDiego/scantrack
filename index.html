@@ -1992,7 +1992,7 @@ let html='<div id="stockFormOverlay" style="position:fixed;inset:0;background:rg
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Material</label>'
 +'<select id="seTipo" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
 +'<option value="rafia"'+(isEdit&&editEntry.tipo==='rafia'?' selected':'')+'>🧵 Ráfia</option>'
-+'<option value="enforca"'+(isEdit&&editEntry.tipo==='enforca'?' selected':'')+'>🪢 Enforca Gato (ráfia + bag)</option>'
++'<option value="enforca"'+(isEdit&&editEntry.tipo==='enforca'?' selected':'')+'>🪢 Abraçadeira (ráfia + bag)</option>'
 +'</select>'
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Quantidade</label>'
 +'<input type="number" id="seQtd" min="1" value="'+(isEdit?editEntry.qtd:'')+'" placeholder="ex: 5000" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:14px;font-size:14px">'
@@ -2077,7 +2077,7 @@ let isRaf=e=>detectTipo(e.codigo||'')==='Rafia';
 let isBag=e=>detectTipo(e.codigo||'')==='Bag';
 let avgRafDay=weekdayAvgFor(allEnv,isRaf,14);
 let avgBagDay=weekdayAvgFor(allEnv,isBag,14);
-// Enforca gato = ráfia + bag (consumo total de despachos)
+// Abraçadeira = ráfia + bag (consumo total de despachos)
 let avgEnfDay=(avgRafDay+avgBagDay)*cfg.margemEnforca;
 // Taxa de retorno de ráfias (para projeção realista)
 let allRet=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
@@ -2126,9 +2126,9 @@ html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 
 +'<div style="font-size:10px;color:#64748b;margin-top:6px">⚠️ Pedir até: <strong>'+alertDt(Math.min(rafPZ,rafRZ),cfg.leadTimeRafia)+'</strong></div>'
 +'<div style="font-size:10px;color:#94a3b8;margin-top:2px">'+avgRafDay.toFixed(1)+'/dia • retorno '+Math.round(retRate*100)+'% • lead '+cfg.leadTimeRafia+'d</div>'
 +'</div>';
-// Enforca
+// Abraçadeira
 html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid #3B82F6">'
-+'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:4px">🪢 ENFORCA GATO '+enfStatus+'</div>'
++'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:4px">🪢 ABRAÇADEIRA '+enfStatus+'</div>'
 +'<div style="font-size:26px;font-weight:800;color:#0F2137">'+enforcaAtual.toLocaleString('pt-BR')+'</div>'
 +'<div style="font-size:10px;color:#94a3b8;margin-bottom:8px">disponíveis estimados</div>'
 +'<div style="display:flex;gap:8px;font-size:11px">'
@@ -2140,9 +2140,9 @@ html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 
 html+='</div>';
 
 // === GRÁFICOS (lado a lado) ===
-html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0">';
 html+=buildStockSVG('🧵 Ráfia — Projeção 30 dias',rafPess,rafReal,null,cfg.leadTimeRafia,'#EF4444','#10B981',futureEntries.filter(e=>e.tipo==='rafia'));
-html+=buildStockSVG('🪢 Enforca Gato — Projeção 30 dias',enfArr,null,null,cfg.leadTimeEnforca,'#3B82F6',null,futureEntries.filter(e=>e.tipo==='enforca'));
+html+=buildStockSVG('🪢 Abraçadeira — Projeção 30 dias',enfArr,null,null,cfg.leadTimeEnforca,'#3B82F6',null,futureEntries.filter(e=>e.tipo==='enforca'));
 html+='</div>';
 
 // === LISTA DE ENTRADAS ===
@@ -2171,7 +2171,7 @@ container.innerHTML=html;
 // Largura auto: N dias × SLOT px → scroll horizontal no mobile e desktop
 function buildStockSVG(title,line1,line2,line3,leadDays,col1,col2,futEntries){
 try{
-const SLOT=26,N=31;
+const SLOT=22,N=31;
 const PT=16,PR=20,PB=48,PL=42;
 const W=N*SLOT+PL+PR;
 const cW=W-PL-PR,cH=120;
@@ -2271,7 +2271,7 @@ leg+='<circle cx="'+(PL)+'" cy="12" r="3.5" fill="'+col1+'"/><text x="'+(PL+7)+'
 +'<line x1="'+(PL+66)+'" y1="10" x2="'+(PL+81)+'" y2="10" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 3"/><text x="'+(PL+84)+'" y="14" font-size="9" fill="#F59E0B">Pedir até</text>';
 }
 
-let svg='<div style="background:#fff;border-radius:12px;padding:14px 12px 8px;box-shadow:0 1px 3px rgba(0,0,0,.08)">'
+let svg='<div style="background:#fff;border-radius:12px;padding:14px 12px 8px;box-shadow:0 1px 3px rgba(0,0,0,.08);min-width:0;overflow:hidden">'
 +'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:8px">'+title+'</div>'
 +'<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">'
 +'<svg width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
