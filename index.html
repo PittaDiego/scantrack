@@ -2167,128 +2167,106 @@ container.innerHTML=html;
 }catch(ex){console.error(ex);let c=$('stockProjectionContent');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados suficientes para projeção</p>';}
 }
 
-// ===== GRÁFICO DE ESTOQUE — Motor scrollável com todos os dias visíveis =====
-// Largura auto: N dias × SLOT px → scroll horizontal no mobile e desktop
+// ===== GRÁFICO DE ESTOQUE =====
+// Cada dia ocupa SLOT px → scroll horizontal quando chart não cabe na célula
+// NÃO usar overflow:hidden no card externo — bloqueia o scroll interno
 function buildStockSVG(title,line1,line2,line3,leadDays,col1,col2,futEntries){
 try{
 const SLOT=22,N=31;
-const PT=16,PR=20,PB=48,PL=42;
+const PT=18,PR=20,PB=50,PL=42;
 const W=N*SLOT+PL+PR;
-const cW=W-PL-PR,cH=120;
-const H=cH+PT+PB;
-const xS=i=>PL+(i/30)*cW;
-// maxV mínimo de 500 evita escala absurda quando estoque é zero
-const maxV=Math.max(...line1,...(line2||[]),...(line3||[]),500);
-const yS=v=>PT+cH-(Math.max(0,Math.min(v,maxV))/maxV)*cH;
+const cH=110,H=cH+PT+PB;
+const xS=function(i){return PL+(i/30)*(W-PL-PR)};
+const allVals=[].concat(line1||[]).concat(line2||[]).concat(line3||[]);
+const maxV=Math.max.apply(null,allVals.concat([500]));
+const yS=function(v){return PT+cH-(Math.max(0,Math.min(v,maxV))/maxV)*cH};
+var c1=col1||'#EF4444',c2=col2||'#10B981';
 
-// Datasets
-let datasets=[];
-if(line1&&line1.length)datasets.push({id:'l1',color:col1||'#EF4444',values:line1,dashed:!!line2,width:line2?2:2.5});
-if(line2&&line2.length)datasets.push({id:'l2',color:col2||'#10B981',values:line2,dashed:false,width:2.5});
+// Gradientes
+var defs='<defs>'
++'<linearGradient id="sgl1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+c1+'" stop-opacity=".15"/><stop offset="100%" stop-color="'+c1+'" stop-opacity="0"/></linearGradient>'
++'<linearGradient id="sgl2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+c2+'" stop-opacity=".15"/><stop offset="100%" stop-color="'+c2+'" stop-opacity="0"/></linearGradient>'
++'</defs>';
 
-// Defs (gradientes)
-let defs='<defs>';
-datasets.forEach(d=>{
-defs+='<linearGradient id="sg'+d.id+'" x1="0" y1="0" x2="0" y2="1">'
-+'<stop offset="0%" stop-color="'+d.color+'" stop-opacity=".15"/>'
-+'<stop offset="100%" stop-color="'+d.color+'" stop-opacity="0"/>'
-+'</linearGradient>';
-});
-defs+='</defs>';
-
-// Grid horizontal — 4 valores redondos no eixo Y, sem repetição
-let grid='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#CBD5E1" stroke-width="1.5"/>';
-// Arredonda o step para valor "bonito" (100, 500, 1000, 2000...)
-var rawStep=maxV/4;
-var mag=Math.pow(10,Math.floor(Math.log10(rawStep)));
-var step=Math.ceil(rawStep/mag)*mag;
-var seen=new Set();
-for(var gi=1;gi<=4;gi++){
+// Grid Y — valores redondos
+var grid='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#CBD5E1" stroke-width="1.5"/>';
+var rawStep=maxV/4,mag=Math.pow(10,Math.floor(Math.log10(Math.max(rawStep,1))));
+var step=Math.ceil(rawStep/mag)*mag||1;
+var seen={};
+for(var gi=1;gi<=5;gi++){
 var gv=Math.round(step*gi);
-if(gv>maxV*1.05)break;
-if(seen.has(gv))continue;seen.add(gv);
+if(gv>maxV*1.05||seen[gv])break;
+seen[gv]=1;
 var gy=yS(gv).toFixed(1);
 grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#F1F5F9" stroke-width="1"/>';
 var lbl=gv>=1000?(gv/1000).toFixed(1).replace(/\.0$/,'')+'k':String(gv);
 grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8.5" fill="#64748b">'+lbl+'</text>';
 }
 
-// "Pedir até" dashed vertical
-let leadX=xS(Math.min(leadDays,30));
-grid+='<rect x="'+(leadX-0.5)+'" y="'+PT+'" width="1.5" height="'+cH+'" fill="#F59E0B" opacity=".6" mask="url(#dash)"/>';
+// Pedir até
+var leadX=xS(Math.min(leadDays,30));
 grid+='<line x1="'+leadX.toFixed(1)+'" y1="'+PT+'" x2="'+leadX.toFixed(1)+'" y2="'+(PT+cH)+'" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5 4"/>';
-grid+='<text x="'+(leadX+3)+'" y="'+(PT+10)+'" font-size="8.5" fill="#F59E0B" font-weight="700">Pedir</text>';
+grid+='<text x="'+(leadX+3)+'" y="'+(PT+11)+'" font-size="8.5" fill="#F59E0B" font-weight="700">Pedir</text>';
 
-// Entrada futura (diamante)
-(futEntries||[]).forEach(e=>{
-let d=new Date();let t=new Date(e.usoInicio+'T12:00:00');
-let idx=Math.max(0,Math.round((t-d)/86400000));
-if(idx<31){
-let fx=xS(idx),fy=PT+10;
+// Entradas futuras
+(futEntries||[]).forEach(function(e){
+var d=new Date(),t=new Date(e.usoInicio+'T12:00:00');
+var idx=Math.max(0,Math.round((t-d)/86400000));
+if(idx>=N)return;
+var fx=xS(idx),fy=PT+11;
 grid+='<polygon points="'+fx+','+(fy+5)+' '+(fx-5)+','+fy+' '+fx+','+(fy-5)+' '+(fx+5)+','+fy+'" fill="#7C3AED" opacity=".9"/>';
-grid+='<text x="'+(fx+8)+'" y="'+(fy+3.5)+'" font-size="8.5" fill="#7C3AED" font-weight="700">+'+Math.round(e.qtd/1000)+'k</text>';
-}
+grid+='<text x="'+(fx+8)+'" y="'+(fy+4)+'" font-size="8" fill="#7C3AED" font-weight="700">+'+Math.round(e.qtd/1000)+'k</text>';
 });
 
-// Eixo X: TODOS os dias, rotacionados -45°, fonte preta
-let dayLabels='';
-for(let i=0;i<N;i++){
-let d=new Date();d.setDate(d.getDate()+i);
-let isToday=i===0;
-let isSun=d.getDay()===0;
-let isNewMonth=d.getDate()===1&&i>0;
-let x=xS(i);
-let baseY=PT+cH;
-let lbl=isToday?'Hoje':isNewMonth?(d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')):String(d.getDate()).padStart(2,'0');
-let color=isToday?(datasets[0]?datasets[0].color:'#EF4444'):isSun?'#94A3B8':'#1E293B';
-let weight=isToday||isNewMonth?'700':'500';
-let tickH=isToday||isNewMonth?6:4;
-dayLabels+='<line x1="'+x.toFixed(1)+'" y1="'+baseY+'" x2="'+x.toFixed(1)+'" y2="'+(baseY+tickH)+'" stroke="'+(isToday?color:'#E2E8F0')+'" stroke-width="'+(isToday?2:1)+'"/>';
-dayLabels+='<text transform="translate('+x.toFixed(1)+','+(baseY+12)+') rotate(-45)" text-anchor="end" font-size="8.5" fill="'+color+'" font-weight="'+weight+'">'+lbl+'</text>';
+// Eixo X: todos os dias, rotacionados -45°, fonte escura
+var dayLabels='';
+for(var i=0;i<N;i++){
+var d=new Date();d.setDate(d.getDate()+i);
+var isToday=i===0,isSun=d.getDay()===0,isNewMonth=d.getDate()===1&&i>0;
+var x=xS(i),baseY=PT+cH;
+var lbl2=isToday?'Hoje':isNewMonth?(d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')):String(d.getDate()).padStart(2,'0');
+var color=isToday?c1:isSun?'#94A3B8':'#1E293B';
+dayLabels+='<line x1="'+x.toFixed(1)+'" y1="'+baseY+'" x2="'+x.toFixed(1)+'" y2="'+(baseY+(isToday?6:4))+'" stroke="'+(isToday?color:'#E2E8F0')+'" stroke-width="'+(isToday?2:1)+'"/>';
+dayLabels+='<text transform="translate('+x.toFixed(1)+','+(baseY+13)+') rotate(-45)" text-anchor="end" font-size="8.5" fill="'+color+'" font-weight="'+(isToday||isNewMonth?'700':'500')+'">'+lbl2+'</text>';
 if(isSun&&!isToday)dayLabels+='<circle cx="'+x.toFixed(1)+'" cy="'+(baseY+3)+'" r="2" fill="#CBD5E1"/>';
 }
 
-// Pontos de label de dados (hoje + cada 7 dias)
-const dotIdxs=[0,7,14,21,28,30];
-
-// Áreas + linhas + pontos + labels
-let areas='',paths='',dotsLbl='';
-datasets.forEach(d=>{
-let pts=d.values.slice(0,N).map((v,i)=>({x:xS(i),y:yS(v),v:Math.max(0,v)}));
-let poly=pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
-areas+='<polygon points="'+poly+' '+xS(30).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH)+'" fill="url(#sg'+d.id+')" />';
-paths+='<polyline points="'+poly+'" fill="none" stroke="'+d.color+'" stroke-width="'+d.width+'" stroke-linecap="round" stroke-linejoin="round"'+(d.dashed?' stroke-dasharray="6 4"':'')+'/>';
-dotIdxs.forEach(i=>{
+// Áreas, linhas e dots
+var dotIdxs=[0,7,14,21,28,30];
+var areas='',paths='',dotsLbl='';
+[[line1,c1,'sgl1',!!line2,line2?2:2.5],[line2,c2,'sgl2',false,2.5]].forEach(function(ds){
+if(!ds[0]||!ds[0].length)return;
+var vals=ds[0],color=ds[1],gid=ds[2],dashed=ds[3],lw=ds[4];
+var pts=vals.slice(0,N).map(function(v,i){return{x:xS(i),y:yS(v),v:Math.max(0,v)}});
+var poly=pts.map(function(p){return p.x.toFixed(1)+','+p.y.toFixed(1)}).join(' ');
+areas+='<polygon points="'+poly+' '+xS(30).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH)+'" fill="url(#'+gid+')" />';
+paths+='<polyline points="'+poly+'" fill="none" stroke="'+color+'" stroke-width="'+lw+'" stroke-linecap="round" stroke-linejoin="round"'+(dashed?' stroke-dasharray="6 4"':'')+'/>';
+dotIdxs.forEach(function(i){
 if(i>=N)return;
-let p=pts[i];
-let lv=p.v>=1000?(p.v/1000).toFixed(1)+'k':Math.round(p.v);
-let ly=p.y-9;if(ly<PT+5)ly=p.y+15;
-dotsLbl+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(i===0?5:3.5)+'" fill="'+d.color+'" stroke="white" stroke-width="1.5"/>';
-dotsLbl+='<text x="'+p.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="9" fill="'+d.color+'" font-weight="700">'+lv+'</text>';
+var p=pts[i];
+var lv=p.v>=1000?(p.v/1000).toFixed(1).replace(/\.0$/,'')+'k':Math.round(p.v);
+var ly=p.y-9;if(ly<PT+5)ly=p.y+15;
+dotsLbl+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(i===0?5:3.5)+'" fill="'+color+'" stroke="white" stroke-width="1.5"/>';
+dotsLbl+='<text x="'+p.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="9" fill="'+color+'" font-weight="700">'+lv+'</text>';
 });
 });
 
-// Legenda compacta no topo
-let leg='';
-if(line2){
-leg+='<circle cx="'+(PL)+'" cy="12" r="3.5" fill="'+col1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Pessimista</text>'
-+'<circle cx="'+(PL+72)+'" cy="12" r="3.5" fill="'+col2+'"/><text x="'+(PL+79)+'" y="15.5" font-size="9" fill="#475569">Realista</text>'
-+'<line x1="'+(PL+145)+'" y1="10" x2="'+(PL+160)+'" y2="10" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 3"/><text x="'+(PL+163)+'" y="14" font-size="9" fill="#F59E0B">Pedir até</text>';
-}else{
-leg+='<circle cx="'+(PL)+'" cy="12" r="3.5" fill="'+col1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Projeção</text>'
-+'<line x1="'+(PL+66)+'" y1="10" x2="'+(PL+81)+'" y2="10" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 3"/><text x="'+(PL+84)+'" y="14" font-size="9" fill="#F59E0B">Pedir até</text>';
-}
+// Legenda
+var leg=line2&&line2.length
+?('<circle cx="'+PL+'" cy="12" r="3.5" fill="'+c1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Pessimista</text>'
++'<circle cx="'+(PL+72)+'" cy="12" r="3.5" fill="'+c2+'"/><text x="'+(PL+79)+'" y="15.5" font-size="9" fill="#475569">Realista</text>'
++'<line x1="'+(PL+148)+'" y1="10" x2="'+(PL+162)+'" y2="10" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 3"/><text x="'+(PL+165)+'" y="14" font-size="9" fill="#F59E0B">Pedir até</text>')
+:('<circle cx="'+PL+'" cy="12" r="3.5" fill="'+c1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Projeção</text>'
++'<line x1="'+(PL+66)+'" y1="10" x2="'+(PL+80)+'" y2="10" stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 3"/><text x="'+(PL+83)+'" y="14" font-size="9" fill="#F59E0B">Pedir até</text>');
 
-let svg='<div style="background:#fff;border-radius:12px;padding:14px 12px 8px;box-shadow:0 1px 3px rgba(0,0,0,.08);min-width:0;overflow:hidden">'
+// Card sem overflow:hidden — scroll interno funciona corretamente
+return '<div style="background:#fff;border-radius:12px;padding:14px 12px 8px;box-shadow:0 1px 3px rgba(0,0,0,.08);min-width:0">'
 +'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:8px">'+title+'</div>'
-+'<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">'
-+'<svg width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg" style="display:block">'
-+defs+grid+areas+paths+dotsLbl+dayLabels
-+'<g>'+leg+'</g>'
++'<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%">'
++'<svg width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg" style="display:block;min-width:'+W+'px">'
++defs+grid+areas+paths+dotsLbl+dayLabels+'<g>'+leg+'</g>'
 +'</svg></div></div>';
-
-return svg;
-}catch(e){return'<div style="font-size:12px;color:var(--gray3);padding:12px">Sem dados para gráfico</div>'}
+}catch(e){return'<div style="font-size:12px;padding:12px;color:red">Erro: '+e.message+'</div>'}
 }
 async function deleteStockEntry(id){
 try{
