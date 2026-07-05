@@ -600,8 +600,35 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <div class="chart-section"><h3>📋 Pendências Hubs</h3><div class="chart-container" id="chartTable"></div></div>
 <div class="charts-row">
 <div class="chart-section"><h3 style="font-size:13px;margin-bottom:6px">📊 Envios vs Retornos — 7 dias</h3><div class="chart-container" id="chartBar" style="padding:8px"></div></div>
-<div class="chart-section"><h3 style="font-size:13px;margin-bottom:6px">❌ Rotas com Pendências</h3><div class="chart-container" id="chartRoutes" style="padding:8px"></div></div>
+
+<!-- QR Code Loss -->
+<div class="chart-section">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<h3 style="font-size:13px;margin:0">🔴 QR Code Loss</h3>
+<span id="qrLossThresholdLabel" style="font-size:10px;color:var(--gray3)">≥7 dias sem retorno</span>
 </div>
+<div class="chart-container" style="padding:10px" id="qrLossCard"><span style="font-size:12px;color:var(--gray3)">Carregando...</span></div>
+</div>
+</div>
+
+<!-- Hub Performance: Top 30 piores -->
+<div class="card" style="margin-bottom:12px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<h4 style="font-size:13px;margin:0">🏭 Performance por Hub (Top 30 piores)</h4>
+<button class="btn btn-sm btn-secondary" onclick="exportHubPerf()" style="font-size:11px;padding:4px 10px">📥 CSV</button>
+</div>
+<div style="overflow-x:auto" id="hubPerfTable"><span style="font-size:12px;color:var(--gray3)">Carregando...</span></div>
+</div>
+
+<!-- Projeção de Estoque -->
+<div class="card" style="margin-bottom:12px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<h4 style="font-size:13px;margin:0">📦 Projeção de Estoque</h4>
+<button onclick="showStockEntryForm()" class="btn btn-sm" style="font-size:11px;padding:4px 10px;background:var(--navy);color:white">+ Lançar entrada</button>
+</div>
+<div id="stockProjectionContent"><span style="font-size:12px;color:var(--gray3)">Carregando...</span></div>
+</div>
+
 <hr style="margin:20px 0;border:none;border-top:2px solid var(--gray2)">
 <div class="card" style="margin-bottom:12px">
 <h4 style="font-size:13px;margin-bottom:10px">📦 TBR por Classificação</h4>
@@ -1398,12 +1425,15 @@ if($('mTbrHoje'))$('mTbrHoje').textContent=tbrHoje;
 if($('mTbrSemana'))$('mTbrSemana').textContent=tbrSemana;
 
 renderBarChart(envArr,regArr,retNormal);
-renderRoutesChart(envArr,regArr,retNormal);
 renderDonutChart(regArr);
 renderHubTable(envArr,regArr);
+renderQRLoss(envArr,regArr);
+renderHubPerf(envArr,regArr);
+renderStockProjection(envArr,regArr);
 }catch(e){
 if($('mSaidas'))$('mSaidas').textContent='—';
-renderBarChart([],[]);renderRoutesChart([],[]);renderDonutChart([]);renderHubTable([],[]);
+renderBarChart([],[]);renderDonutChart([]);renderHubTable([],[]);
+let qc=$('qrLossCard');if(qc)qc.innerHTML='<span style="font-size:12px;color:var(--gray3)">Sem dados</span>';
 }
 }
 window.loadDashboard=loadDashboard;
@@ -1644,6 +1674,438 @@ toast('✅ '+pendentes.length+' pendências exportadas!','success');
 }catch(e){toast('Erro ao exportar pendentes','error')}
 }
 window.exportPendentes=exportPendentes;
+
+// ===== QR CODE LOSS =====
+// Itens que saíram e não retornaram dentro do threshold → prováveis perdas de etiqueta
+function getStockConfig(){
+try{return Object.assign({leadTimeRafia:10,leadTimeEnforca:10,margemEnforca:1.3,lossThreshold:7},ls('stockConfig')||{})}
+catch(e){return {leadTimeRafia:10,leadTimeEnforca:10,margemEnforca:1.3,lossThreshold:7}}
+}
+
+function renderQRLoss(envArr,regArr){
+try{
+let container=$('qrLossCard');if(!container)return;
+let cfg=getStockConfig();
+let threshold=cfg.lossThreshold||7;
+
+// Índice de retornos por chave normalizada
+let retSet=new Set();
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{
+retSet.add(r.codigo);let k=codeKey(r.codigo);if(k)retSet.add(k);
+});
+
+// Classifica saídas por dias pendentes
+let threshStr=localDateStr(new Date(Date.now()-threshold*86400000));
+let emRisco=[],perda=[]; // emRisco: 3..threshold-1 dias | perda: >= threshold dias
+envArr.filter(r=>r.tipo!=='Pacote').forEach(e=>{
+if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))return;
+let ds=(e.datahora||'').split('T')[0];
+if(!ds)return;
+let dias=Math.round((Date.now()-new Date(ds))/86400000);
+if(dias>=threshold){perda.push({...e,dias})}
+else if(dias>=3){emRisco.push({...e,dias})}
+});
+
+perda.sort((a,b)=>b.dias-a.dias);
+emRisco.sort((a,b)=>b.dias-a.dias);
+
+let lbl=$('qrLossThresholdLabel');if(lbl)lbl.textContent='≥'+threshold+' dias sem retorno';
+let btnR=$('btnReprint');
+
+let html='';
+if(!perda.length&&!emRisco.length){
+html='<div style="color:var(--green);font-weight:600;font-size:13px;text-align:center;padding:8px">✅ Nenhuma perda provável de QR Code</div>';
+}else{
+html+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">';
+html+='<div style="flex:1;min-width:120px;background:#fff5f5;border-radius:8px;padding:10px;text-align:center">';
+html+='<div style="font-size:26px;font-weight:700;color:var(--red)">'+perda.length+'</div>';
+html+='<div style="font-size:11px;color:var(--gray3)">Prováveis perdas (≥'+threshold+'d)</div></div>';
+html+='<div style="flex:1;min-width:120px;background:#fffbf0;border-radius:8px;padding:10px;text-align:center">';
+html+='<div style="font-size:26px;font-weight:700;color:var(--orange)">'+emRisco.length+'</div>';
+html+='<div style="font-size:11px;color:var(--gray3)">Em risco (3–'+(threshold-1)+'d)</div></div>';
+html+='</div>';
+if(perda.length){
+html+='<button onclick="exportReprintList()" style="width:100%;padding:8px;background:#0F2137;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:8px">🖨️ Exportar '+perda.length+' códigos para Reprint</button>';
+}
+if(perda.length){
+html+='<div style="font-size:11px;color:var(--gray3);margin-bottom:4px">Perdas prováveis (amostra):</div>';
+html+='<div style="max-height:120px;overflow-y:auto">';
+perda.slice(0,10).forEach(e=>{
+let rota=getRota(e)||'—';let hub=getHub(e)||'—';
+html+='<div style="font-size:11px;padding:3px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between">';
+html+='<span style="color:var(--navy);font-weight:600">'+e.codigo+'</span>';
+html+='<span style="color:var(--gray3)">'+rota+' / '+hub+' • '+e.dias+'d</span></div>';
+});
+if(perda.length>10)html+='<div style="font-size:11px;color:var(--gray3);padding:3px">... e mais '+(perda.length-10)+' itens</div>';
+html+='</div>';
+}
+}
+container.innerHTML=html;
+// Cache para exportReprintList
+state._qrLossPerda=perda;
+}catch(ex){}
+}
+
+function exportReprintList(){
+try{
+let perda=state._qrLossPerda||[];
+if(!perda.length){toast('Nenhuma perda registrada','warn');return}
+let bom='\uFEFF';
+let csv=bom+'Código,Tipo,Rota,Hub,DS,Data Saída,Dias Pendente\n';
+csv+=perda.map(e=>'"'+e.codigo+'","'+e.tipo+'","'+(getRota(e)||'')+'","'+(getHub(e)||'')+'","'+(e.ds||state.ds)+'","'+fmtDate(e.datahora)+'",'+e.dias).join('\n');
+let blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+let a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='reprint_'+state.ds+'_'+today()+'.csv';
+a.click();
+toast('✅ '+perda.length+' códigos exportados para reprint','success');
+}catch(e){toast('Erro ao exportar','error')}
+}
+window.exportReprintList=exportReprintList;
+
+// ===== HUB PERFORMANCE =====
+function renderHubPerf(envArr,regArr){
+try{
+let container=$('hubPerfTable');if(!container)return;
+// Agrupa saídas por hub + data
+let hubMap={};// hub → {env:[], ret:[]}
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+allEnv.forEach(e=>{
+let h=getHub(e)||'(sem hub)';
+if(!hubMap[h])hubMap[h]={env:0,ret:0,consecutive_bad:0};
+hubMap[h].env++;
+});
+// Retornos confirmados (por codeKey)
+let retKeySet=new Set();
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{
+retKeySet.add(r.codigo);let k=codeKey(r.codigo);if(k)retKeySet.add(k);
+});
+// Conta retornos por hub (saídas que foram retornadas)
+allEnv.forEach(e=>{
+if(retKeySet.has(e.codigo)||retKeySet.has(codeKey(e.codigo))){
+let h=getHub(e)||'(sem hub)';
+if(hubMap[h])hubMap[h].ret++;
+}
+});
+// Calcula dias consecutivos <50% por hub
+let byHubDay={};// "hub|date" → {env,ret}
+allEnv.forEach(e=>{
+let h=getHub(e)||'(sem hub)';
+let d=(e.datahora||'').split('T')[0]||today();
+let key=h+'|'+d;
+if(!byHubDay[key])byHubDay[key]={env:0,ret:0};
+byHubDay[key].env++;
+if(retKeySet.has(e.codigo)||retKeySet.has(codeKey(e.codigo)))byHubDay[key].ret++;
+});
+// Acha streaks de dias consecutivos <50% por hub
+let hubStreak={};
+Object.entries(byHubDay).forEach(([key,val])=>{
+let[h,d]=key.split('|');
+if(!hubStreak[h])hubStreak[h]=[];
+if(val.env>0&&(val.ret/val.env)<0.5)hubStreak[h].push(d);
+});
+Object.entries(hubStreak).forEach(([h,days])=>{
+days.sort();let maxConsec=1,cur=1;
+for(let i=1;i<days.length;i++){
+let d0=new Date(days[i-1]),d1=new Date(days[i]);
+let diff=Math.round((d1-d0)/86400000);
+cur=(diff<=3)?cur+1:1;
+if(cur>maxConsec)maxConsec=cur;
+}
+if(hubMap[h])hubMap[h].consecutive_bad=maxConsec;
+});
+
+let rows=Object.entries(hubMap)
+.filter(([h,v])=>v.env>0)
+.map(([h,v])=>({hub:h,...v,pct:Math.round((v.ret/v.env)*100)}))
+.sort((a,b)=>a.pct-b.pct)
+.slice(0,30);
+
+if(!rows.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados</p>';return}
+
+state._hubPerfRows=rows;
+
+let html='<table class="data-table" style="font-size:12px"><thead><tr><th>Hub</th><th>Enviadas</th><th>Retornadas</th><th>%</th><th>Streak</th></tr></thead><tbody>';
+rows.forEach(r=>{
+let pctColor=r.pct<50?'color:var(--red);font-weight:700':r.pct<80?'color:var(--orange)':'color:var(--green)';
+let streakBadge=r.consecutive_bad>=2?'<span style="background:#E74C3C;color:white;border-radius:4px;padding:1px 5px;font-size:10px">'+r.consecutive_bad+'d ⚠️</span>':'<span style="color:var(--gray3)">—</span>';
+html+='<tr><td style="font-weight:600">'+r.hub+'</td><td>'+r.env+'</td><td>'+r.ret+'</td><td style="'+pctColor+'">'+r.pct+'%</td><td>'+streakBadge+'</td></tr>';
+});
+html+='</tbody></table>';
+if(rows.length===30)html+='<p style="font-size:10px;color:var(--gray3);margin-top:4px">Exibindo os 30 piores hubs</p>';
+container.innerHTML=html;
+}catch(e){let c=$('hubPerfTable');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Erro</p>';}
+}
+
+function exportHubPerf(){
+try{
+let rows=state._hubPerfRows||[];
+if(!rows.length){toast('Sem dados para exportar','warn');return}
+let bom='\uFEFF';
+let csv=bom+'Hub,Enviadas,Retornadas,% Retorno,Dias Consecutivos <50%\n';
+csv+=rows.map(r=>'"'+r.hub+'",'+r.env+','+r.ret+','+r.pct+'%,'+r.consecutive_bad).join('\n');
+let a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+a.download='hub_perf_'+state.ds+'_'+today()+'.csv';a.click();
+}catch(e){toast('Erro ao exportar','error')}
+}
+window.exportHubPerf=exportHubPerf;
+
+// ===== PROJEÇÃO DE ESTOQUE =====
+function getStockEntries(){return ls('stockEntries')||[]}
+function saveStockEntries(e){ls('stockEntries',e)}
+
+function showStockEntryForm(){
+try{
+let html='<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">'
++'<div class="card" style="width:100%;max-width:380px">'
++'<h4 style="margin-bottom:12px">📦 Lançar Entrada de Material</h4>'
++'<label style="font-size:12px;display:block;margin-bottom:4px">Data da chegada</label>'
++'<input type="date" id="seData" value="'+today()+'" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
++'<label style="font-size:12px;display:block;margin-bottom:4px">Material</label>'
++'<select id="seTipo" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
++'<option value="rafia">🧵 Ráfia</option>'
++'<option value="enforca">🪢 Enforca Gato</option>'
++'</select>'
++'<label style="font-size:12px;display:block;margin-bottom:4px">Quantidade</label>'
++'<input type="number" id="seQtd" min="1" placeholder="ex: 5000" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:14px;font-size:14px">'
++'<div style="display:flex;gap:8px">'
++'<button onclick="saveStockEntry()" class="btn btn-success" style="flex:1">✅ Salvar</button>'
++'<button onclick="this.closest(\'div[style*=fixed]\').remove()" class="btn" style="background:var(--gray);color:var(--navy)">Cancelar</button>'
++'</div></div></div>';
+document.body.insertAdjacentHTML('beforeend',html);
+}catch(e){}
+}
+window.showStockEntryForm=showStockEntryForm;
+
+function saveStockEntry(){
+try{
+let data=($('seData')||{}).value;
+let tipo=($('seTipo')||{}).value;
+let qtd=parseInt(($('seQtd')||{}).value||'0');
+if(!data||!qtd||qtd<1){toast('Preencha todos os campos','warn');return}
+// Uso começa no dia seguinte à chegada
+let d=new Date(data+'T12:00:00');
+d.setDate(d.getDate()+1);
+let usoInicio=localDateStr(d);
+let entries=getStockEntries();
+entries.push({id:Date.now(),data,tipo,qtd,usoInicio,operador:state.user||'admin'});
+saveStockEntries(entries);
+let overlay=document.querySelector('div[style*="position:fixed"]');if(overlay)overlay.remove();
+toast('✅ Entrada registrada: '+qtd+' '+tipo,'success');
+renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
+}catch(e){toast('Erro ao salvar','error')}
+}
+window.saveStockEntry=saveStockEntry;
+
+function renderStockProjection(envArr,regArr){
+try{
+let container=$('stockProjectionContent');if(!container)return;
+let cfg=getStockConfig();
+let entries=getStockEntries();
+
+// Estoque acumulado: só entradas cujo uso_inicio <= hoje
+let todayStr=today();
+let rafiaTotal=0,enforcaTotal=0;
+let futureEntries=[];
+let purchaseEvents=[];// para plotar no gráfico
+entries.forEach(e=>{
+if(e.usoInicio<=todayStr){
+if(e.tipo==='rafia')rafiaTotal+=e.qtd;
+else enforcaTotal+=e.qtd;
+purchaseEvents.push({data:e.data,usoInicio:e.usoInicio,tipo:e.tipo,qtd:e.qtd});
+}else{
+futureEntries.push(e);
+purchaseEvents.push({data:e.data,usoInicio:e.usoInicio,tipo:e.tipo,qtd:e.qtd,future:true});
+}
+});
+
+// Se não há entradas configuradas, mostra formulário de setup
+if(!rafiaTotal&&!enforcaTotal&&!entries.length){
+container.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray3)">'
++'<div style="font-size:32px;margin-bottom:8px">📦</div>'
++'<div style="font-size:13px;margin-bottom:12px">Nenhum estoque configurado ainda.</div>'
++'<button onclick="showStockEntryForm()" style="background:var(--navy);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer">+ Lançar primeira entrada</button>'
++'</div>';
+return;
+}
+
+// Métricas de consumo diário (últimos 14 dias)
+let d14=new Date();d14.setDate(d14.getDate()-14);
+let d14str=localDateStr(d14);
+let allEnv14=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')))
+.filter(e=>(e.datahora||'').split('T')[0]>=d14str);
+let ret14=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote'
+&&(r.datahora||'').split('T')[0]>=d14str);
+let rafSaid14=allEnv14.filter(e=>e.tipo==='Rafia'||detectTipo(e.codigo||'')!=='Bag').length;
+let bagSaid14=allEnv14.filter(e=>e.tipo==='Bag'||detectTipo(e.codigo||'')==='Bag').length;
+let rafRet14=ret14.filter(r=>r.tipo==='Rafia'||detectTipo(r.codigo||'')!=='Bag').length;
+let diasComdados=14;
+let avgRafDay=rafSaid14/diasComdados;
+let avgBagDay=bagSaid14/diasComdados;
+let retRate14=rafSaid14>0?rafRet14/rafSaid14:0.5;
+
+// Estoque atual (total comprado - consumido até hoje)
+let allEnvTot=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+let allRetTot=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
+let rafSaidTot=allEnvTot.filter(e=>detectTipo(e.codigo||'')==='Rafia').length;
+let bagSaidTot=allEnvTot.filter(e=>detectTipo(e.codigo||'')==='Bag').length;
+let rafRetTot=allRetTot.filter(r=>detectTipo(r.codigo||'')==='Rafia').length;
+let rafiaAtual=Math.max(0,rafiaTotal-rafSaidTot+rafRetTot);
+let enforcaAtual=Math.max(0,enforcaTotal-Math.ceil(bagSaidTot*cfg.margemEnforca));
+
+// Projeção: 30 dias à frente
+const PROJ_DAYS=30;
+let rafPess=[rafiaAtual],rafReal=[rafiaAtual],enfPess=[enforcaAtual];
+for(let i=1;i<=PROJ_DAYS;i++){
+let d=new Date();d.setDate(d.getDate()+i);
+let ds=localDateStr(d);
+// Adiciona futuras entradas que ficam ativas neste dia
+let futBonus={rafia:0,enforca:0};
+futureEntries.forEach(e=>{if(e.usoInicio===ds)futBonus[e.tipo]=(futBonus[e.tipo]||0)+e.qtd;});
+let rafLiq_pess=avgRafDay;// pessimista: nada volta
+let rafLiq_real=avgRafDay*(1-retRate14);// realista: taxa histórica de retorno
+let enfLiq=avgBagDay*cfg.margemEnforca;
+rafPess.push(Math.max(0,(rafPess[i-1]||0)-rafLiq_pess+(futBonus.rafia||0)));
+rafReal.push(Math.max(0,(rafReal[i-1]||0)-rafLiq_real+(futBonus.rafia||0)));
+enfPess.push(Math.max(0,(enfPess[i-1]||0)-enfLiq+(futBonus.enforca||0)));
+}
+
+// Calcula dias até zerar
+function daysToZero(arr){for(let i=0;i<arr.length;i++){if(arr[i]<=0)return i;}return PROJ_DAYS;}
+let rafPessZero=daysToZero(rafPess);
+let rafRealZero=daysToZero(rafReal);
+let enfZero=daysToZero(enfPess);
+
+// Data ideal de compra = zero - lead_time
+function alertDate(daysToZero,leadTime){
+let d=new Date();d.setDate(d.getDate()+Math.max(0,daysToZero-leadTime));
+return fmtDate(localDateStr(d)+'T00:00:00');
+}
+let rafAlert=alertDate(Math.min(rafPessZero,rafRealZero),cfg.leadTimeRafia);
+let enfAlert=alertDate(enfZero,cfg.leadTimeEnforca);
+
+// Cartões de resumo
+let rafStatus=rafPessZero<=cfg.leadTimeRafia?'🔴 COMPRAR JÁ':rafPessZero<=cfg.leadTimeRafia*2?'🟡 ATENÇÃO':'🟢 OK';
+let enfStatus=enfZero<=cfg.leadTimeEnforca?'🔴 COMPRAR JÁ':enfZero<=cfg.leadTimeEnforca*2?'🟡 ATENÇÃO':'🟢 OK';
+
+let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
+// Ráfia card
+html+='<div style="background:#f8fafc;border-radius:10px;padding:12px">'
++'<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px">🧵 Ráfia '+rafStatus+'</div>'
++'<div style="font-size:22px;font-weight:700;color:var(--navy)">'+rafiaAtual.toLocaleString('pt-BR')+'</div>'
++'<div style="font-size:10px;color:var(--gray3)">disponíveis estimados</div>'
++'<div style="margin-top:8px;font-size:11px"><span style="color:var(--orange)">Pess: '+rafPessZero+'d</span> &nbsp; <span style="color:var(--green)">Real: '+rafRealZero+'d</span></div>'
++'<div style="margin-top:4px;font-size:11px;color:var(--gray3)">⚠️ Pedir até: <strong style="color:var(--navy)">'+rafAlert+'</strong></div>'
++'<div style="font-size:10px;color:var(--gray3);margin-top:2px">'+avgRafDay.toFixed(1)+'/dia • retorno '+Math.round(retRate14*100)+'%</div>'
++'</div>';
+// Enforca gato card
+html+='<div style="background:#f8fafc;border-radius:10px;padding:12px">'
++'<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px">🪢 Enforca Gato '+enfStatus+'</div>'
++'<div style="font-size:22px;font-weight:700;color:var(--navy)">'+enforcaAtual.toLocaleString('pt-BR')+'</div>'
++'<div style="font-size:10px;color:var(--gray3)">disponíveis estimados</div>'
++'<div style="margin-top:8px;font-size:11px"><span style="color:var(--orange)">Acaba em: '+enfZero+'d</span></div>'
++'<div style="margin-top:4px;font-size:11px;color:var(--gray3)">⚠️ Pedir até: <strong style="color:var(--navy)">'+enfAlert+'</strong></div>'
++'<div style="font-size:10px;color:var(--gray3);margin-top:2px">'+avgBagDay.toFixed(1)+'bags/dia × '+cfg.margemEnforca+'</div>'
++'</div>';
+html+='</div>';
+
+// Gráfico de linha curva — Ráfia Pessimista vs Realista
+html+=renderStockChart(rafPess,rafReal,enfPess,cfg.leadTimeRafia,cfg.leadTimeEnforca);
+
+// Lista de entradas registradas
+html+='<div style="margin-top:10px"><div style="font-size:11px;color:var(--gray3);margin-bottom:4px">Entradas registradas:</div>';
+let sortedEntries=[...entries].sort((a,b)=>a.data.localeCompare(b.data));
+sortedEntries.forEach(e=>{
+html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:11px">'
++'<span>'+(e.tipo==='rafia'?'🧵':'🪢')+' <strong>'+e.qtd.toLocaleString('pt-BR')+'</strong> '+e.tipo+' — chegou '+fmtDate(e.data+'T12:00:00')+' • usa a partir de '+fmtDate(e.usoInicio+'T12:00:00')+'</span>'
++'<button onclick="deleteStockEntry('+e.id+')" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:13px">✕</button>'
++'</div>';
+});
+html+='</div>';
+container.innerHTML=html;
+}catch(ex){let c=$('stockProjectionContent');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados suficientes para projeção</p>';}
+}
+
+function renderStockChart(rafPess,rafReal,enfPess,leadRaf,leadEnf){
+try{
+const W=520,H=140,PT=16,PR=16,PB=24,PL=44;
+const cW=W-PL-PR,cH=H-PT-PB;
+const N=Math.min(rafPess.length,31);
+const maxV=Math.max(...rafPess,...rafReal,...enfPess,1);
+const xS=i=>PL+(i/(N-1))*cW;
+const yS=v=>PT+cH-(Math.min(v,maxV)/maxV)*cH;
+
+const mkPath=pts=>{
+if(!pts||pts.length<2)return'';
+let d='M '+xS(0).toFixed(1)+' '+yS(pts[0]).toFixed(1);
+for(let i=0;i<pts.length-1&&i<N-1;i++){
+let cx=((xS(i)+xS(i+1))/2).toFixed(1);
+d+=' C '+cx+' '+yS(pts[i]).toFixed(1)+','+cx+' '+yS(pts[i+1]).toFixed(1)+','+xS(i+1).toFixed(1)+' '+yS(pts[i+1]).toFixed(1);
+}
+return d;
+};
+
+// Grid
+let grid='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#cbd5e1" stroke-width="1.5"/>';
+[0.25,0.5,0.75,1].forEach(f=>{
+let gv=Math.round(maxV*f);
+let gy=yS(gv).toFixed(1);
+grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#f1f5f9" stroke-width="1"/>';
+grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8" fill="#94a3b8">'+Math.round(gv/1000)+'k</text>';
+});
+
+// Lead time zones (vertical lines onde se deve comprar)
+let rafLeadX=xS(Math.min(leadRaf,N-1)).toFixed(1);
+let enfLeadX=xS(Math.min(leadEnf,N-1)).toFixed(1);
+grid+='<line x1="'+rafLeadX+'" y1="'+PT+'" x2="'+rafLeadX+'" y2="'+(PT+cH)+'" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="4 3"/>';
+
+// Day labels
+let dayLabels='';
+[0,7,14,21,29].forEach(i=>{
+if(i<N){
+let d=new Date();d.setDate(d.getDate()+i);
+let lbl=i===0?'Hoje':d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0');
+dayLabels+='<text x="'+xS(i).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8" fill="#94a3b8">'+lbl+'</text>';
+}
+});
+
+// Lines
+let rafPessPath=mkPath(rafPess);
+let rafRealPath=mkPath(rafReal);
+let enfPath=mkPath(enfPess);
+
+let legend='<circle cx="'+(PL+8)+'" cy="12" r="3.5" fill="#E74C3C"/>'
++'<text x="'+(PL+14)+'" y="15.5" font-size="9" fill="#334155">Ráfia pessimista</text>'
++'<circle cx="'+(PL+95)+'" cy="12" r="3.5" fill="#00A86B"/>'
++'<text x="'+(PL+101)+'" y="15.5" font-size="9" fill="#334155">Ráfia realista</text>'
++'<circle cx="'+(PL+178)+'" cy="12" r="3.5" fill="#3B82F6"/>'
++'<text x="'+(PL+184)+'" y="15.5" font-size="9" fill="#334155">Enforca gato</text>'
++'<line x1="'+(PL+255)+'" y1="9" x2="'+(PL+268)+'" y2="9" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="3 2"/>'
++'<text x="'+(PL+271)+'" y="13" font-size="9" fill="#FF9900">Pedir até</text>';
+
+let svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-top:10px">'
++'<rect width="100%" height="100%" fill="white"/>'
++grid
++'<path d="'+rafPessPath+'" fill="none" stroke="#E74C3C" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/>'
++'<path d="'+rafRealPath+'" fill="none" stroke="#00A86B" stroke-width="2" stroke-linecap="round"/>'
++'<path d="'+enfPath+'" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>'
++dayLabels+legend
++'</svg>';
+return svg;
+}catch(e){return''}
+}
+
+function deleteStockEntry(id){
+try{
+if(!confirm('Remover esta entrada de estoque?'))return;
+let entries=getStockEntries().filter(e=>e.id!==id);
+saveStockEntries(entries);
+toast('Entrada removida','success');
+renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
+}catch(e){}
+}
+window.deleteStockEntry=deleteStockEntry;
 
 // ===== REGISTROS =====
 async function loadRegistros(){
