@@ -614,7 +614,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <!-- Hub Performance: Top 30 piores -->
 <div class="card" style="margin-bottom:12px">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<h4 style="font-size:13px;margin:0">🏭 Performance por Hub (Top 30 piores)</h4>
+<h4 style="font-size:13px;margin:0">📋 Matriz de Retorno por Hub</h4>
 <button class="btn btn-sm btn-secondary" onclick="exportHubPerf()" style="font-size:11px;padding:4px 10px">📥 CSV</button>
 </div>
 <div style="overflow-x:auto" id="hubPerfTable"><span style="font-size:12px;color:var(--gray3)">Carregando...</span></div>
@@ -1764,89 +1764,129 @@ toast('✅ '+perda.length+' códigos exportados para reprint','success');
 window.exportReprintList=exportReprintList;
 
 // ===== HUB PERFORMANCE =====
+// ===== MATRIZ DE RETORNO POR HUB =====
+// Granularidade: Dia × Hub × Rota — mostra recorrência de não-retorno
 function renderHubPerf(envArr,regArr){
 try{
 let container=$('hubPerfTable');if(!container)return;
-// Agrupa saídas por hub + data
-let hubMap={};// hub → {env:[], ret:[]}
-let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
-allEnv.forEach(e=>{
-let h=getHub(e)||'(sem hub)';
-if(!hubMap[h])hubMap[h]={env:0,ret:0,consecutive_bad:0};
-hubMap[h].env++;
-});
-// Retornos confirmados (por codeKey)
-let retKeySet=new Set();
+
+// Índice de retornos (código bruto + chave normalizada)
+let retSet=new Set();
 regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{
-retKeySet.add(r.codigo);let k=codeKey(r.codigo);if(k)retKeySet.add(k);
+retSet.add(r.codigo);let k=codeKey(r.codigo);if(k)retSet.add(k);
 });
-// Conta retornos por hub (saídas que foram retornadas)
+
+// Constrói linhas: dia × hub × rota
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+let matrix={}; // key = "data|hub|rota"
 allEnv.forEach(e=>{
-if(retKeySet.has(e.codigo)||retKeySet.has(codeKey(e.codigo))){
-let h=getHub(e)||'(sem hub)';
-if(hubMap[h])hubMap[h].ret++;
-}
-});
-// Calcula dias consecutivos <50% por hub
-let byHubDay={};// "hub|date" → {env,ret}
-allEnv.forEach(e=>{
-let h=getHub(e)||'(sem hub)';
 let d=(e.datahora||'').split('T')[0]||today();
-let key=h+'|'+d;
-if(!byHubDay[key])byHubDay[key]={env:0,ret:0};
-byHubDay[key].env++;
-if(retKeySet.has(e.codigo)||retKeySet.has(codeKey(e.codigo)))byHubDay[key].ret++;
-});
-// Acha streaks de dias consecutivos <50% por hub
-let hubStreak={};
-Object.entries(byHubDay).forEach(([key,val])=>{
-let[h,d]=key.split('|');
-if(!hubStreak[h])hubStreak[h]=[];
-if(val.env>0&&(val.ret/val.env)<0.5)hubStreak[h].push(d);
-});
-Object.entries(hubStreak).forEach(([h,days])=>{
-days.sort();let maxConsec=1,cur=1;
-for(let i=1;i<days.length;i++){
-let d0=new Date(days[i-1]),d1=new Date(days[i]);
-let diff=Math.round((d1-d0)/86400000);
-cur=(diff<=3)?cur+1:1;
-if(cur>maxConsec)maxConsec=cur;
-}
-if(hubMap[h])hubMap[h].consecutive_bad=maxConsec;
+let h=getHub(e)||'(sem hub)';
+let rt=getRota(e)||'—';
+let key=d+'|'+h+'|'+rt;
+if(!matrix[key])matrix[key]={data:d,hub:h,rota:rt,env:0,ret:0};
+matrix[key].env++;
+if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))matrix[key].ret++;
 });
 
-let rows=Object.entries(hubMap)
-.filter(([h,v])=>v.env>0)
-.map(([h,v])=>({hub:h,...v,pct:Math.round((v.ret/v.env)*100)}))
-.sort((a,b)=>a.pct-b.pct)
-.slice(0,30);
+let rows=Object.values(matrix)
+.filter(r=>r.env>0)
+.map(r=>({...r,pct:Math.round((r.ret/r.env)*100)}));
 
-if(!rows.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados</p>';return}
-
-state._hubPerfRows=rows;
-
-let html='<table class="data-table" style="font-size:12px"><thead><tr><th>Hub</th><th>Enviadas</th><th>Retornadas</th><th>%</th><th>Streak</th></tr></thead><tbody>';
+// Calcula streak por HUB: quantos dias consecutivos (mais recentes) < 50%
+// Para cada hub, agrupa os dias que aparecem e verifica sequência
+let hubDays={}; // hub → Set of dates
 rows.forEach(r=>{
-let pctColor=r.pct<50?'color:var(--red);font-weight:700':r.pct<80?'color:var(--orange)':'color:var(--green)';
-let streakBadge=r.consecutive_bad>=2?'<span style="background:#E74C3C;color:white;border-radius:4px;padding:1px 5px;font-size:10px">'+r.consecutive_bad+'d ⚠️</span>':'<span style="color:var(--gray3)">—</span>';
-html+='<tr><td style="font-weight:600">'+r.hub+'</td><td>'+r.env+'</td><td>'+r.ret+'</td><td style="'+pctColor+'">'+r.pct+'%</td><td>'+streakBadge+'</td></tr>';
+if(!hubDays[r.hub])hubDays[r.hub]={};
+if(!hubDays[r.hub][r.data])hubDays[r.hub][r.data]={env:0,ret:0};
+hubDays[r.hub][r.data].env+=r.env;
+hubDays[r.hub][r.data].ret+=r.ret;
 });
-html+='</tbody></table>';
-if(rows.length===30)html+='<p style="font-size:10px;color:var(--gray3);margin-top:4px">Exibindo os 30 piores hubs</p>';
+let hubStreak={}; // hub → current streak (consecutive days <50% from most recent)
+Object.entries(hubDays).forEach(([hub,dayMap])=>{
+let sorted=Object.entries(dayMap).sort((a,b)=>b[0].localeCompare(a[0]));// desc
+let streak=0;
+for(let[d,v] of sorted){
+if(v.env>0&&(v.ret/v.env)<0.5)streak++;
+else break;
+}
+hubStreak[hub]=streak;
+});
+
+// Ordena: streak desc (piores recorrentes primeiro), depois data desc, depois % asc
+rows.sort((a,b)=>{
+let sd=(hubStreak[b.hub]||0)-(hubStreak[a.hub]||0);
+if(sd!==0)return sd;
+let dd=b.data.localeCompare(a.data);
+if(dd!==0)return dd;
+return a.pct-b.pct;
+});
+
+// Limita a 60 linhas mais relevantes
+let display=rows.slice(0,60);
+state._hubPerfRows=display;
+state._hubPerfStreaks=hubStreak;
+
+if(!display.length){
+container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:12px">Sem dados de movimentação no período</p>';
+return;
+}
+
+// Renderiza tabela
+let html='<div style="overflow-x:auto">'
++'<table class="data-table" style="font-size:12px;width:100%">'
++'<thead><tr><th>Data</th><th>Hub</th><th>Rota</th><th style="text-align:center">Enviadas</th><th style="text-align:center">Retornou</th><th style="text-align:center">%</th><th style="text-align:center">Streak</th></tr></thead><tbody>';
+
+let prevDate='';
+display.forEach(r=>{
+let pct=r.pct;
+let pctColor=pct<50?'color:#dc2626;font-weight:700':pct<80?'color:#d97706;font-weight:600':'color:#16a34a';
+let streak=hubStreak[r.hub]||0;
+// Destaque de linha se hub com streak >= 2
+let rowStyle=streak>=2?'background:#fff5f5;':'';
+let streakBadge=streak>=3
+?'<span style="background:#dc2626;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">'+streak+'d 🔴</span>'
+:streak>=2
+?'<span style="background:#f97316;color:white;border-radius:4px;padding:1px 6px;font-size:10px">'+streak+'d 🟡</span>'
+:'<span style="color:#94a3b8;font-size:11px">—</span>';
+// Linha separadora quando muda de data
+let dateLabel=r.data!==prevDate?'<span style="font-weight:700">'+fmtDate(r.data+'T12:00:00').split(' ')[0]+'</span>':'';
+if(r.data!==prevDate)prevDate=r.data;
+html+='<tr style="'+rowStyle+'">'
++'<td style="color:#64748b;min-width:60px">'+dateLabel+'</td>'
++'<td style="font-weight:600">'+r.hub+'</td>'
++'<td style="color:#64748b">'+r.rota+'</td>'
++'<td style="text-align:center">'+r.env+'</td>'
++'<td style="text-align:center">'+r.ret+'</td>'
++'<td style="text-align:center;'+pctColor+'">'+pct+'%</td>'
++'<td style="text-align:center">'+streakBadge+'</td>'
++'</tr>';
+});
+html+='</tbody></table></div>';
+if(display.length===60)html+='<p style="font-size:10px;color:#94a3b8;margin-top:4px;text-align:right">Exibindo 60 registros mais relevantes</p>';
+// Legenda
+html+='<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#64748b;flex-wrap:wrap">'
++'<span><span style="color:#dc2626;font-weight:700">Vermelho</span> &lt;50%</span>'
++'<span><span style="color:#d97706;font-weight:600">Laranja</span> 50–79%</span>'
++'<span><span style="color:#16a34a">Verde</span> ≥80%</span>'
++'<span><span style="background:#fff5f5;border:1px solid #fca5a5;border-radius:3px;padding:0 4px">Linha rosa</span> = hub com streak ≥ 2 dias</span>'
++'</div>';
 container.innerHTML=html;
-}catch(e){let c=$('hubPerfTable');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Erro</p>';}
+}catch(e){let c=$('hubPerfTable');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Erro ao carregar matriz</p>';}
 }
 
 function exportHubPerf(){
 try{
 let rows=state._hubPerfRows||[];
+let streaks=state._hubPerfStreaks||{};
 if(!rows.length){toast('Sem dados para exportar','warn');return}
 let bom='\uFEFF';
-let csv=bom+'Hub,Enviadas,Retornadas,% Retorno,Dias Consecutivos <50%\n';
-csv+=rows.map(r=>'"'+r.hub+'",'+r.env+','+r.ret+','+r.pct+'%,'+r.consecutive_bad).join('\n');
+let csv=bom+'Data,Hub,Rota,Enviadas,Retornou,% Retorno,Streak Hub (dias consec. <50%)\n';
+csv+=rows.map(r=>'"'+fmtDate(r.data+'T12:00:00').split(' ')[0]+'","'+r.hub+'","'+r.rota+'",'+r.env+','+r.ret+','+r.pct+'%,'+(streaks[r.hub]||0)).join('\n');
 let a=document.createElement('a');
 a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-a.download='hub_perf_'+state.ds+'_'+today()+'.csv';a.click();
+a.download='matriz_retorno_hub_'+state.ds+'_'+today()+'.csv';a.click();
+toast('✅ Matriz exportada','success');
 }catch(e){toast('Erro ao exportar','error')}
 }
 window.exportHubPerf=exportHubPerf;
@@ -1855,17 +1895,49 @@ window.exportHubPerf=exportHubPerf;
 function getStockEntries(){return ls('stockEntries')||[]}
 function saveStockEntries(e){ls('stockEntries',e)}
 
+// Calcula média diária SEM Domingos — domingos usam 40% da média semanal na projeção
+function weekdayAvgFor(arr,tipoCb,days){
+try{
+days=days||14;
+let startStr=localDateStr(new Date(Date.now()-days*86400000));
+let byDate={};
+arr.filter(tipoCb).forEach(e=>{
+let d=(e.datahora||'').split('T')[0];
+if(d>=startStr){byDate[d]=(byDate[d]||0)+1}
+});
+let vals=Object.entries(byDate)
+.filter(([d])=>new Date(d+'T12:00:00').getDay()!==0)// remove domingos
+.map(([,v])=>v);
+return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+}catch(e){return 0}
+}
+
+// Consumo do dia projetado: domingos = 40% da média
+function dayConsumption(dayOffset,wkAvg,sundayFactor){
+try{
+sundayFactor=sundayFactor===undefined?0.4:sundayFactor;
+let d=new Date();d.setDate(d.getDate()+dayOffset);
+return d.getDay()===0?wkAvg*sundayFactor:wkAvg;
+}catch(e){return wkAvg}
+}
+
 function showStockEntryForm(){
 try{
-let html='<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">'
+let dsList=[];
+try{let c=state.config;if(c&&c.dsList)dsList=c.dsList;else if(c&&c.ds)dsList=[c.ds]}catch(x){}
+if(!dsList.length)dsList=[state.ds||'DSP2'];
+let dsOpts=dsList.map(d=>'<option value="'+d+'"'+(d===state.ds?' selected':'')+'>'+d+'</option>').join('');
+let html='<div style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">'
 +'<div class="card" style="width:100%;max-width:380px">'
 +'<h4 style="margin-bottom:12px">📦 Lançar Entrada de Material</h4>'
++'<label style="font-size:12px;display:block;margin-bottom:4px">DS / Estação</label>'
++'<select id="seDs" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'+dsOpts+'</select>'
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Data da chegada</label>'
 +'<input type="date" id="seData" value="'+today()+'" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Material</label>'
 +'<select id="seTipo" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
 +'<option value="rafia">🧵 Ráfia</option>'
-+'<option value="enforca">🪢 Enforca Gato</option>'
++'<option value="enforca">🪢 Enforca Gato (ráfia + bag)</option>'
 +'</select>'
 +'<label style="font-size:12px;display:block;margin-bottom:4px">Quantidade</label>'
 +'<input type="number" id="seQtd" min="1" placeholder="ex: 5000" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:14px;font-size:14px">'
@@ -1880,19 +1952,18 @@ window.showStockEntryForm=showStockEntryForm;
 
 function saveStockEntry(){
 try{
+let ds=($('seDs')||{}).value||state.ds;
 let data=($('seData')||{}).value;
 let tipo=($('seTipo')||{}).value;
 let qtd=parseInt(($('seQtd')||{}).value||'0');
 if(!data||!qtd||qtd<1){toast('Preencha todos os campos','warn');return}
-// Uso começa no dia seguinte à chegada
-let d=new Date(data+'T12:00:00');
-d.setDate(d.getDate()+1);
+let d=new Date(data+'T12:00:00');d.setDate(d.getDate()+1);
 let usoInicio=localDateStr(d);
 let entries=getStockEntries();
-entries.push({id:Date.now(),data,tipo,qtd,usoInicio,operador:state.user||'admin'});
+entries.push({id:Date.now(),data,tipo,qtd,usoInicio,operador:state.user||'admin',ds:ds||state.ds});
 saveStockEntries(entries);
 let overlay=document.querySelector('div[style*="position:fixed"]');if(overlay)overlay.remove();
-toast('✅ Entrada registrada: '+qtd+' '+tipo,'success');
+toast('✅ Entrada registrada: '+qtd.toLocaleString('pt-BR')+' '+tipo,'success');
 renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
 }catch(e){toast('Erro ao salvar','error')}
 }
@@ -1903,197 +1974,208 @@ try{
 let container=$('stockProjectionContent');if(!container)return;
 let cfg=getStockConfig();
 let entries=getStockEntries();
-
-// Estoque acumulado: só entradas cujo uso_inicio <= hoje
 let todayStr=today();
-let rafiaTotal=0,enforcaTotal=0;
-let futureEntries=[];
-let purchaseEvents=[];// para plotar no gráfico
-entries.forEach(e=>{
-if(e.usoInicio<=todayStr){
-if(e.tipo==='rafia')rafiaTotal+=e.qtd;
-else enforcaTotal+=e.qtd;
-purchaseEvents.push({data:e.data,usoInicio:e.usoInicio,tipo:e.tipo,qtd:e.qtd});
-}else{
-futureEntries.push(e);
-purchaseEvents.push({data:e.data,usoInicio:e.usoInicio,tipo:e.tipo,qtd:e.qtd,future:true});
-}
-});
 
-// Se não há entradas configuradas, mostra formulário de setup
-if(!rafiaTotal&&!enforcaTotal&&!entries.length){
-container.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray3)">'
-+'<div style="font-size:32px;margin-bottom:8px">📦</div>'
-+'<div style="font-size:13px;margin-bottom:12px">Nenhum estoque configurado ainda.</div>'
+// Filtra entradas por DS ativa
+let dsFilter=state.ds;
+let myEntries=entries.filter(e=>!e.ds||e.ds===dsFilter||e.ds===dsFilter.split(':')[0]);
+
+// Entradas ativas (chegaram antes de hoje)
+let activeRaf=myEntries.filter(e=>e.tipo==='rafia'&&e.usoInicio<=todayStr).reduce((s,e)=>s+e.qtd,0);
+let activeEnf=myEntries.filter(e=>e.tipo==='enforca'&&e.usoInicio<=todayStr).reduce((s,e)=>s+e.qtd,0);
+let futureEntries=myEntries.filter(e=>e.usoInicio>todayStr);
+
+if(!activeRaf&&!activeEnf&&!entries.length){
+container.innerHTML='<div style="text-align:center;padding:24px;color:var(--gray3)">'
++'<div style="font-size:36px;margin-bottom:8px">📦</div>'
++'<div style="font-size:13px;margin-bottom:12px">Nenhum estoque configurado para <strong>'+dsFilter+'</strong>.</div>'
 +'<button onclick="showStockEntryForm()" style="background:var(--navy);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer">+ Lançar primeira entrada</button>'
 +'</div>';
 return;
 }
 
-// Métricas de consumo diário (últimos 14 dias)
-let d14=new Date();d14.setDate(d14.getDate()-14);
-let d14str=localDateStr(d14);
-let allEnv14=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')))
-.filter(e=>(e.datahora||'').split('T')[0]>=d14str);
-let ret14=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote'
-&&(r.datahora||'').split('T')[0]>=d14str);
-let rafSaid14=allEnv14.filter(e=>e.tipo==='Rafia'||detectTipo(e.codigo||'')!=='Bag').length;
-let bagSaid14=allEnv14.filter(e=>e.tipo==='Bag'||detectTipo(e.codigo||'')==='Bag').length;
-let rafRet14=ret14.filter(r=>r.tipo==='Rafia'||detectTipo(r.codigo||'')!=='Bag').length;
-let diasComdados=14;
-let avgRafDay=rafSaid14/diasComdados;
-let avgBagDay=bagSaid14/diasComdados;
-let retRate14=rafSaid14>0?rafRet14/rafSaid14:0.5;
+// === MÉDIAS DIÁRIAS (excluindo domingos) ===
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+let isRaf=e=>detectTipo(e.codigo||'')==='Rafia';
+let isBag=e=>detectTipo(e.codigo||'')==='Bag';
+let avgRafDay=weekdayAvgFor(allEnv,isRaf,14);
+let avgBagDay=weekdayAvgFor(allEnv,isBag,14);
+// Enforca gato = ráfia + bag (consumo total de despachos)
+let avgEnfDay=(avgRafDay+avgBagDay)*cfg.margemEnforca;
+// Taxa de retorno de ráfias (para projeção realista)
+let allRet=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
+let retRate=allEnv.filter(isRaf).length>0?Math.min(0.95,allRet.filter(r=>isRaf(r)).length/allEnv.filter(isRaf).length):0.5;
 
-// Estoque atual (total comprado - consumido até hoje)
-let allEnvTot=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
-let allRetTot=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
-let rafSaidTot=allEnvTot.filter(e=>detectTipo(e.codigo||'')==='Rafia').length;
-let bagSaidTot=allEnvTot.filter(e=>detectTipo(e.codigo||'')==='Bag').length;
-let rafRetTot=allRetTot.filter(r=>detectTipo(r.codigo||'')==='Rafia').length;
-let rafiaAtual=Math.max(0,rafiaTotal-rafSaidTot+rafRetTot);
-let enforcaAtual=Math.max(0,enforcaTotal-Math.ceil(bagSaidTot*cfg.margemEnforca));
+// === ESTOQUE ATUAL ===
+let rafSaidTot=allEnv.filter(isRaf).length;
+let bagSaidTot=allEnv.filter(isBag).length;
+let rafRetTot=allRet.filter(r=>isRaf(r)).length;
+let rafiaAtual=Math.max(0,activeRaf-rafSaidTot+rafRetTot);
+let enforcaAtual=Math.max(0,activeEnf-Math.round((rafSaidTot+bagSaidTot)*cfg.margemEnforca));
 
-// Projeção: 30 dias à frente
-const PROJ_DAYS=30;
-let rafPess=[rafiaAtual],rafReal=[rafiaAtual],enfPess=[enforcaAtual];
-for(let i=1;i<=PROJ_DAYS;i++){
-let d=new Date();d.setDate(d.getDate()+i);
-let ds=localDateStr(d);
-// Adiciona futuras entradas que ficam ativas neste dia
-let futBonus={rafia:0,enforca:0};
-futureEntries.forEach(e=>{if(e.usoInicio===ds)futBonus[e.tipo]=(futBonus[e.tipo]||0)+e.qtd;});
-let rafLiq_pess=avgRafDay;// pessimista: nada volta
-let rafLiq_real=avgRafDay*(1-retRate14);// realista: taxa histórica de retorno
-let enfLiq=avgBagDay*cfg.margemEnforca;
-rafPess.push(Math.max(0,(rafPess[i-1]||0)-rafLiq_pess+(futBonus.rafia||0)));
-rafReal.push(Math.max(0,(rafReal[i-1]||0)-rafLiq_real+(futBonus.rafia||0)));
-enfPess.push(Math.max(0,(enfPess[i-1]||0)-enfLiq+(futBonus.enforca||0)));
+// === PROJEÇÃO 30 DIAS ===
+const N=31;
+let rafPess=[rafiaAtual],rafReal=[rafiaAtual],enfArr=[enforcaAtual];
+for(let i=1;i<N;i++){
+let d=new Date();d.setDate(d.getDate()+i);let ds=localDateStr(d);
+let futRaf=futureEntries.filter(e=>e.tipo==='rafia'&&e.usoInicio===ds).reduce((s,e)=>s+e.qtd,0);
+let futEnf=futureEntries.filter(e=>e.tipo==='enforca'&&e.usoInicio===ds).reduce((s,e)=>s+e.qtd,0);
+let cRaf=dayConsumption(i,avgRafDay);
+let cEnf=dayConsumption(i,avgEnfDay);
+rafPess.push(Math.max(0,rafPess[i-1]-cRaf+futRaf));
+rafReal.push(Math.max(0,rafReal[i-1]-cRaf*(1-retRate)+futRaf));
+enfArr.push(Math.max(0,enfArr[i-1]-cEnf+futEnf));
 }
 
-// Calcula dias até zerar
-function daysToZero(arr){for(let i=0;i<arr.length;i++){if(arr[i]<=0)return i;}return PROJ_DAYS;}
-let rafPessZero=daysToZero(rafPess);
-let rafRealZero=daysToZero(rafReal);
-let enfZero=daysToZero(enfPess);
+// Dias até zerar
+let dtz=arr=>{for(let i=0;i<arr.length;i++)if(arr[i]<=0)return i;return N-1};
+let rafPZ=dtz(rafPess),rafRZ=dtz(rafReal),enfZ=dtz(enfArr);
+let alertDt=(dz,lt)=>{let d=new Date();d.setDate(d.getDate()+Math.max(0,dz-lt));return fmtDate(localDateStr(d)+'T12:00:00')};
+let rafStatus=rafPZ<=cfg.leadTimeRafia?'🔴':rafPZ<=cfg.leadTimeRafia*2?'🟡':'🟢';
+let enfStatus=enfZ<=cfg.leadTimeEnforca?'🔴':enfZ<=cfg.leadTimeEnforca*2?'🟡':'🟢';
 
-// Data ideal de compra = zero - lead_time
-function alertDate(daysToZero,leadTime){
-let d=new Date();d.setDate(d.getDate()+Math.max(0,daysToZero-leadTime));
-return fmtDate(localDateStr(d)+'T00:00:00');
-}
-let rafAlert=alertDate(Math.min(rafPessZero,rafRealZero),cfg.leadTimeRafia);
-let enfAlert=alertDate(enfZero,cfg.leadTimeEnforca);
-
-// Cartões de resumo
-let rafStatus=rafPessZero<=cfg.leadTimeRafia?'🔴 COMPRAR JÁ':rafPessZero<=cfg.leadTimeRafia*2?'🟡 ATENÇÃO':'🟢 OK';
-let enfStatus=enfZero<=cfg.leadTimeEnforca?'🔴 COMPRAR JÁ':enfZero<=cfg.leadTimeEnforca*2?'🟡 ATENÇÃO':'🟢 OK';
-
-let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">';
-// Ráfia card
-html+='<div style="background:#f8fafc;border-radius:10px;padding:12px">'
-+'<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px">🧵 Ráfia '+rafStatus+'</div>'
-+'<div style="font-size:22px;font-weight:700;color:var(--navy)">'+rafiaAtual.toLocaleString('pt-BR')+'</div>'
-+'<div style="font-size:10px;color:var(--gray3)">disponíveis estimados</div>'
-+'<div style="margin-top:8px;font-size:11px"><span style="color:var(--orange)">Pess: '+rafPessZero+'d</span> &nbsp; <span style="color:var(--green)">Real: '+rafRealZero+'d</span></div>'
-+'<div style="margin-top:4px;font-size:11px;color:var(--gray3)">⚠️ Pedir até: <strong style="color:var(--navy)">'+rafAlert+'</strong></div>'
-+'<div style="font-size:10px;color:var(--gray3);margin-top:2px">'+avgRafDay.toFixed(1)+'/dia • retorno '+Math.round(retRate14*100)+'%</div>'
+let html='';
+// === KPI CARDS ===
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">';
+// Ráfia
+html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid #10B981">'
++'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:4px">🧵 RÁFIA '+rafStatus+'</div>'
++'<div style="font-size:26px;font-weight:800;color:#0F2137">'+rafiaAtual.toLocaleString('pt-BR')+'</div>'
++'<div style="font-size:10px;color:#94a3b8;margin-bottom:8px">disponíveis estimados</div>'
++'<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">'
++'<span style="background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 8px">Pess: '+rafPZ+'d</span>'
++'<span style="background:#dcfce7;color:#16a34a;border-radius:6px;padding:2px 8px">Real: '+rafRZ+'d</span>'
++'</div>'
++'<div style="font-size:10px;color:#64748b;margin-top:6px">⚠️ Pedir até: <strong>'+alertDt(Math.min(rafPZ,rafRZ),cfg.leadTimeRafia)+'</strong></div>'
++'<div style="font-size:10px;color:#94a3b8;margin-top:2px">'+avgRafDay.toFixed(1)+'/dia • retorno '+Math.round(retRate*100)+'% • lead '+cfg.leadTimeRafia+'d</div>'
 +'</div>';
-// Enforca gato card
-html+='<div style="background:#f8fafc;border-radius:10px;padding:12px">'
-+'<div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px">🪢 Enforca Gato '+enfStatus+'</div>'
-+'<div style="font-size:22px;font-weight:700;color:var(--navy)">'+enforcaAtual.toLocaleString('pt-BR')+'</div>'
-+'<div style="font-size:10px;color:var(--gray3)">disponíveis estimados</div>'
-+'<div style="margin-top:8px;font-size:11px"><span style="color:var(--orange)">Acaba em: '+enfZero+'d</span></div>'
-+'<div style="margin-top:4px;font-size:11px;color:var(--gray3)">⚠️ Pedir até: <strong style="color:var(--navy)">'+enfAlert+'</strong></div>'
-+'<div style="font-size:10px;color:var(--gray3);margin-top:2px">'+avgBagDay.toFixed(1)+'bags/dia × '+cfg.margemEnforca+'</div>'
+// Enforca
+html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid #3B82F6">'
++'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:4px">🪢 ENFORCA GATO '+enfStatus+'</div>'
++'<div style="font-size:26px;font-weight:800;color:#0F2137">'+enforcaAtual.toLocaleString('pt-BR')+'</div>'
++'<div style="font-size:10px;color:#94a3b8;margin-bottom:8px">disponíveis estimados</div>'
++'<div style="display:flex;gap:8px;font-size:11px">'
++'<span style="background:#fef9c3;color:#ca8a04;border-radius:6px;padding:2px 8px">Acaba em: '+enfZ+'d</span>'
++'</div>'
++'<div style="font-size:10px;color:#64748b;margin-top:6px">⚠️ Pedir até: <strong>'+alertDt(enfZ,cfg.leadTimeEnforca)+'</strong></div>'
++'<div style="font-size:10px;color:#94a3b8;margin-top:2px">'+(avgEnfDay).toFixed(1)+'/dia = ('+avgRafDay.toFixed(1)+'+'+avgBagDay.toFixed(1)+')×'+cfg.margemEnforca+' • lead '+cfg.leadTimeEnforca+'d</div>'
 +'</div>';
 html+='</div>';
 
-// Gráfico de linha curva — Ráfia Pessimista vs Realista
-html+=renderStockChart(rafPess,rafReal,enfPess,cfg.leadTimeRafia,cfg.leadTimeEnforca);
+// === GRÁFICOS ===
+html+=buildStockSVG('🧵 Ráfia — Projeção 30 dias',rafPess,rafReal,null,cfg.leadTimeRafia,'#10B981','#EF4444',futureEntries.filter(e=>e.tipo==='rafia'));
+html+='<div style="margin-top:10px"></div>';
+html+=buildStockSVG('🪢 Enforca Gato — Projeção 30 dias',enfArr,null,null,cfg.leadTimeEnforca,'#3B82F6',null,futureEntries.filter(e=>e.tipo==='enforca'));
 
-// Lista de entradas registradas
-html+='<div style="margin-top:10px"><div style="font-size:11px;color:var(--gray3);margin-bottom:4px">Entradas registradas:</div>';
-let sortedEntries=[...entries].sort((a,b)=>a.data.localeCompare(b.data));
-sortedEntries.forEach(e=>{
-html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:11px">'
-+'<span>'+(e.tipo==='rafia'?'🧵':'🪢')+' <strong>'+e.qtd.toLocaleString('pt-BR')+'</strong> '+e.tipo+' — chegou '+fmtDate(e.data+'T12:00:00')+' • usa a partir de '+fmtDate(e.usoInicio+'T12:00:00')+'</span>'
-+'<button onclick="deleteStockEntry('+e.id+')" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:13px">✕</button>'
+// === LISTA DE ENTRADAS ===
+html+='<div style="margin-top:14px;background:#f8fafc;border-radius:10px;padding:10px">'
++'<div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;letter-spacing:.5px">ENTRADAS REGISTRADAS</div>';
+let sortedE=[...entries].sort((a,b)=>a.data.localeCompare(b.data));
+if(!sortedE.length){html+='<div style="font-size:12px;color:#94a3b8">Nenhuma entrada registrada</div>';}
+sortedE.forEach(e=>{
+let mine=!e.ds||e.ds===dsFilter;
+html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #e2e8f0;font-size:11px'+(mine?'':';opacity:0.45')+'">'
++'<span>'+(e.tipo==='rafia'?'🧵':'🪢')+' <strong>'+e.qtd.toLocaleString('pt-BR')+'</strong> '+e.tipo
++' — chegou '+fmtDate(e.data+'T12:00:00')
++(e.ds?' <span style="background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:1px 5px;font-size:10px">'+e.ds+'</span>':'')+'</span>'
++'<button onclick="deleteStockEntry('+e.id+')" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px">✕</button>'
 +'</div>';
 });
 html+='</div>';
 container.innerHTML=html;
-}catch(ex){let c=$('stockProjectionContent');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados suficientes para projeção</p>';}
+}catch(ex){console.error(ex);let c=$('stockProjectionContent');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados suficientes para projeção</p>';}
 }
 
-function renderStockChart(rafPess,rafReal,enfPess,leadRaf,leadEnf){
+// Gráfico de linha com área — estilo DA_HUB (área gradiente + polyline + labels dias)
+function buildStockSVG(title,line1,line2,line3,leadDays,col1,col2,futEntries){
 try{
-const W=520,H=140,PT=16,PR=16,PB=24,PL=44;
+const W=520,H=160,PT=24,PR=20,PB=26,PL=46;
 const cW=W-PL-PR,cH=H-PT-PB;
-const N=Math.min(rafPess.length,31);
-const maxV=Math.max(...rafPess,...rafReal,...enfPess,1);
+const N=line1.length;
+const maxV=Math.max(...line1,...(line2||[]),...(line3||[]),1);
 const xS=i=>PL+(i/(N-1))*cW;
 const yS=v=>PT+cH-(Math.min(v,maxV)/maxV)*cH;
 
-const mkPath=pts=>{
-if(!pts||pts.length<2)return'';
-let d='M '+xS(0).toFixed(1)+' '+yS(pts[0]).toFixed(1);
-for(let i=0;i<pts.length-1&&i<N-1;i++){
-let cx=((xS(i)+xS(i+1))/2).toFixed(1);
-d+=' C '+cx+' '+yS(pts[i]).toFixed(1)+','+cx+' '+yS(pts[i+1]).toFixed(1)+','+xS(i+1).toFixed(1)+' '+yS(pts[i+1]).toFixed(1);
-}
-return d;
-};
-
-// Grid
-let grid='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#cbd5e1" stroke-width="1.5"/>';
+// Grid lines (4 levels)
+let grid='';
 [0.25,0.5,0.75,1].forEach(f=>{
-let gv=Math.round(maxV*f);
-let gy=yS(gv).toFixed(1);
-grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#f1f5f9" stroke-width="1"/>';
-grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8" fill="#94a3b8">'+Math.round(gv/1000)+'k</text>';
+let gv=Math.round(maxV*f);let gy=yS(gv).toFixed(1);
+grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#E2E8F0" stroke-width="1"/>';
+grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8.5" fill="#94A3B8">'+Math.round(gv/1000)+'k</text>';
+});
+grid+='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#CBD5E1" stroke-width="1.5"/>';
+
+// "Pedir até" vertical dashed line
+let leadX=xS(Math.min(leadDays,N-1));
+grid+='<line x1="'+leadX.toFixed(1)+'" y1="'+PT+'" x2="'+leadX.toFixed(1)+'" y2="'+(PT+cH)+'" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3"/>';
+grid+='<text x="'+(leadX+3).toFixed(1)+'" y="'+(PT+9)+'" font-size="8" fill="#F59E0B" font-weight="700">Pedir</text>';
+
+// Future stock entries markers
+(futEntries||[]).forEach(e=>{
+let d=new Date();let target=new Date(e.usoInicio+'T12:00:00');
+let idx=Math.round((target-d)/86400000);
+if(idx>=0&&idx<N){
+let mx=xS(idx).toFixed(1),my=(PT+cH-16).toFixed(1);
+grid+='<polygon points="'+mx+','+(PT+cH)+' '+(parseFloat(mx)-5)+','+my+' '+(parseFloat(mx)+5)+','+my+'" fill="#7C3AED" opacity=".8"/>';
+grid+='<text x="'+(parseFloat(mx))+'" y="'+(parseFloat(my)-4)+'" text-anchor="middle" font-size="8" fill="#7C3AED" font-weight="700">+'+Math.round(e.qtd/1000)+'k</text>';
+}
 });
 
-// Lead time zones (vertical lines onde se deve comprar)
-let rafLeadX=xS(Math.min(leadRaf,N-1)).toFixed(1);
-let enfLeadX=xS(Math.min(leadEnf,N-1)).toFixed(1);
-grid+='<line x1="'+rafLeadX+'" y1="'+PT+'" x2="'+rafLeadX+'" y2="'+(PT+cH)+'" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="4 3"/>';
+// Build polyline points
+let pts1=line1.map((v,i)=>xS(i).toFixed(1)+','+yS(v).toFixed(1)).join(' ');
+let pts2=line2?line2.map((v,i)=>xS(i).toFixed(1)+','+yS(v).toFixed(1)).join(' '):'';
 
-// Day labels
+// Area polygon for line1
+let area1=pts1+' '+xS(N-1).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH);
+
+// SVG defs for gradients
+let defs='<defs>'
++'<linearGradient id="g1_'+col1.replace('#','')+'" x1="0" y1="0" x2="0" y2="1">'
++'<stop offset="0%" stop-color="'+col1+'" stop-opacity=".18"/>'
++'<stop offset="100%" stop-color="'+col1+'" stop-opacity=".01"/>'
++'</linearGradient>'
++(line2?'<linearGradient id="g2_'+col2.replace('#','')+'" x1="0" y1="0" x2="0" y2="1">'
++'<stop offset="0%" stop-color="'+col2+'" stop-opacity=".12"/>'
++'<stop offset="100%" stop-color="'+col2+'" stop-opacity=".01"/>'
++'</linearGradient>':'')
++'</defs>';
+
+// Day labels (today, every 7 days)
 let dayLabels='';
-[0,7,14,21,29].forEach(i=>{
-if(i<N){
+for(let i=0;i<N;i+=7){
 let d=new Date();d.setDate(d.getDate()+i);
 let lbl=i===0?'Hoje':d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0');
-dayLabels+='<text x="'+xS(i).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8" fill="#94a3b8">'+lbl+'</text>';
+let isSun=d.getDay()===0;
+dayLabels+='<text x="'+xS(i).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8.5" fill="'+(i===0?col1:'#94A3B8')+'" font-weight="'+(i===0?'700':'400')+'">'+(isSun?'☀ ':'')+lbl+'</text>';
 }
-});
+// Last day
+dayLabels+='<text x="'+xS(N-1).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle" font-size="8.5" fill="#94A3B8">+30d</text>';
 
-// Lines
-let rafPessPath=mkPath(rafPess);
-let rafRealPath=mkPath(rafReal);
-let enfPath=mkPath(enfPess);
+// Legend
+let legend='<circle cx="'+(PL)+'" cy="14" r="4" fill="'+col1+'"/>'
++'<text x="'+(PL+8)+'" y="17.5" font-size="9" fill="#334155">'+(line2?'Pessimista':'Projeção')+'</text>'
++(line2?'<circle cx="'+(PL+80)+'" cy="14" r="4" fill="'+col2+'"/>'
++'<text x="'+(PL+88)+'" y="17.5" font-size="9" fill="#334155">Realista</text>':'')
++'<line x1="'+(PL+(line2?160:90))+'" y1="11" x2="'+(PL+(line2?175:105))+'" y2="11" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="4 3"/>'
++'<text x="'+(PL+(line2?178:108))+'" y="15" font-size="9" fill="#F59E0B">Pedir até</text>';
 
-let legend='<circle cx="'+(PL+8)+'" cy="12" r="3.5" fill="#E74C3C"/>'
-+'<text x="'+(PL+14)+'" y="15.5" font-size="9" fill="#334155">Ráfia pessimista</text>'
-+'<circle cx="'+(PL+95)+'" cy="12" r="3.5" fill="#00A86B"/>'
-+'<text x="'+(PL+101)+'" y="15.5" font-size="9" fill="#334155">Ráfia realista</text>'
-+'<circle cx="'+(PL+178)+'" cy="12" r="3.5" fill="#3B82F6"/>'
-+'<text x="'+(PL+184)+'" y="15.5" font-size="9" fill="#334155">Enforca gato</text>'
-+'<line x1="'+(PL+255)+'" y1="9" x2="'+(PL+268)+'" y2="9" stroke="#FF9900" stroke-width="1.5" stroke-dasharray="3 2"/>'
-+'<text x="'+(PL+271)+'" y="13" font-size="9" fill="#FF9900">Pedir até</text>';
-
-let svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;margin-top:10px">'
-+'<rect width="100%" height="100%" fill="white"/>'
+let svg='<div style="background:#fff;border-radius:12px;padding:14px 12px 8px;box-shadow:0 1px 3px rgba(0,0,0,.08)">'
++'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:8px">'+title+'</div>'
++'<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">'
++defs
 +grid
-+'<path d="'+rafPessPath+'" fill="none" stroke="#E74C3C" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 3"/>'
-+'<path d="'+rafRealPath+'" fill="none" stroke="#00A86B" stroke-width="2" stroke-linecap="round"/>'
-+'<path d="'+enfPath+'" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>'
++'<polygon points="'+area1+'" fill="url(#g1_'+col1.replace('#','')+')" />'
++(line2?'<polygon points="'+pts2+' '+xS(N-1).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH)+'" fill="url(#g2_'+col2.replace('#','')+')" />':'')
++(line2?'<polyline points="'+pts2+'" fill="none" stroke="'+col2+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>':'')
++'<polyline points="'+pts1+'" fill="none" stroke="'+col1+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'
++'<circle cx="'+xS(0).toFixed(1)+'" cy="'+yS(line1[0]).toFixed(1)+'" r="4" fill="'+col1+'" stroke="white" stroke-width="1.5"/>'
++'<circle cx="'+xS(N-1).toFixed(1)+'" cy="'+yS(line1[N-1]).toFixed(1)+'" r="4" fill="'+col1+'" stroke="white" stroke-width="1.5"/>'
++(line2?'<circle cx="'+xS(0).toFixed(1)+'" cy="'+yS(line2[0]).toFixed(1)+'" r="3.5" fill="'+col2+'" stroke="white" stroke-width="1.5"/>'
++'<circle cx="'+xS(N-1).toFixed(1)+'" cy="'+yS(line2[N-1]).toFixed(1)+'" r="3.5" fill="'+col2+'" stroke="white" stroke-width="1.5"/>':'')
 +dayLabels+legend
-+'</svg>';
++'</svg></div>';
 return svg;
-}catch(e){return''}
+}catch(e){return'<div style="font-size:12px;color:var(--gray3)">Erro no gráfico</div>'}
 }
 
 function deleteStockEntry(id){
