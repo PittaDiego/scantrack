@@ -2077,35 +2077,64 @@ let isRaf=e=>detectTipo(e.codigo||'')==='Rafia';
 let isBag=e=>detectTipo(e.codigo||'')==='Bag';
 let avgRafDay=weekdayAvgFor(allEnv,isRaf,14);
 let avgBagDay=weekdayAvgFor(allEnv,isBag,14);
-// Abraçadeira = ráfia + bag (consumo total de despachos)
 let avgEnfDay=(avgRafDay+avgBagDay)*cfg.margemEnforca;
-// Taxa de retorno de ráfias (para projeção realista)
 let allRet=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
 let retRate=allEnv.filter(isRaf).length>0?Math.min(0.95,allRet.filter(r=>isRaf(r)).length/allEnv.filter(isRaf).length):0.5;
 
-// === ESTOQUE ATUAL ===
-let rafSaidTot=allEnv.filter(isRaf).length;
-let bagSaidTot=allEnv.filter(isBag).length;
-let rafRetTot=allRet.filter(r=>isRaf(r)).length;
-let rafiaAtual=Math.max(0,activeRaf-rafSaidTot+rafRetTot);
-let enforcaAtual=Math.max(0,activeEnf-Math.round((rafSaidTot+bagSaidTot)*cfg.margemEnforca));
+// === ESTOQUE ATUAL — baseado em dias decorridos (não em total do período filtrado) ===
+// Evita que despachos de períodos anteriores ao estoque inflacionem o consumo contabilizado
+function calcDaysConsumed(fromDateStr){
+try{
+let start=new Date(fromDateStr+'T12:00:00'),now=new Date();
+let consumed=0;
+for(let d=new Date(start);d<=now;d.setDate(d.getDate()+1)){
+consumed+=d.getDay()===0?0.4:1;// domingo = 40% da média
+}
+return Math.max(0,consumed);
+}catch(e){return 0}
+}
+let rafFirstUse=myEntries.filter(e=>e.tipo==='rafia'&&e.usoInicio<=todayStr).map(e=>e.usoInicio).sort()[0];
+let enfFirstUse=myEntries.filter(e=>e.tipo==='enforca'&&e.usoInicio<=todayStr).map(e=>e.usoInicio).sort()[0];
+let rafDaysConsumed=rafFirstUse?calcDaysConsumed(rafFirstUse):0;
+let enfDaysConsumed=enfFirstUse?calcDaysConsumed(enfFirstUse):0;
+// Ráfia desconta retornos: consumo líquido = (1 - taxa retorno) × diária
+let rafiaAtual=Math.max(0,Math.round(activeRaf-rafDaysConsumed*avgRafDay*(1-retRate)));
+let enforcaAtual=Math.max(0,Math.round(activeEnf-enfDaysConsumed*avgEnfDay));
 
-// === PROJEÇÃO 30 DIAS ===
-const N=31;
-let rafPess=[rafiaAtual],rafReal=[rafiaAtual],enfArr=[enforcaAtual];
-for(let i=1;i<N;i++){
+// === HISTÓRICO (7 dias atrás) + HOJE + PROJEÇÃO (30 dias) ===
+// O gráfico mostra o passado estimado + o futuro projetado, com "Hoje" no índice 7
+const N_HIST=7,N_PROJ=15,N=N_HIST+N_PROJ;// 22 pontos: -7 dias + hoje + +14 dias
+const TODAY_IDX=N_HIST;// índice 7 = hoje
+
+// Reconstrói o histórico trabalhando de volta a partir do estoque atual
+let histRafPess=[rafiaAtual],histRafReal=[rafiaAtual],histEnf=[enforcaAtual];
+for(let i=1;i<=N_HIST;i++){
+let d=new Date();d.setDate(d.getDate()-i);
+let c=d.getDay()===0?0.4:1;
+histRafPess.unshift(histRafPess[0]+avgRafDay*c);
+histRafReal.unshift(histRafReal[0]+avgRafDay*(1-retRate)*c);
+histEnf.unshift(histEnf[0]+avgEnfDay*c);
+}
+// Clipa o histórico nos limites do estoque comprado
+histRafPess=histRafPess.map(v=>Math.max(0,Math.min(v,activeRaf)));
+histRafReal=histRafReal.map(v=>Math.max(0,Math.min(v,activeRaf)));
+histEnf=histEnf.map(v=>Math.max(0,Math.min(v,activeEnf)));
+
+// Constrói a projeção futura a partir do estoque atual
+let rafPess=[...histRafPess],rafReal=[...histRafReal],enfArr=[...histEnf];
+for(let i=1;i<N_PROJ;i++){
 let d=new Date();d.setDate(d.getDate()+i);let ds=localDateStr(d);
 let futRaf=futureEntries.filter(e=>e.tipo==='rafia'&&e.usoInicio===ds).reduce((s,e)=>s+e.qtd,0);
 let futEnf=futureEntries.filter(e=>e.tipo==='enforca'&&e.usoInicio===ds).reduce((s,e)=>s+e.qtd,0);
 let cRaf=dayConsumption(i,avgRafDay);
 let cEnf=dayConsumption(i,avgEnfDay);
-rafPess.push(Math.max(0,rafPess[i-1]-cRaf+futRaf));
-rafReal.push(Math.max(0,rafReal[i-1]-cRaf*(1-retRate)+futRaf));
-enfArr.push(Math.max(0,enfArr[i-1]-cEnf+futEnf));
+rafPess.push(Math.max(0,rafPess[rafPess.length-1]-cRaf+futRaf));
+rafReal.push(Math.max(0,rafReal[rafReal.length-1]-cRaf*(1-retRate)+futRaf));
+enfArr.push(Math.max(0,enfArr[enfArr.length-1]-cEnf+futEnf));
 }
 
-// Dias até zerar
-let dtz=arr=>{for(let i=0;i<arr.length;i++)if(arr[i]<=0)return i;return N-1};
+// Dias até zerar (contados a partir de hoje = TODAY_IDX)
+let dtz=arr=>{for(let i=TODAY_IDX;i<arr.length;i++)if(arr[i]<=0)return i-TODAY_IDX;return N_PROJ-1};
 let rafPZ=dtz(rafPess),rafRZ=dtz(rafReal),enfZ=dtz(enfArr);
 let alertDt=(dz,lt)=>{let d=new Date();d.setDate(d.getDate()+Math.max(0,dz-lt));return fmtDate(localDateStr(d)+'T12:00:00')};
 let rafStatus=rafPZ<=cfg.leadTimeRafia?'🔴':rafPZ<=cfg.leadTimeRafia*2?'🟡':'🟢';
@@ -2141,8 +2170,8 @@ html+='</div>';
 
 // === GRÁFICOS (lado a lado) ===
 html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0">';
-html+=buildStockSVG('🧵 Ráfia — Projeção 30 dias',rafPess,rafReal,null,cfg.leadTimeRafia,'#EF4444','#10B981',futureEntries.filter(e=>e.tipo==='rafia'));
-html+=buildStockSVG('🪢 Abraçadeira — Projeção 30 dias',enfArr,null,null,cfg.leadTimeEnforca,'#3B82F6',null,futureEntries.filter(e=>e.tipo==='enforca'));
+html+=buildStockSVG('🧵 Ráfia — 7 dias + projeção 30 dias',rafPess,rafReal,null,cfg.leadTimeRafia,'#EF4444','#10B981',futureEntries.filter(e=>e.tipo==='rafia'),TODAY_IDX);
+html+=buildStockSVG('🪢 Abraçadeira — 7 dias + projeção 30 dias',enfArr,null,null,cfg.leadTimeEnforca,'#3B82F6',null,futureEntries.filter(e=>e.tipo==='enforca'),TODAY_IDX);
 html+='</div>';
 
 // === LISTA DE ENTRADAS ===
@@ -2170,13 +2199,15 @@ container.innerHTML=html;
 // ===== GRÁFICO DE ESTOQUE =====
 // Cada dia ocupa SLOT px → scroll horizontal quando chart não cabe na célula
 // NÃO usar overflow:hidden no card externo — bloqueia o scroll interno
-function buildStockSVG(title,line1,line2,line3,leadDays,col1,col2,futEntries){
+function buildStockSVG(title,line1,line2,line3,leadDays,col1,col2,futEntries,todayIdx){
 try{
-const SLOT=22,N=31;
+todayIdx=todayIdx||0;
+const N=(line1||[]).length;
+const SLOT=22;
 const PT=18,PR=20,PB=50,PL=42;
 const W=N*SLOT+PL+PR;
 const cH=110,H=cH+PT+PB;
-const xS=function(i){return PL+(i/30)*(W-PL-PR)};
+const xS=function(i){return PL+(i/(N-1))*(W-PL-PR)};
 const allVals=[].concat(line1||[]).concat(line2||[]).concat(line3||[]);
 const maxV=Math.max.apply(null,allVals.concat([500]));
 const yS=function(v){return PT+cH-(Math.max(0,Math.min(v,maxV))/maxV)*cH};
@@ -2203,31 +2234,37 @@ var lbl=gv>=1000?(gv/1000).toFixed(1).replace(/\.0$/,'')+'k':String(gv);
 grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8.5" fill="#64748b">'+lbl+'</text>';
 }
 
-// Pedir até
-var leadX=xS(Math.min(leadDays,30));
+// Pedir até (relativo ao dia atual = todayIdx)
+var leadX=xS(Math.min(todayIdx+leadDays,N-1));
 grid+='<line x1="'+leadX.toFixed(1)+'" y1="'+PT+'" x2="'+leadX.toFixed(1)+'" y2="'+(PT+cH)+'" stroke="#F59E0B" stroke-width="2" stroke-dasharray="5 4"/>';
-grid+='<text x="'+(leadX+3)+'" y="'+(PT+11)+'" font-size="8.5" fill="#F59E0B" font-weight="700">Pedir</text>';
+grid+='<text x="'+(leadX+3)+'" y="'+(PT+22)+'" font-size="8.5" fill="#F59E0B" font-weight="700">Pedir</text>';
 
-// Entradas futuras
+// Marcador "Hoje"
+var todayX2=xS(todayIdx);
+grid+='<line x1="'+todayX2.toFixed(1)+'" y1="'+PT+'" x2="'+todayX2.toFixed(1)+'" y2="'+(PT+cH)+'" stroke="#334155" stroke-width="1.5" stroke-dasharray="3 3" opacity=".35"/>';
+
+// Entradas futuras (diamante roxo)
 (futEntries||[]).forEach(function(e){
 var d=new Date(),t=new Date(e.usoInicio+'T12:00:00');
-var idx=Math.max(0,Math.round((t-d)/86400000));
-if(idx>=N)return;
+var idx=todayIdx+Math.round((t-d)/86400000);
+if(idx<0||idx>=N)return;
 var fx=xS(idx),fy=PT+11;
 grid+='<polygon points="'+fx+','+(fy+5)+' '+(fx-5)+','+fy+' '+fx+','+(fy-5)+' '+(fx+5)+','+fy+'" fill="#7C3AED" opacity=".9"/>';
 grid+='<text x="'+(fx+8)+'" y="'+(fy+4)+'" font-size="8" fill="#7C3AED" font-weight="700">+'+Math.round(e.qtd/1000)+'k</text>';
 });
 
-// Eixo X: todos os dias, rotacionados -45°, fonte escura
+// Eixo X: todos os dias com data real baseada no offset de todayIdx
 var dayLabels='';
 for(var i=0;i<N;i++){
-var d=new Date();d.setDate(d.getDate()+i);
-var isToday=i===0,isSun=d.getDay()===0,isNewMonth=d.getDate()===1&&i>0;
+var dayOffset=i-todayIdx;// negativo=passado, 0=hoje, positivo=futuro
+var d=new Date();d.setDate(d.getDate()+dayOffset);
+var isToday=i===todayIdx,isSun=d.getDay()===0,isNewMonth=d.getDate()===1;
 var x=xS(i),baseY=PT+cH;
 var lbl2=isToday?'Hoje':isNewMonth?(d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')):String(d.getDate()).padStart(2,'0');
-var color=isToday?c1:isSun?'#94A3B8':'#1E293B';
-dayLabels+='<line x1="'+x.toFixed(1)+'" y1="'+baseY+'" x2="'+x.toFixed(1)+'" y2="'+(baseY+(isToday?6:4))+'" stroke="'+(isToday?color:'#E2E8F0')+'" stroke-width="'+(isToday?2:1)+'"/>';
-dayLabels+='<text transform="translate('+x.toFixed(1)+','+(baseY+13)+') rotate(-45)" text-anchor="end" font-size="8.5" fill="'+color+'" font-weight="'+(isToday||isNewMonth?'700':'500')+'">'+lbl2+'</text>';
+var color=isToday?'#0F2137':isSun?'#94A3B8':'#1E293B';
+var weight=isToday||isNewMonth?'700':'500';
+dayLabels+='<line x1="'+x.toFixed(1)+'" y1="'+baseY+'" x2="'+x.toFixed(1)+'" y2="'+(baseY+(isToday?7:4))+'" stroke="'+(isToday?'#0F2137':'#E2E8F0')+'" stroke-width="'+(isToday?2:1)+'"/>';
+dayLabels+='<text transform="translate('+x.toFixed(1)+','+(baseY+13)+') rotate(-45)" text-anchor="end" font-size="'+(isToday?9:8.5)+'" fill="'+color+'" font-weight="'+weight+'">'+lbl2+'</text>';
 if(isSun&&!isToday)dayLabels+='<circle cx="'+x.toFixed(1)+'" cy="'+(baseY+3)+'" r="2" fill="#CBD5E1"/>';
 }
 
