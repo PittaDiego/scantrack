@@ -597,7 +597,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <div style="font-size:10px;color:#94a3b8;margin-top:2px">Estoque (não conta na %)</div>
 </div>
 </div>
-<div class="chart-section"><h3>📋 Pendências Hubs</h3><div class="chart-container" id="chartTable"></div></div>
+<div class="chart-section">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+<h3 style="font-size:13px;margin:0">📋 Matriz de Retorno por Hub</h3>
+<button class="btn btn-sm btn-secondary" onclick="exportHubPerf()" style="font-size:11px;padding:4px 10px">📥 CSV</button>
+</div>
+<div class="chart-container" id="chartTable"></div>
+</div>
 <div class="charts-row">
 <div class="chart-section"><h3 style="font-size:13px;margin-bottom:6px">📊 Envios vs Retornos — 7 dias</h3><div class="chart-container" id="chartBar" style="padding:8px"></div></div>
 
@@ -611,14 +617,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 </div>
 </div>
 
-<!-- Hub Performance: Top 30 piores -->
-<div class="card" style="margin-bottom:12px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-<h4 style="font-size:13px;margin:0">📋 Matriz de Retorno por Hub</h4>
-<button class="btn btn-sm btn-secondary" onclick="exportHubPerf()" style="font-size:11px;padding:4px 10px">📥 CSV</button>
-</div>
-<div style="overflow-x:auto" id="hubPerfTable"><span style="font-size:12px;color:var(--gray3)">Carregando...</span></div>
-</div>
+<!-- Hub Performance merged into Pendências Hubs above -->
 
 <!-- Projeção de Estoque -->
 <div class="card" style="margin-bottom:12px">
@@ -1428,7 +1427,6 @@ renderBarChart(envArr,regArr,retNormal);
 renderDonutChart(regArr);
 renderHubTable(envArr,regArr);
 renderQRLoss(envArr,regArr);
-renderHubPerf(envArr,regArr);
 renderStockProjection(envArr,regArr);
 }catch(e){
 if($('mSaidas'))$('mSaidas').textContent='—';
@@ -1604,17 +1602,119 @@ container.innerHTML=html;
 function renderHubTable(envArr,regArr){
 try{
 let container=$('chartTable');if(!container)return;
-let hubs={};
-envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{let h=e.hub||(e.observacao&&e.observacao.match(/Hub:([^|]*)/)?e.observacao.match(/Hub:([^|]*)/)[1].trim():'')||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].env++});
-regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let h=getHub(r)||'N/A';if(!hubs[h])hubs[h]={env:0,ret:0};hubs[h].ret++});
-let sorted=Object.entries(hubs).map(([n,v])=>({name:n,...v,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).sort((a,b)=>b.pend-a.pend).slice(0,10);
-if(!sorted.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
-let html='<table class="data-table"><thead><tr><th>Hub</th><th>Envios</th><th>Retornos</th><th>Pend.</th><th>%</th></tr></thead><tbody>';
-sorted.forEach(h=>{let pctColor=h.pct<80?'color:var(--red);font-weight:700':'';html+='<tr><td>'+h.name+'</td><td>'+h.env+'</td><td>'+h.ret+'</td><td style="color:var(--red);font-weight:600">'+h.pend+'</td><td style="'+pctColor+'">'+h.pct+'%'+(h.pct<80?' 🔴':'')+'</td></tr>'});
-html+='</tbody></table>';
-container.innerHTML=html;
-}catch(e){}
+
+// Índice de retornos por código + chave normalizada
+let retSet=new Set();
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{
+retSet.add(r.codigo);let k=codeKey(r.codigo);if(k)retSet.add(k);
+});
+
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+
+// Nível 1: Agregado por Hub
+let hubAgg={};
+allEnv.forEach(e=>{
+let h=getHub(e)||'N/A';
+if(!hubAgg[h])hubAgg[h]={name:h,env:0,ret:0};
+hubAgg[h].env++;
+if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))hubAgg[h].ret++;
+});
+
+// Nível 2: Granularidade dia × hub (para streak e detalhe)
+let hubDay={};// hub → date → {env,ret}
+allEnv.forEach(e=>{
+let h=getHub(e)||'N/A';
+let d=(e.datahora||'').split('T')[0]||today();
+if(!hubDay[h])hubDay[h]={};
+if(!hubDay[h][d])hubDay[h][d]={env:0,ret:0};
+hubDay[h][d].env++;
+if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))hubDay[h][d].ret++;
+});
+
+// Calcula streak atual de cada hub (dias consecutivos mais recentes <50%)
+let hubStreak={};
+Object.entries(hubDay).forEach(([hub,dayMap])=>{
+let sorted=Object.keys(dayMap).sort((a,b)=>b.localeCompare(a));
+let streak=0;
+for(let d of sorted){
+let v=dayMap[d];
+if(v.env>0&&(v.ret/v.env)<0.5)streak++;
+else break;
 }
+hubStreak[hub]=streak;
+});
+
+// Monta linhas agregadas e ordena: streak desc → % asc
+let rows=Object.values(hubAgg)
+.filter(h=>h.env>0)
+.map(h=>({...h,pend:h.env-h.ret,pct:h.env?Math.round((h.ret/h.env)*100):0,streak:hubStreak[h.name]||0}))
+.sort((a,b)=>{
+let sd=(b.streak-a.streak);if(sd!==0)return sd;
+return a.pct-b.pct;
+})
+.slice(0,20);
+
+if(!rows.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
+
+// Salva para export
+state._hubPerfRows=rows;
+state._hubPerfStreaks=hubStreak;
+state._hubDay=hubDay;
+
+let html='<div style="overflow-x:auto"><table class="data-table" style="font-size:12px"><thead>'
++'<tr><th>Hub</th><th>Envios</th><th>Retornos</th><th>Pend.</th><th>%</th><th style="text-align:center">Streak</th></tr>'
++'</thead><tbody>';
+
+rows.forEach((h,idx)=>{
+let pctColor=h.pct<50?'color:#dc2626;font-weight:700':h.pct<80?'color:#d97706;font-weight:600':'color:#16a34a';
+let rowBg=h.streak>=2?'style="background:#fff5f5"':'';
+let streakBadge=h.streak>=3
+?'<span style="background:#dc2626;color:white;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">'+h.streak+'d 🔴</span>'
+:h.streak>=2
+?'<span style="background:#f97316;color:white;border-radius:4px;padding:1px 7px;font-size:10px">'+h.streak+'d 🟡</span>'
+:'<span style="color:#94a3b8;font-size:11px">—</span>';
+
+// Linha principal
+html+='<tr '+rowBg+' onclick="toggleHubDetail(\'hd'+idx+'\')" style="cursor:pointer">'
++'<td style="font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+h.name+'</td>'
++'<td>'+h.env+'</td>'
++'<td>'+h.ret+'</td>'
++'<td style="color:#dc2626;font-weight:600">'+h.pend+'</td>'
++'<td style="'+pctColor+'">'+h.pct+'%</td>'
++'<td style="text-align:center">'+streakBadge+'</td>'
++'</tr>';
+
+// Linha de detalhe expandível (dia a dia)
+let dayEntries=hubDay[h.name]||{};
+let sortedDays=Object.entries(dayEntries).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14);
+let detHtml='<tr id="hd'+idx+'" class="hidden"><td colspan="6" style="padding:0;background:#f8fafc">'
++'<table style="width:100%;font-size:11px;border-collapse:collapse">'
++'<tr style="background:#e2e8f0"><th style="padding:4px 8px;text-align:left;font-weight:600">Data</th><th style="padding:4px;text-align:center">Enviadas</th><th style="padding:4px;text-align:center">Retornou</th><th style="padding:4px;text-align:center">%</th></tr>';
+sortedDays.forEach(([d,v])=>{
+let dp=v.env?Math.round((v.ret/v.env)*100):0;
+let dc=dp<50?'color:#dc2626;font-weight:700':dp<80?'color:#d97706':'color:#16a34a';
+detHtml+='<tr style="border-top:1px solid #e2e8f0">'
++'<td style="padding:3px 8px;color:#64748b">'+fmtDate(d+'T12:00:00').split(' ')[0]+'</td>'
++'<td style="padding:3px;text-align:center">'+v.env+'</td>'
++'<td style="padding:3px;text-align:center">'+v.ret+'</td>'
++'<td style="padding:3px;text-align:center;'+dc+'">'+dp+'%</td>'
++'</tr>';
+});
+detHtml+='</table></td></tr>';
+html+=detHtml;
+});
+
+html+='</tbody></table></div>';
+if(rows.length===20)html+='<p style="font-size:10px;color:#94a3b8;margin-top:4px">Top 20 por pior desempenho. Clique na linha para ver o histórico por dia.</p>';
+else html+='<p style="font-size:10px;color:#94a3b8;margin-top:4px">Clique em qualquer linha para ver o histórico por dia.</p>';
+container.innerHTML=html;
+}catch(e){let c=$('chartTable');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Erro</p>';}
+}
+
+function toggleHubDetail(id){
+try{let el=$(id);if(el){el.classList.toggle('hidden')}}catch(e){}
+}
+window.toggleHubDetail=toggleHubDetail;
 
 function exportReport(){
 try{
@@ -1764,117 +1864,6 @@ toast('✅ '+perda.length+' códigos exportados para reprint','success');
 window.exportReprintList=exportReprintList;
 
 // ===== HUB PERFORMANCE =====
-// ===== MATRIZ DE RETORNO POR HUB =====
-// Granularidade: Dia × Hub × Rota — mostra recorrência de não-retorno
-function renderHubPerf(envArr,regArr){
-try{
-let container=$('hubPerfTable');if(!container)return;
-
-// Índice de retornos (código bruto + chave normalizada)
-let retSet=new Set();
-regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{
-retSet.add(r.codigo);let k=codeKey(r.codigo);if(k)retSet.add(k);
-});
-
-// Constrói linhas: dia × hub × rota
-let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
-let matrix={}; // key = "data|hub|rota"
-allEnv.forEach(e=>{
-let d=(e.datahora||'').split('T')[0]||today();
-let h=getHub(e)||'(sem hub)';
-let rt=getRota(e)||'—';
-let key=d+'|'+h+'|'+rt;
-if(!matrix[key])matrix[key]={data:d,hub:h,rota:rt,env:0,ret:0};
-matrix[key].env++;
-if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))matrix[key].ret++;
-});
-
-let rows=Object.values(matrix)
-.filter(r=>r.env>0)
-.map(r=>({...r,pct:Math.round((r.ret/r.env)*100)}));
-
-// Calcula streak por HUB: quantos dias consecutivos (mais recentes) < 50%
-// Para cada hub, agrupa os dias que aparecem e verifica sequência
-let hubDays={}; // hub → Set of dates
-rows.forEach(r=>{
-if(!hubDays[r.hub])hubDays[r.hub]={};
-if(!hubDays[r.hub][r.data])hubDays[r.hub][r.data]={env:0,ret:0};
-hubDays[r.hub][r.data].env+=r.env;
-hubDays[r.hub][r.data].ret+=r.ret;
-});
-let hubStreak={}; // hub → current streak (consecutive days <50% from most recent)
-Object.entries(hubDays).forEach(([hub,dayMap])=>{
-let sorted=Object.entries(dayMap).sort((a,b)=>b[0].localeCompare(a[0]));// desc
-let streak=0;
-for(let[d,v] of sorted){
-if(v.env>0&&(v.ret/v.env)<0.5)streak++;
-else break;
-}
-hubStreak[hub]=streak;
-});
-
-// Ordena: streak desc (piores recorrentes primeiro), depois data desc, depois % asc
-rows.sort((a,b)=>{
-let sd=(hubStreak[b.hub]||0)-(hubStreak[a.hub]||0);
-if(sd!==0)return sd;
-let dd=b.data.localeCompare(a.data);
-if(dd!==0)return dd;
-return a.pct-b.pct;
-});
-
-// Limita a 60 linhas mais relevantes
-let display=rows.slice(0,60);
-state._hubPerfRows=display;
-state._hubPerfStreaks=hubStreak;
-
-if(!display.length){
-container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:12px">Sem dados de movimentação no período</p>';
-return;
-}
-
-// Renderiza tabela
-let html='<div style="overflow-x:auto">'
-+'<table class="data-table" style="font-size:12px;width:100%">'
-+'<thead><tr><th>Data</th><th>Hub</th><th>Rota</th><th style="text-align:center">Enviadas</th><th style="text-align:center">Retornou</th><th style="text-align:center">%</th><th style="text-align:center">Streak</th></tr></thead><tbody>';
-
-let prevDate='';
-display.forEach(r=>{
-let pct=r.pct;
-let pctColor=pct<50?'color:#dc2626;font-weight:700':pct<80?'color:#d97706;font-weight:600':'color:#16a34a';
-let streak=hubStreak[r.hub]||0;
-// Destaque de linha se hub com streak >= 2
-let rowStyle=streak>=2?'background:#fff5f5;':'';
-let streakBadge=streak>=3
-?'<span style="background:#dc2626;color:white;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">'+streak+'d 🔴</span>'
-:streak>=2
-?'<span style="background:#f97316;color:white;border-radius:4px;padding:1px 6px;font-size:10px">'+streak+'d 🟡</span>'
-:'<span style="color:#94a3b8;font-size:11px">—</span>';
-// Linha separadora quando muda de data
-let dateLabel=r.data!==prevDate?'<span style="font-weight:700">'+fmtDate(r.data+'T12:00:00').split(' ')[0]+'</span>':'';
-if(r.data!==prevDate)prevDate=r.data;
-html+='<tr style="'+rowStyle+'">'
-+'<td style="color:#64748b;min-width:60px">'+dateLabel+'</td>'
-+'<td style="font-weight:600">'+r.hub+'</td>'
-+'<td style="color:#64748b">'+r.rota+'</td>'
-+'<td style="text-align:center">'+r.env+'</td>'
-+'<td style="text-align:center">'+r.ret+'</td>'
-+'<td style="text-align:center;'+pctColor+'">'+pct+'%</td>'
-+'<td style="text-align:center">'+streakBadge+'</td>'
-+'</tr>';
-});
-html+='</tbody></table></div>';
-if(display.length===60)html+='<p style="font-size:10px;color:#94a3b8;margin-top:4px;text-align:right">Exibindo 60 registros mais relevantes</p>';
-// Legenda
-html+='<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#64748b;flex-wrap:wrap">'
-+'<span><span style="color:#dc2626;font-weight:700">Vermelho</span> &lt;50%</span>'
-+'<span><span style="color:#d97706;font-weight:600">Laranja</span> 50–79%</span>'
-+'<span><span style="color:#16a34a">Verde</span> ≥80%</span>'
-+'<span><span style="background:#fff5f5;border:1px solid #fca5a5;border-radius:3px;padding:0 4px">Linha rosa</span> = hub com streak ≥ 2 dias</span>'
-+'</div>';
-container.innerHTML=html;
-}catch(e){let c=$('hubPerfTable');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Erro ao carregar matriz</p>';}
-}
-
 function exportHubPerf(){
 try{
 let rows=state._hubPerfRows||[];
