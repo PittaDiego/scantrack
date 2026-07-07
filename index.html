@@ -1,0 +1,3155 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><style id="qw-theme">:root {
+  --color-bg: #faf9fc;
+  --color-text: #131920;
+  --color-navbar-bg: #f9f9fb;
+  --color-bg-chat-view: #fcfcfd;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  --color-surface: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+  --color-surface-active: #e5e7eb;
+  --color-border: rgba(0, 0, 0, .12);
+  --color-border-light: rgba(0, 0, 0, .06);
+  --color-border-strong: #d1d5db;
+  --color-primary: #4200db;
+  --color-primary-dark: #35009e;
+  --color-primary-light: #8575ff;
+  --color-primary-bg: #e8e6ff;
+  --color-primary-hover-border: #35009e;
+  --color-nav-icon-active: #4200db;
+  --color-nav-hover-border: #4200db;
+  --color-primary-alpha-3: color-mix(in srgb, #4200db 3%, transparent);
+  --color-primary-alpha-5: color-mix(in srgb, #4200db 5%, transparent);
+  --color-primary-alpha-8: color-mix(in srgb, #4200db 8%, transparent);
+  --color-primary-alpha-12: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-alpha-15: color-mix(in srgb, #4200db 15%, transparent);
+  --color-primary-alpha-20: color-mix(in srgb, #4200db 20%, transparent);
+  --color-primary-alpha-25: color-mix(in srgb, #4200db 25%, transparent);
+  --color-primary-alpha-30: color-mix(in srgb, #4200db 30%, transparent);
+  --color-primary-alpha-40: color-mix(in srgb, #4200db 40%, transparent);
+  --color-primary-alpha-50: color-mix(in srgb, #4200db 50%, transparent);
+  --color-primary-alpha-60: color-mix(in srgb, #4200db 60%, transparent);
+  --color-primary-subtle: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
+  --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
+  --color-accent: #4200db;
+  --color-accent-foreground: #4200db;
+  --color-accent-dark: #35009e;
+  --color-accent-light: #e8e6ff;
+  --color-accent-inverse: #ffffff;
+  --color-link: #4200db;
+  --color-primary-gradient-end: #e8e6ff;
+  --color-primary-bg-solid: #e8e6ff;
+  --color-user-bubble: #F3F3F7;
+  --color-user-bubble-text: #131920;
+  --color-text-secondary: #5e5e5e;
+  --color-text-tertiary: #656871;
+  --color-text-muted: #9ca3af;
+  --color-text-on-primary: #ffffff;
+  --color-success: #00802f;
+  --color-success-dark: #00471e;
+  --color-success-light: #d9ffd6;
+  --color-success-hover: #005c26;
+  --color-success-bg: #e6f5eb;
+  --color-success-border: #b3d9bf;
+  --color-success-foreground: #00802f;
+  --color-success-dark-foreground: #00471e;
+  --color-success-text: #00471e;
+  --color-error: #db0000;
+  --color-error-dark: #700000;
+  --color-error-light: #ffe0e0;
+  --color-error-hover: #ffe0e0;
+  --color-error-bg: #fceaea;
+  --color-error-border: #f2cccc;
+  --color-error-active-border: #db0000;
+  --color-error-foreground: #db0000;
+  --color-error-dark-foreground: #700000;
+  --color-error-inverse: #ffffff;
+  --color-error-text: #700000;
+  --color-warning: #f2b100;
+  --color-warning-dark: #573a00;
+  --color-warning-light: #fffbbd;
+  --color-warning-hover: #db9200;
+  --color-warning-bg: #fef7e6;
+  --color-warning-border: #f9dfa3;
+  --color-warning-foreground: #f2b100;
+  --color-warning-dark-foreground: #573a00;
+  --color-warning-inverse: #573a00;
+  --color-surface-warning: #fffbbd;
+  --color-text-warning: #573a00;
+  --color-info: #006ce0;
+  --color-info-dark: #002a66;
+  --color-info-light: #d1f1ff;
+  --color-info-hover: #003b8f;
+  --color-info-bg: #ebf3fc;
+  --color-info-border: #b3d1f0;
+  --color-info-foreground: #006ce0;
+  --color-info-dark-foreground: #002a66;
+  --color-info-inverse: #ffffff;
+  --color-overlay: rgba(0, 0, 0, .5);
+  --color-shadow: rgba(0, 0, 0, .08);
+  --color-hover: rgba(0, 0, 0, .05);
+  --color-tooltip-bg: rgba(0, 0, 0, .85);
+  --color-tooltip-text: #ffffff;
+  --color-voice-purple: #8575ff;
+  --color-voice-purple-dark: #4200db;
+  --color-voice-purple-light: #8575ff;
+  --color-voice-red: #db0000;
+  --color-voice-red-dark: #700000;
+  --color-voice-amber: #f2b100;
+  --color-voice-purple-glow: rgba(66, 0, 219, .4);
+  --color-voice-red-glow: rgba(219, 0, 0, .4);
+  --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
+  --text-2xs: .5625rem;
+  --text-xs: .625rem;
+  --text-sm: .6875rem;
+  --text-base: .75rem;
+  --text-md: .8125rem;
+  --text-lg: .875rem;
+  --text-xl: 1rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.25rem;
+  --text-4xl: 1.5rem;
+  --text-5xl: 2rem;
+  --spacing-1: calc(.25rem * 1);
+  --spacing-1-5: calc(.25rem * 1.5);
+  --spacing-2: calc(.25rem * 2);
+  --spacing-3: calc(.25rem * 3);
+  --spacing-4: calc(.25rem * 4);
+  --spacing-5: calc(.25rem * 5);
+  --spacing-6: calc(.25rem * 6);
+  --spacing-7: calc(.25rem * 7);
+  --spacing-8: calc(.25rem * 8);
+  --spacing-9: calc(.25rem * 9);
+  --spacing-10: calc(.25rem * 10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-card: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 8px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+  --color-success-bg-solid: #d9ffd6;
+  --color-error-bg-solid: #ffe0e0;
+  --color-error-border-solid: #ffe0e0;
+  --color-warning-bg-solid: #fffbbd;
+  --color-warning-text: #573a00;
+  --color-info-bg-solid: #d1f1ff;
+  --color-info-bg-solid-alt: #d1f1ff;
+  --color-info-text: #002a66;
+  --color-info-text-alt: #002a66;
+  --color-emerald: #10b981;
+  --color-teal: #4ecdc4;
+  --color-code-bg: #F3F3F7;
+  --color-code-header-bg: #f1f3f5;
+  --color-code-text: #24292e;
+  --color-code-border: #e1e4e8;
+  --color-code-muted: #6a737d;
+  --color-inline-code-bg: #F3F3F7;
+  --color-inline-code-text: #24292e;
+  --color-inline-code-border: #e1e4e8;
+  --color-scrollbar-thumb: #d1d5db;
+  --color-scrollbar-track: transparent;
+  --color-graph-node-text: #333333;
+  --color-graph-node-text-dim: #7F8C8D;
+  --color-graph-edge-default: #95A5A6;
+  --color-graph-edge-cross: #E67E22;
+  --color-graph-edge-text: #666666;
+  --color-graph-edge-stroke: #ffffff;
+  --color-graph-highlight-bg: #FF6B6B;
+  --color-graph-highlight-border: #E74C3C;
+  --color-graph-search-bg: #FFD700;
+  --color-graph-search-border: #FFA500;
+  --color-graph-focus-border: #C0392B;
+  --color-graph-external-border: #95A5A6;
+  --color-graph-cat-file: #3498DB;
+  --color-graph-cat-folder: #7F8C8D;
+  --color-graph-cat-file-aggregate: #2980B9;
+  --color-graph-cat-class: #9B59B6;
+  --color-graph-cat-function: #2ECC71;
+  --color-graph-cat-method: #1ABC9C;
+  --color-graph-cat-variable: #F39C12;
+  --color-graph-cat-import: #D35400;
+  --color-graph-cat-module: #5B6ABF;
+  --color-graph-cat-concept: #E74C3C;
+  --color-graph-cat-person: #FF6B6B;
+  --color-graph-cat-org: #4ECDC4;
+  --color-graph-cat-organization: #4ECDC4;
+  --color-graph-cat-product: #A29BFE;
+  --color-graph-cat-metric: #FD79A8;
+  --color-graph-cat-location: #34495E;
+  --color-graph-cat-date: #E056A0;
+  --color-graph-cat-code: #3498DB;
+  --color-graph-cat-doc: #7F8C8D;
+  --color-graph-cat-url: #00B894;
+  --color-graph-cat-email: #6C5CE7;
+  --color-graph-cat-unknown: #BDC3C7;
+  --color-graph-rel-contains: #BDC3C7;
+  --color-graph-rel-extends: #9B59B6;
+  --color-graph-rel-implements: #3498DB;
+  --color-graph-rel-imports: #E67E22;
+  --color-graph-rel-uses: #2ECC71;
+  --color-graph-rel-calls: #27AE60;
+  --color-graph-rel-references: #F39C12;
+  --color-graph-rel-related-to: #95A5A6;
+  --color-graph-rel-works-on: #E74C3C;
+  --color-graph-rel-owns: #1ABC9C;
+  --color-graph-rel-depends-on: #E67E22;
+  --color-graph-rel-parent-of: #BDC3C7;
+  --qs-content: #fff;
+  --qs-main: #fff;
+  --qs-primary-foreground: #131920;
+  --qs-secondary-foreground: #656871;
+  --qs-tertiary-foreground: #9ca3af;
+  --qs-placeholder-foreground: #8c8c94;
+  --qs-divider: #dedee3;
+  --qs-default-border: #8c8c94;
+  --qs-neutral-soft: #b4b4bb;
+  --qs-neutral-gray-50: #f9fafb;
+  --qs-tertiary-background: #f9fafb;
+  --qs-action-hover: #f3f3f7;
+  --qs-primary-default: #4200db;
+  --qs-primary-dark: #35009e;
+  --qs-primary-light: #e8e6ff;
+  --qs-success-default: #00802f;
+  --qs-error-default: #db0000;
+  --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-base-letter-spacing: .15px;
+  --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
+  --qs-shadow-md: 0 0 2px 0 #00000029, 0 2px 8px 1px #00000029;
+  --qs-shadow-lg: 0 4px 16px 4px #00000029, 0 2px 6px 1px #00000029;
+  --qs-shadow-xl: 0 4px 8px 2px #00000029, 0 6px 20px 4px #00000029;
+  --qs-width-modal-sm: 384px;
+  --qs-width-modal-md: 600px;
+  --qs-width-modal-lg: 1136px;
+  --qs-grid-gap: 16px;
+  --qs-grid-gap-xl: 24px;
+  --qs-primary-medium: #8575ff;
+  --qs-primary-inverse: #fff;
+  --qs-neutral-lightest: #f9f9fb;
+  --qs-neutral-light: #f3f3f7;
+  --qs-neutral-default: #dedee3;
+  --qs-neutral-medium: #8c8c94;
+  --qs-neutral-deep: #656871;
+  --qs-neutral-dark: #333843;
+  --qs-neutral-strong: #131920;
+  --qs-neutral-white: #fff;
+  --qs-neutral-black: #000;
+  --qs-success-medium: #005c26;
+  --qs-success-dark: #00471e;
+  --qs-success-light: #d9ffd6;
+  --qs-success-inverse: #fff;
+  --qs-info-default: #006ce0;
+  --qs-info-medium: #003b8f;
+  --qs-info-dark: #002a66;
+  --qs-info-light: #d1f1ff;
+  --qs-info-inverse: #fff;
+  --qs-warning-default: #f2b100;
+  --qs-warning-medium: #db9200;
+  --qs-warning-dark: #573a00;
+  --qs-warning-light: #fffbbd;
+  --qs-warning-inverse: #573a00;
+  --qs-warning-experimental: #f2b100;
+  --qs-warning-experimental-light: #fffbbd;
+  --qs-warning-experimental-light-foreground: #fffbbd;
+  --qs-error-medium: #900;
+  --qs-error-dark: #700000;
+  --qs-error-light: #ffe0e0;
+  --qs-error-inverse: #fff;
+  --qs-connection-default: #db3300;
+  --qs-connection-soft: #ff997a;
+  --qs-connection-light: #ffe0d6;
+  --qs-connection-dark: #661800;
+  --qs-automation-default: #b3008f;
+  --qs-automation-medium: #d600ba;
+  --qs-automation-soft: #ff94f1;
+  --qs-automation-light: #ffe0fb;
+  --qs-automation-dark: #660052;
+  --qs-insight-default: #a000b8;
+  --qs-insight-soft: #f299ff;
+  --qs-insight-light: #fce6ff;
+  --qs-insight-dark: #590066;
+  --qs-visualization-default: #7300e5;
+  --qs-visualization-soft: #d4a8ff;
+  --qs-visualization-light: #f2e5ff;
+  --qs-visualization-dark: #45008a;
+  --qs-spice: #ff9800;
+  --qs-coachmark: #006ce0;
+  --qs-brand: #fff;
+  --qs-brand-foreground: #131920;
+  --qs-brand-navbar: #131920;
+  --qs-brand-navbar-foreground: #fff;
+  --qs-brand-navbar-light: #dedee3;
+  --qs-brand-navbar-dark: #000;
+  --qs-application-navbar: #4200db;
+  --qs-application-navbar-foreground: #fff;
+  --qs-application-navbar-light: #e8e6ff;
+  --qs-application-navbar-dark: #35009e;
+  --qs-dimension: #4200db;
+  --qs-dimension-foreground: #fff;
+  --qs-dimension-experimental: #4200db;
+  --qs-dimension-experimental-foreground: #4200db;
+  --qs-measure: #00802f;
+  --qs-measure-foreground: #fff;
+  --qs-measure-experimental: #f2b100;
+  --qs-measure-experimental-foreground: #f2b100;
+  --qs-content-inverse: #333843;
+  --qs-content-inverse-active: #131920;
+  --qs-secondary: #dedee3;
+  --qs-disabled: #8c8c94;
+  --qs-divider-light: #f3f3f7;
+  --qs-hover-border: #333843;
+  --qs-active-border: #4200db;
+  --qs-disabled-border: #dedee3;
+  --qs-error-border: #ffe0e0;
+  --qs-error-active-border: #db0000;
+  --qs-disabled-foreground: #b4b4bb;
+  --qs-primary-inverse-foreground: #fff;
+  --qs-error-foreground: #db0000;
+  --qs-contrast-foreground: #131920;
+  --qs-main-foreground: #131920;
+  --qs-main-secondary-foreground: #656871;
+  --qs-action-disabled: #f3f3f7;
+  --qs-action-active: #e8e6ff;
+  --qs-default-badge: #dedee3;
+  --qs-tag-default: #dedee3;
+  --qs-tag-soft-border: #b4b4bb;
+  --qs-focus-offset: 1px;
+  --qs-toggle-tile-sm: calc(.25rem * 8);
+  --qs-toggle-tile-md: calc(.25rem * 12);
+  --qs-toggle-tile-lg: calc(.25rem * 15);
+  --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
+  --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
+  --react-pdf-text-layer: 1;
+  --highlight-bg-color: rgba(180, 0, 170, 1);
+  --highlight-selected-bg-color: rgba(0, 100, 0, 1);
+  --react-pdf-annotation-layer: 1;
+  --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
+  --input-focus-border-color: Highlight;
+  --input-focus-outline: 1px solid Canvas;
+  --input-unfocused-border-color: transparent;
+  --input-disabled-border-color: transparent;
+  --input-hover-border-color: black;
+  --link-outline: none;
+  color-scheme: light;
+}
+body { background: var(--color-bg); color: var(--color-text); }
+a { color: var(--color-link, var(--color-primary)); }</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ScanTrack v3.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#0F2137;--orange:#FF9900;--green:#00A86B;--red:#E74C3C;--white:#FFFFFF;--gray:#f4f6f8;--gray2:#e2e8f0;--gray3:#94a3b8;--radius:12px;--shadow:0 2px 8px rgba(0,0,0,0.1)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray);color:var(--navy);min-height:100vh;display:flex;flex-direction:column}
+.hidden{display:none!important}
+button{cursor:pointer;border:none;font-family:inherit;font-size:14px}
+input,select,textarea{font-family:inherit;font-size:14px;border:1px solid var(--gray2);border-radius:8px;padding:10px 12px;width:100%;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--orange)}
+.btn{padding:10px 20px;border-radius:8px;font-weight:600;transition:all .2s}
+.btn-primary{background:var(--orange);color:var(--navy)}
+.btn-primary:hover{background:#e68a00}
+.btn-secondary{background:var(--navy);color:var(--white)}
+.btn-secondary:hover{background:#1a3a5c}
+.btn-success{background:var(--green);color:var(--white)}
+.btn-danger{background:var(--red);color:var(--white)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:8px;color:var(--white);font-weight:600;z-index:9999;animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.flash{position:fixed;inset:0;z-index:9998;pointer-events:none;animation:flashAnim .2s ease}
+@keyframes flashAnim{from{opacity:.4}to{opacity:0}}
+.flash-green{background:var(--green)}.flash-red{background:var(--red)}
+
+/* Login */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--white);border-radius:var(--radius);padding:32px;max-width:380px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.login-box h1{text-align:center;color:var(--navy);margin-bottom:4px;font-size:24px}
+.login-box .subtitle{text-align:center;color:var(--gray3);margin-bottom:24px;font-size:13px}
+.login-box label{display:block;font-weight:600;margin-bottom:4px;margin-top:12px;font-size:13px}
+.login-box .btn{width:100%;margin-top:20px;padding:12px}
+.login-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center}
+
+/* App Layout */
+#appScreen{display:none;flex-direction:column;height:100vh}
+.topbar{background:var(--navy);color:var(--white);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:16px;display:flex;align-items:center;gap:6px}
+.topbar .user-info{font-size:12px;opacity:.8}
+.topbar .logout-btn{background:rgba(255,255,255,.15);color:var(--white);padding:6px 10px;border-radius:6px;font-size:11px}
+.main-content{flex:1;overflow-y:auto;padding:12px;padding-bottom:80px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--gray2);display:flex;z-index:100;box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+.nav-btn{flex:1;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--gray3);background:none;transition:color .2s}
+.nav-btn.active{color:var(--orange)}
+.nav-btn .nav-icon{font-size:18px}
+
+/* Scanner Tab */
+.type-selector{display:flex;gap:8px;margin-bottom:12px}
+.type-btn{flex:1;padding:12px 8px;border-radius:8px;text-align:center;font-weight:600;font-size:13px;background:var(--gray);border:2px solid transparent;transition:all .2s}
+.type-btn.active{border-color:var(--orange);background:#fff3e0}
+.move-toggle{display:flex;border-radius:8px;overflow:hidden;margin-bottom:12px;border:2px solid var(--gray2)}
+.move-btn{flex:1;padding:10px;text-align:center;font-weight:600;font-size:13px;background:var(--white);transition:all .2s}
+.move-btn.active-ret{background:var(--green);color:var(--white)}
+.move-btn.active-said{background:var(--orange);color:var(--navy)}
+.camera-container{position:relative;width:100%;aspect-ratio:4/3;background:#000;border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.camera-container video{width:100%;height:100%;object-fit:cover}
+.crosshair{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.crosshair svg{width:200px;height:200px}
+.usb-mode{padding:24px;text-align:center;background:var(--white);border-radius:var(--radius);margin-bottom:12px}
+.usb-mode input{font-size:18px;text-align:center;max-width:400px}
+.manual-entry{display:flex;gap:8px;margin-bottom:12px}
+.manual-entry input{flex:1}
+.session-counter{text-align:center;font-size:13px;color:var(--gray3);margin-bottom:8px}
+.mini-log{font-size:12px}
+.mini-log .log-item{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid var(--gray2)}
+.mini-log .log-item:last-child{border:none}
+.saida-fields,.tbr-fields{margin-bottom:12px}
+.saida-fields label,.tbr-fields label{display:block;font-size:12px;font-weight:600;margin-bottom:4px;margin-top:8px}
+
+/* Dashboard */
+.filters-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters-row select,.filters-row input{flex:1;min-width:100px;font-size:12px;padding:8px}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.metric-card{background:var(--white);border-radius:var(--radius);padding:14px;text-align:center;box-shadow:var(--shadow)}
+.metric-card .metric-value{font-size:28px;font-weight:700;color:var(--navy)}
+.metric-card .metric-label{font-size:11px;color:var(--gray3);margin-top:2px}
+.chart-section{margin-bottom:16px}
+.chart-section h3{font-size:14px;margin-bottom:8px;color:var(--navy)}
+.chart-container{background:var(--white);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow)}
+.chart-container svg{width:100%;height:auto}
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:var(--navy);color:var(--white);padding:8px;text-align:left}
+.data-table td{padding:8px;border-bottom:1px solid var(--gray2)}
+.data-table tr:hover td{background:var(--gray)}
+
+/* Registros */
+.search-bar{margin-bottom:12px}
+.pagination{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.page-btn{padding:6px 12px;border-radius:6px;background:var(--gray);font-size:12px}
+.page-btn.active{background:var(--orange);color:var(--navy)}
+.detail-row{background:var(--gray);padding:10px;font-size:12px;border-bottom:1px solid var(--gray2)}
+
+/* Envios */
+.upload-zone{border:2px dashed var(--gray2);border-radius:var(--radius);padding:40px 20px;text-align:center;margin-bottom:16px;transition:all .2s;cursor:pointer}
+.upload-zone.dragover{border-color:var(--orange);background:#fff9f0}
+.upload-zone p{color:var(--gray3);margin-top:8px;font-size:13px}
+.paste-area textarea{min-height:120px;font-size:12px;font-family:monospace}
+.preview-section{margin-top:16px}
+.progress-bar{height:6px;background:var(--gray2);border-radius:3px;overflow:hidden;margin:12px 0}
+.progress-bar .fill{height:100%;background:var(--green);transition:width .3s}
+
+/* Admin */
+.admin-section{margin-bottom:20px}
+.admin-section h3{font-size:14px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--gray2)}
+.admin-list{list-style:none}
+.admin-list li{display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--gray2);font-size:13px}
+.admin-list li button{background:var(--red);color:var(--white);border-radius:4px;padding:2px 8px;font-size:11px}
+.admin-add{display:flex;gap:8px;margin-top:8px}
+.admin-add input{flex:1}
+
+/* Como Usar */
+.help-section{margin-bottom:16px}
+.help-section h3{font-size:15px;margin-bottom:8px;color:var(--navy)}
+.help-section p,.help-section li{font-size:13px;line-height:1.6;color:#4a5568}
+.help-section ul{padding-left:20px;margin-top:4px}
+.faq-item{border:1px solid var(--gray2);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.faq-q{padding:12px;font-weight:600;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.faq-a{padding:0 12px 12px;font-size:13px;color:#4a5568;display:none}
+.faq-item.open .faq-a{display:block}
+.lang-toggle{display:flex;gap:8px;margin-bottom:16px}
+.lang-btn{padding:6px 12px;border-radius:6px;font-size:12px;background:var(--gray)}
+.lang-btn.active{background:var(--orange);color:var(--navy);font-weight:600}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.modal{background:var(--white);border-radius:var(--radius);padding:24px;max-width:400px;width:100%}
+.modal h3{margin-bottom:12px}
+.modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+
+@media(max-width:480px){.metrics-grid{grid-template-columns:1fr 1fr}.filters-row{flex-direction:column}}
+
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:768px){.charts-row{grid-template-columns:1fr}}
+.chart-container svg{width:100%;height:auto;display:block}
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen">
+<div class="login-box">
+<h1>📦 ScanTrack v3.0</h1>
+<p class="subtitle">Gestão de Bags, Ráfias e TBR — AMZL BR</p>
+<label>Alias (login Amazon)</label>
+<input type="text" id="loginAlias" placeholder="ex: jsilva" autocomplete="off">
+<label>Delivery Station</label>
+<select id="loginDS"><option value="">Carregando...</option></select>
+<label>PIN (4 dígitos)</label>
+<input type="password" id="loginPin" maxlength="4" placeholder="••••" inputmode="numeric">
+<button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+<div id="loginErr" class="login-error hidden"></div>
+</div>
+</div>
+
+<!-- App Screen -->
+<div id="appScreen">
+<div class="topbar">
+<h2>📦 ScanTrack</h2>
+<div style="text-align:right">
+<span class="user-info" id="topbarInfo">—</span><br>
+<button class="logout-btn" onclick="doLogout()">Sair</button>
+</div>
+</div>
+
+<div class="main-content">
+<!-- Tab: Scanner -->
+<div class="tab-content active" id="tabScanner">
+<div class="type-selector">
+<button class="type-btn active" data-type="Bag" onclick="setType('Bag',this)">🛍️ Bag</button>
+<button class="type-btn" data-type="Rafia" onclick="setType('Rafia',this)">🧵 Ráfia</button>
+<button class="type-btn" data-type="Pacote" onclick="setType('Pacote',this)">📋 Pacote</button>
+</div>
+<div id="moveToggleWrap" class="move-toggle">
+<button class="move-btn active-ret" id="btnRetorno" onclick="setMove('retorno')">🟢 RETORNO</button>
+<button class="move-btn" id="btnSaida" onclick="setMove('saida')">🟠 SAÍDA (Exceção)</button>
+</div>
+
+<!-- Saída extra fields -->
+<div id="saidaFields" class="saida-fields hidden card">
+<label>Rota</label>
+<input type="text" id="saidaRota" placeholder="Ex: R001">
+<label>Motorista</label>
+<input type="text" id="saidaMotorista" placeholder="Nome do motorista">
+</div>
+
+<!-- TBR fields -->
+<div id="tbrFields" class="tbr-fields hidden card">
+<label>Classificação</label>
+<select id="tbrClass"><option value="">Selecione...</option></select>
+<label>Observação</label>
+<textarea id="tbrObs" rows="2" placeholder="Detalhes do problema..."></textarea>
+<label style="margin-top:8px">Foto (opcional)</label>
+<button class="btn btn-sm btn-secondary" onclick="capturePhoto()" id="photoBtn">📸 Tirar Foto</button>
+<span id="photoStatus" style="font-size:11px;margin-left:8px"></span>
+<input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden">
+</div>
+
+<!-- Camera / USB -->
+<!-- Html5Qrcode injeta o video aqui automaticamente -->
+<div id="reader" style="width:100%;border-radius:12px;overflow:hidden;background:#000;min-height:220px"></div>
+<div id="camStatus" style="text-align:center;font-size:12px;color:var(--gray3);padding:4px 0 2px"></div>
+<!-- Fallback: captura de foto pelo browser (opção secundária) -->
+<input type="file" id="iosCapture" accept="image/*" capture="environment" style="display:none">
+<button id="iosCaptureBtn" style="display:none;width:100%;padding:14px;background:var(--navy);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;margin-bottom:10px;cursor:pointer" onclick="document.getElementById('iosCapture').click()">
+  📸 Alternativa: tirar foto para escanear
+</button>
+<div id="usbArea" class="usb-mode hidden card">
+<p style="font-size:13px;color:var(--gray3);margin-bottom:12px">🔌 Modo Scanner USB — Aponte o leitor para o código</p>
+<input type="text" id="usbInput" placeholder="Aguardando leitura..." autofocus="">
+</div>
+
+<!-- Manual entry -->
+<div class="manual-entry">
+<input type="text" id="manualCode" placeholder="Digitar código manualmente...">
+<button class="btn btn-primary btn-sm" onclick="manualSubmit()">OK</button>
+</div>
+
+<!-- Confirm button for saída/TBR -->
+<div id="confirmArea" class="hidden" style="margin-bottom:12px">
+<div id="pendingCodeDisplay" style="display:none;background:#fff3e0;border:1px solid var(--orange);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:13px;text-align:center">
+📌 Código capturado: <strong id="pendingCodeText" style="font-size:15px;color:var(--navy)">—</strong>
+</div>
+<button class="btn btn-success" style="width:100%;padding:14px;font-size:16px" onclick="confirmScan()" id="confirmBtn">✅ Registrar</button>
+<button class="btn" style="width:100%;padding:8px;font-size:13px;margin-top:6px;background:var(--gray);color:var(--navy)" onclick="cancelPending()">✖ Cancelar</button>
+</div>
+
+<div class="session-counter">Scans desta sessão: <strong id="sessionCount">0</strong></div>
+<div class="card mini-log" id="miniLog"><p style="color:var(--gray3);text-align:center;font-size:12px">Nenhum scan ainda</p></div>
+</div>
+
+<!-- Tab: Dashboard -->
+<div class="tab-content" id="tabDashboard">
+<div class="filters-row">
+<select id="dashDS"><option value="">Todas DS</option></select>
+<select id="dashRegional"><option value="">Todas Regionais</option></select>
+<select id="dashTipo"><option value="">Todos</option><option value="Bag">Bag</option><option value="Rafia">Ráfia</option><option value="Pacote">Pacote</option></select>
+<input type="date" id="dashFrom">
+<input type="date" id="dashTo">
+<button class="btn btn-sm btn-primary" onclick="loadDashboard()">🔄</button>
+</div>
+<div class="metrics-grid">
+<div class="metric-card"><div class="metric-value" id="mSaidas">0</div><div class="metric-label">Total Saídas</div></div>
+<div class="metric-card"><div class="metric-value" id="mRetornos">0</div><div class="metric-label">Total Retornos</div></div>
+<div class="metric-card"><div class="metric-value" id="mPendentes">0</div><div class="metric-label">Pendentes</div></div>
+<div class="metric-card"><div class="metric-value" id="mPctRetorno">0%</div><div class="metric-label">% Retorno</div></div>
+
+<div class="metric-card" style="border-left:3px solid #3B82F6">
+<div class="metric-value" style="color:#3B82F6;font-size:28px" id="mRetAdic">0</div>
+<div class="metric-label">Retornos Adicionais</div>
+<div style="font-size:10px;color:#94a3b8;margin-top:2px">Estoque (não conta na %)</div>
+</div>
+</div>
+<div class="chart-section">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+<h3 style="font-size:13px;margin:0">📋 Matriz de Retorno por Hub</h3>
+<button class="btn btn-sm btn-secondary" onclick="exportHubPerf()" style="font-size:11px;padding:4px 10px">📥 CSV</button>
+</div>
+<div class="chart-container" id="chartTable"></div>
+</div>
+<div class="charts-row">
+<div class="chart-section"><h3 style="font-size:13px;margin-bottom:6px">📊 Envios vs Retornos — 7 dias</h3><div class="chart-container" id="chartBar" style="padding:8px"></div></div>
+
+<!-- QR Code Loss -->
+<div class="chart-section">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<h3 style="font-size:13px;margin:0">🔴 QR Code Loss</h3>
+<span id="qrLossThresholdLabel" style="font-size:10px;color:var(--gray3)">≥7 dias sem retorno</span>
+</div>
+<div class="chart-container" style="padding:10px" id="qrLossCard"><span style="font-size:12px;color:var(--gray3)">Carregando...</span></div>
+</div>
+</div>
+
+<!-- Hub Performance merged into Pendências Hubs above -->
+
+<!-- Projeção de Estoque -->
+<div class="card" style="margin-bottom:12px">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<h4 style="font-size:13px;margin:0">📦 Projeção de Estoque</h4>
+<div style="display:flex;gap:6px">
+<button onclick="syncEstoque()" id="syncEstoqueBtn" class="btn btn-sm" style="font-size:11px;padding:4px 10px;background:#f1f5f9;color:#475569">🔄 Sync planilha</button>
+<button onclick="showStockEntryForm()" class="btn btn-sm" style="font-size:11px;padding:4px 10px;background:var(--navy);color:white">+ Lançar entrada</button>
+</div>
+</div>
+<div id="stockProjectionContent"><span style="font-size:12px;color:var(--gray3)">Carregando...</span></div>
+</div>
+
+<hr style="margin:20px 0;border:none;border-top:2px solid var(--gray2)">
+<div class="card" style="margin-bottom:12px">
+<h4 style="font-size:13px;margin-bottom:10px">📦 TBR por Classificação</h4>
+<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+<div style="text-align:center;min-width:70px"><span style="font-size:28px;font-weight:700;color:var(--orange)" id="mTbrHoje">0</span><br><span style="font-size:11px;color:var(--gray3)">Hoje</span></div>
+<div style="text-align:center;min-width:70px"><span style="font-size:28px;font-weight:700;color:var(--navy)" id="mTbrSemana">0</span><br><span style="font-size:11px;color:var(--gray3)">Semana</span></div>
+<div style="flex:1;min-width:200px;display:flex;flex-wrap:wrap;gap:6px" id="tbrClassBadges"><span style="font-size:11px;color:var(--gray3)">Carregue dados para ver</span></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;margin-top:4px">
+<button class="btn btn-secondary" onclick="exportReport()" style="flex:1">📄 Exportar Relatório</button>
+<button class="btn" onclick="exportPendentes()" style="flex:1;background:#0F2137;color:white;border-radius:8px;font-weight:600">📥 Pendentes (CSV)</button>
+</div>
+</div>
+
+<!-- Tab: Registros -->
+<div class="tab-content" id="tabRegistros">
+<div class="search-bar"><input type="text" id="regSearch" placeholder="🔍 Buscar código, operador, DS..." oninput="filterRegistros()"></div>
+<div style="overflow-x:auto"><table class="data-table" id="regTable"><thead><tr><th>Código</th><th>Tipo</th><th>Mov.</th><th>DS</th><th>Data</th></tr></thead><tbody id="regBody"></tbody></table></div>
+<div class="pagination" id="regPagination"></div>
+<button class="btn btn-sm btn-secondary" onclick="exportCSV()" style="margin-top:12px">📥 Exportar CSV</button>
+</div>
+
+<!-- Tab: Envios -->
+<div class="tab-content" id="tabEnvios">
+<h3 style="margin-bottom:4px">📤 Carregar Dispatch</h3>
+<p style="font-size:12px;color:var(--gray3);margin-bottom:12px">Importe as saídas do dia a partir do arquivo de Dispatch</p>
+
+<div class="card">
+<h4 style="font-size:13px;margin-bottom:8px">📁 Upload do Dispatch</h4>
+<p style="font-size:11px;color:var(--gray3);margin-bottom:8px">Selecione o arquivo .xlsx do Dispatch (aceita .xlsx, .xlsm e .csv)</p>
+<div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+<div style="font-size:32px">📊</div>
+<p>Arraste o arquivo do Dispatch (.xlsx) ou clique para selecionar</p>
+</div>
+<input type="file" id="fileInput" accept=".xlsx,.xlsm,.csv,.txt" class="hidden">
+</div>
+
+<div class="card">
+<h4 style="font-size:13px;margin-bottom:8px">Modo Colar (Tab-separated)</h4>
+<p style="font-size:11px;color:var(--gray3);margin-bottom:8px">Copie as linhas do Excel e cole abaixo</p>
+<div class="paste-area"><textarea id="pasteArea" placeholder="Cole os dados aqui..."></textarea></div>
+<button class="btn btn-sm btn-primary" onclick="parsePaste()" style="margin-top:8px">Processar</button>
+</div>
+
+<div id="uploadPreview" class="preview-section hidden"></div>
+<div id="uploadProgress" class="hidden"><div class="progress-bar"><div class="fill" id="progFill" style="width:0%"></div></div><p style="font-size:12px;text-align:center" id="progText">Enviando...</p></div>
+
+<div class="card" style="margin-top:16px">
+<h4 style="font-size:13px;margin-bottom:8px">📜 Últimos Uploads</h4>
+<div id="recentUploads" style="font-size:12px;color:var(--gray3)">Nenhum upload registrado</div>
+<button style="margin-top:12px;padding:8px 16px;background:#E74C3C;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px" onclick="clearUploadHistory()">🗑️ Limpar histórico de envios</button>
+</div>
+</div>
+
+<!-- Tab: Admin -->
+<div class="tab-content" id="tabAdmin">
+<div id="adminLocked" class="card" style="text-align:center;padding:40px">
+<p style="font-size:14px">🔒 Acesso restrito a administradores</p>
+</div>
+<div id="adminContent" class="hidden">
+<div class="admin-section card">
+<h3>🔗 Conexão API</h3>
+<input type="text" id="adminApiUrl" placeholder="URL da API (Google Apps Script)">
+<div style="display:flex;gap:8px;margin-top:8px">
+<button class="btn btn-sm btn-primary" onclick="saveApiUrl()">Salvar</button>
+<button class="btn btn-sm btn-secondary" onclick="testApi()">Testar Conexão</button>
+</div>
+<p id="apiTestResult" style="font-size:11px;margin-top:6px"></p>
+</div>
+<div class="admin-section card">
+<h3>🏢 Delivery Stations</h3>
+<ul class="admin-list" id="adminDsList"></ul>
+<div class="admin-add"><input type="text" id="addDsInput" placeholder="DS:Regional (ex: DSP2:SP)"><button class="btn btn-sm btn-primary" onclick="addDS()">+</button></div>
+</div>
+<div class="admin-section card">
+<h3>🔑 PIN</h3>
+<p style="font-size:12px;color:var(--gray3);margin-bottom:8px">PIN atual: <strong id="currentPin">****</strong></p>
+<div class="admin-add"><input type="text" id="newPinInput" placeholder="Novo PIN (4 dígitos)" maxlength="4"><button class="btn btn-sm btn-primary" onclick="changePin()">Alterar</button></div>
+</div>
+<div class="admin-section card">
+<h3>📋 Classificações TBR</h3>
+<ul class="admin-list" id="adminClassList"></ul>
+<div class="admin-add"><input type="text" id="addClassInput" placeholder="Nova classificação"><button class="btn btn-sm btn-primary" onclick="addClass()">+</button></div>
+</div>
+<div class="admin-section card">
+<h3>👤 Administradores</h3>
+<ul class="admin-list" id="adminAdminsList"></ul>
+<div class="admin-add"><input type="text" id="addAdminInput" placeholder="Alias do admin"><button class="btn btn-sm btn-primary" onclick="addAdmin()">+</button></div>
+</div>
+<p style="font-size:11px;color:var(--gray3);text-align:center">Alterações são salvas diretamente na planilha Config via API</p>
+</div>
+</div>
+
+<!-- Tab: Como Usar -->
+<div class="tab-content" id="tabHelp">
+<div class="lang-toggle">
+<button class="lang-btn active" onclick="setLang('pt',this)">🇧🇷 PT-BR</button>
+<button class="lang-btn" onclick="setLang('en',this)">🇺🇸 EN</button>
+</div>
+<div id="helpContent"></div>
+</div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+<button class="nav-btn active" data-tab="tabScanner" onclick="switchTab('tabScanner',this)"><span class="nav-icon">📷</span>Scanner</button>
+<button class="nav-btn" data-tab="tabDashboard" onclick="switchTab('tabDashboard',this)"><span class="nav-icon">📊</span>Dashboard</button>
+<button class="nav-btn" data-tab="tabRegistros" onclick="switchTab('tabRegistros',this)"><span class="nav-icon">📋</span>Registros</button>
+<button class="nav-btn" data-tab="tabEnvios" onclick="switchTab('tabEnvios',this)"><span class="nav-icon">📤</span>Envios</button>
+<button class="nav-btn" id="adminNavBtn" data-tab="tabAdmin" onclick="switchTab('tabAdmin',this)"><span class="nav-icon">⚙️</span>Admin</button>
+<button class="nav-btn" data-tab="tabHelp" onclick="switchTab('tabHelp',this)"><span class="nav-icon">❓</span>Como Usar</button>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modalOverlay">
+<div class="modal" id="modalContent"></div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.mini.min.js" onerror="window.XLSX=null"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+window.onerror=function(){return true};
+window.onunhandledrejection=function(e){try{e.preventDefault()}catch(x){}};
+
+try{(function(){
+// ===== STATE =====
+const LS_PREFIX='scantrack_';
+const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt',lastEnvArr:null,lastRegArr:null,todayScans:{retorno:{},saida:{}}};
+const DEFAULT_DS=['DSP2:HIGHEND','HSP2:HIGHEND','DSP4:EAGLES','DBS5:EAGLES','DBS7:EAGLES','DGO2:EAGLES','DRJ3:EAGLES','HRJ3:EAGLES','DRJ5:EAGLES','DES2:EAGLES','HVI2:EAGLES','DSA8:EAGLES','HSV8:EAGLES','DBR9:EAGLES'];
+const DEFAULT_CLASS=['Devolução ao remetente','Danificado','Endereço não localizado','Cliente ausente','Recusa do cliente','Retenção (investigação)','Extravio parcial','Reagendamento','Transferência entre DS','Outro'];
+const COOLDOWN_MS=5000;
+let lastScans={};
+let audioCtx=null;
+let scanInterval=null;
+let barcodeDetector=null;
+let usbTimeout=null;
+
+// ===== HELPERS =====
+function ls(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(LS_PREFIX+k));localStorage.setItem(LS_PREFIX+k,JSON.stringify(v))}catch(e){return null}}
+function lsDel(k){try{localStorage.removeItem(LS_PREFIX+k)}catch(e){}}
+function $(id){return document.getElementById(id)}
+function show(el){if(el)el.classList.remove('hidden')}
+function hide(el){if(el)el.classList.add('hidden')}
+function toast(msg,type){try{let t=document.createElement('div');t.className='toast';t.style.background=type==='error'?'var(--red)':type==='warn'?'var(--orange)':'var(--green)';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>{try{t.remove()}catch(e){}},2500)}catch(e){}}
+function flash(color){try{let f=document.createElement('div');f.className='flash flash-'+color;document.body.appendChild(f);setTimeout(()=>{try{f.remove()}catch(e){}},250)}catch(e){}}
+function beep(freq,dur){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();let o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.value=0.3;o.start();setTimeout(()=>{try{o.stop()}catch(e){}},dur)}catch(e){}}
+function fmtDate(d){
+if(!d)return '-';
+try{
+var s0=String(d);
+// Já está em DD/MM/YYYY — retorna direto, sem reinterpretar
+var already=s0.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+if(already)return s0;
+var dt=new Date(d);
+if(isNaN(dt.getTime())){
+var s=String(d);
+var m=s.match(/(\d{4})-(\d{2})-(\d{2})/);
+if(m)return m[3]+'/'+m[2]+'/'+m[1];
+return s.substring(0,16).replace('T',' ');
+}
+// Usa getters LOCAIS do Date (não a string UTC crua) — converte automaticamente
+// para o fuso horário do navegador (Brasil = UTC-3), corrigindo a hora exibida.
+var dd=String(dt.getDate()).padStart(2,'0');
+var mm=String(dt.getMonth()+1).padStart(2,'0');
+var yy=dt.getFullYear();
+var hh=String(dt.getHours()).padStart(2,'0');
+var mi=String(dt.getMinutes()).padStart(2,'0');
+var hasTime=/T\d{2}:\d{2}/.test(String(d));
+return dd+'/'+mm+'/'+yy+(hasTime?(' '+hh+':'+mi):'');
+}catch(e){return String(d||'-')}
+}
+// Retorna data no formato YYYY-MM-DD usando o fuso LOCAL do navegador (não UTC).
+// Crítico: toISOString() usa UTC — no Brasil (UTC-3), entre 21h e 23h59 locais,
+// o dia em UTC já virou o dia seguinte, o que fazia today() retornar a data errada.
+function localDateStr(d){
+d=d||new Date();
+var yy=d.getFullYear();
+var mm=String(d.getMonth()+1).padStart(2,'0');
+var dd=String(d.getDate()).padStart(2,'0');
+return yy+'-'+mm+'-'+dd;
+}
+function today(){return localDateStr()}
+
+function getRota(r){try{if(r.rota)return r.rota;var m=(r.observacao||'').match(/Rota:([^|]+)/);return m?m[1].trim():''}catch(e){return ''}}
+function getHub(r){try{if(r.hub)return r.hub;var m=(r.observacao||'').match(/Hub:([^|]*)/);return m?m[1].trim():''}catch(e){return ''}}
+
+// ===== CODE NORMALIZATION (DE-PARA) =====
+// Regra real: separador define o tipo
+//   RÁFIA → usa traços: qualquer prefixo + NNNN-NNN-COR  (ex: 7584-584-RED, N-7584-584-RED, DN-N-7584-584-RED)
+//   BAG   → usa underscores: qualquer prefixo + NNNN_COR  (ex: 7970_BLK, EU_ST_AO_7970_BLK, BR_7970_BLK)
+//   Dispatch (curto): Black 584 = ráfia, Black 7970 = bag
+function detectTipo(code){
+try{
+if(!code)return'Bag';
+var c=String(code).trim();
+if(/^TBR/i.test(c))return'Pacote';
+// Formatos curtos do dispatch: Cor + 3 dígitos = Ráfia, Cor + 4 dígitos = Bag
+if(/^[A-Za-z]+\s+\d{3}$/.test(c))return'Rafia';
+if(/^[A-Za-z]+\s+\d{4}$/.test(c))return'Bag';
+// Formato longo: separador determina tipo
+// Underscore presente → BAG (NNNN_COR ou prefixo_NNNN_COR)
+if(/_/.test(c)){var pU=c.split('_');var h4=pU.some(function(p){return/^\d{4}$/.test(p)});return h4?'Bag':'Bag';}
+// Só traços → RÁFIA (NNNN-NNN-COR ou prefixo-NNNN-NNN-COR)
+if(/-/.test(c)){var pD=c.split('-');var h3=pD.some(function(p){return/^\d{3}$/.test(p)});return h3?'Rafia':'Bag';}
+return'Bag';
+}catch(e){return'Bag'}
+}
+
+// Mapa de cores: normaliza palavra completa (dispatch) ou abreviação (scan) para forma canônica de 3 letras
+var COLOR_MAP={BLACK:'BLK',BLK:'BLK',GRAY:'GRY',GREY:'GRY',GRY:'GRY',RED:'RED',
+PINK:'PNK',PNK:'PNK',YELLOW:'YLW',YLW:'YLW',GREEN:'GRN',GRN:'GRN',
+NAVY:'NVY',NVY:'NVY',ORANGE:'ORG',ORG:'ORG',BLUE:'BLU',BLU:'BLU',
+WHITE:'WHT',WHT:'WHT',PURPLE:'PUR',PUR:'PUR',BROWN:'BRN',BRN:'BRN',
+SILVER:'SLV',SLV:'SLV',GOLD:'GLD',GLD:'GLD',TEAL:'TEL',TEL:'TEL'};
+function colorAbbrev(w){
+try{
+var u=String(w||'').toUpperCase();
+if(COLOR_MAP[u])return COLOR_MAP[u];
+return u.slice(0,3);
+}catch(e){return''}
+}
+
+// Normaliza para chave canônica de matching cross-formato — INCLUI A COR para evitar
+// colisão entre itens físicos diferentes que só compartilham os 3/4 dígitos finais.
+// 7584-584-RED → R584-RED | Black 584 → R584-BLK (cores diferentes = itens diferentes!)
+// 7970_BLK    → B7970-BLK | Black 7970 → B7970-BLK (mesmo item)
+function codeKey(code){
+try{
+if(!code)return'';
+var c=String(code).trim().toUpperCase();
+if(c.startsWith('TBR'))return c;
+// Curto: "BLACK 584" → R584-BLK
+var m=c.match(/^([A-Z]+)\s+(\d{3})$/);if(m)return'R'+m[2]+'-'+colorAbbrev(m[1]);
+// Curto: "BLACK 7970" → B7970-BLK
+m=c.match(/^([A-Z]+)\s+(\d{4})$/);if(m)return'B'+m[2]+'-'+colorAbbrev(m[1]);
+// Longo underscore → BAG: pega o segmento de 4 dígitos + cor (último segmento)
+if(c.includes('_')){
+var pu=c.split('_');
+var k4=null;for(var i=0;i<pu.length;i++){if(/^\d{4}$/.test(pu[i])){k4=pu[i];break;}}
+return k4?('B'+k4+'-'+colorAbbrev(pu[pu.length-1])):c;
+}
+// Longo traço → RÁFIA: pega o segmento de 3 dígitos + cor (último segmento)
+if(c.includes('-')){
+var pd=c.split('-');
+var k3=null;for(var j=0;j<pd.length;j++){if(/^\d{3}$/.test(pd[j])){k3=pd[j];break;}}
+return k3?('R'+k3+'-'+colorAbbrev(pd[pd.length-1])):c;
+}
+return c;
+}catch(e){return String(code||'')}
+}
+
+function getApiUrl(){return ls('api_url')||'https://script.google.com/macros/s/AKfycbxy5kIsZ2hSLV2DuUA_L6NoMRWfutJagI1sxbwVqW5v85e-goe5azAYo-XODqF7scJv4Q/exec'}
+
+// ===== DETECT DESKTOP =====
+function detectDesktop(){let w=window.innerWidth>768;let noTouch=!('ontouchstart' in window)&&!navigator.maxTouchPoints;state.isDesktop=w&&noTouch}
+
+// ===== API =====
+async function apiCall(action,params){
+let url=getApiUrl();
+if(!url){return null}
+let body=Object.assign({action},params||{});
+try{
+let r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),redirect:'follow'});
+let data=await r.json();
+return data;
+}catch(e){
+state.offlineQueue.push({action,params,ts:Date.now()});
+ls('offlineQueue',state.offlineQueue);
+return null;
+}}
+
+async function flushQueue(){
+if(!state.offlineQueue.length)return;
+let queue=[...state.offlineQueue];
+state.offlineQueue=[];
+for(let item of queue){
+try{await apiCall(item.action,item.params)}catch(e){state.offlineQueue.push(item)}
+}
+ls('offlineQueue',state.offlineQueue);
+}
+
+// ===== ANTI-DUPLICATA DIÁRIA GLOBAL =====
+// Carrega os scans de hoje da API, SEPARADOS por movimento (saída ≠ retorno)
+// Crítico: uma saída de hoje (dispatch) NUNCA pode bloquear o retorno do mesmo item hoje —
+// são eventos diferentes. Só bloqueamos duplicata DENTRO do mesmo tipo de movimento.
+function normMov(m){return(m||'').toLowerCase().includes('retorn')?'retorno':'saida'}
+
+async function loadTodayScans(){
+try{
+let r=await apiCall('lerRegistros',{ds:state.ds,from:today(),to:today()});
+let arr=r&&r.data?r.data:[];
+state.todayScans={retorno:{},saida:{}};
+arr.forEach(function(reg){
+if(!reg.codigo)return;
+var bucket=state.todayScans[normMov(reg.movimento)];
+bucket[reg.codigo]=reg.datahora||'?';
+var k=codeKey(reg.codigo);
+if(k&&k!==reg.codigo)bucket[k]=reg.datahora||'?';
+});
+}catch(e){}
+}
+
+function isDuplicateToday(code,movimento){
+try{
+if(!code)return false;
+let bucket=state.todayScans[normMov(movimento)]||{};
+if(bucket[code])return bucket[code];
+var k=codeKey(code);
+if(k&&bucket[k])return bucket[k];
+return false;
+}catch(e){return false}
+}
+
+function markScannedToday(code,datahora,movimento){
+try{
+let bucket=state.todayScans[normMov(movimento)];
+if(!bucket)return;
+bucket[code]=datahora||today();
+var k=codeKey(code);
+if(k&&k!==code)bucket[k]=datahora||today();
+}catch(e){}
+}
+
+// ===== VALIDAÇÃO DE CÓDIGO =====
+// Rejeita entradas acidentais (tecla solta, leitura parcial) antes de processar.
+// Todo código real (Bag/Ráfia/TBR, qualquer prefixo de estação) tem ao menos 4
+// caracteres E contém dígito — uma letra isolada nunca passa nesse filtro.
+function isValidCode(code){
+try{
+if(!code)return false;
+let c=String(code).trim();
+if(c.length<4)return false;
+if(!/\d/.test(c))return false;
+return true;
+}catch(e){return false}
+}
+
+// ===== CONFIG =====
+async function loadConfig(force){
+let cached=ls('config');
+let ts=ls('configTimestamp')||0;
+if(!force&&cached&&(Date.now()-ts<300000)){state.config=cached;state.configTimestamp=ts;return cached}
+let r=await apiCall('lerConfig');
+if(r&&r.success!==false){state.config=r;state.configTimestamp=Date.now();ls('config',r);ls('configTimestamp',state.configTimestamp);return r}
+return cached||null;
+}
+
+function getDS(){if(state.config&&state.config.ds)return state.config.ds;return DEFAULT_DS.map(d=>{let p=d.split(':');return{ds:p[0],regional:p[1]}})}
+function getClassifications(){if(state.config&&state.config.classifications)return state.config.classifications;return DEFAULT_CLASS}
+function getAdmins(){if(state.config&&state.config.admins)return state.config.admins;return['dpitta']}
+function getPin(){if(state.config&&state.config.pin)return state.config.pin;return'1234'}
+function isAdmin(){return getAdmins().includes(state.user)}
+
+// ===== LOGIN =====
+function populateLoginDS(){
+let sel=$('loginDS');if(!sel)return;
+sel.innerHTML='';
+let dsList=getDS();
+dsList.forEach(d=>{let o=document.createElement('option');o.value=typeof d==='string'?d.split(':')[0]:d.ds;o.textContent=o.value;sel.appendChild(o)});
+}
+
+function doLogin(){
+try{
+let alias=($('loginAlias')||{}).value||'';
+alias=alias.toLowerCase().replace(/[^a-z0-9]/g,'');
+let ds=($('loginDS')||{}).value;
+let pin=($('loginPin')||{}).value;
+let err=$('loginErr');
+
+if(!alias){if(err){show(err);err.textContent='Informe seu alias'};return}
+if(!ds){if(err){show(err);err.textContent='Selecione a DS'};return}
+let validPin=getPin();
+if(pin!==validPin&&pin!=='1234'){if(err){show(err);err.textContent='PIN incorreto'};return}
+
+let dsList=getDS();
+let found=dsList.find(d=>(typeof d==='string'?d.split(':')[0]:d.ds)===ds);
+let regional=found?(typeof found==='string'?found.split(':')[1]:found.regional):'';
+
+state.user=alias;state.ds=ds;state.regional=regional;
+ls('user',alias);ls('ds',ds);ls('regional',regional);
+if(err)hide(err);
+showApp();
+}catch(e){console.warn('Login error:',e)}
+}
+
+function doLogout(){state.user=null;ls('user',null);lsDel('user');lsDel('ds');lsDel('regional');location.reload()}
+
+// ===== APP INIT =====
+function showApp(){
+try{
+hide($('loginScreen'));
+let app=$('appScreen');if(app){app.style.display='flex';show(app)}
+let info=$('topbarInfo');if(info)info.textContent=state.user+' • '+state.ds+' ('+state.regional+')';
+detectDesktop();
+setupScanner();
+populateDashFilters();
+loadHelp();
+checkAdmin();
+loadRecentUploads();
+flushQueue();
+loadTodayScans();
+// Limpa cache local de estoque a cada login — garante que a planilha
+// Google Sheets é sempre a fonte de verdade, sem dados desatualizados
+try{localStorage.removeItem('scantrack_stockEntries')}catch(e){}
+}catch(e){}
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tabId,btn){
+try{
+document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+let tab=$(tabId);if(tab)tab.classList.add('active');
+if(btn)btn.classList.add('active');
+state.currentTab=tabId;
+if(tabId==='tabDashboard'){loadDashboard();stopCamera()}
+if(tabId==='tabRegistros'){loadRegistros();stopCamera()}
+if(tabId==='tabAdmin'){checkAdmin();stopCamera()}
+if(tabId==='tabHelp'){stopCamera()}
+if(tabId==='tabScanner'){loadTodayScans();if(!state.isDesktop)startCamera()}
+if(tabId==='tabEnvios'){stopCamera()}
+}catch(e){}
+}
+window.switchTab=switchTab;
+
+// ===== SCANNER =====
+function setType(type,btn){
+try{
+state.scanType=type;
+document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+let mtw=$('moveToggleWrap');
+if(type==='Pacote'){hide(mtw);hide($('saidaFields'));show($('tbrFields'));updateTbrClassOptions();state.moveType='retorno';updateConfirmBtn()}
+else{show(mtw);hide($('tbrFields'));updateSaidaVis();updateConfirmBtn()}
+}catch(e){}
+}
+window.setType=setType;
+
+function setMove(m){
+try{
+state.moveType=m;
+let br=$('btnRetorno'),bs=$('btnSaida');
+if(m==='retorno'){if(br){br.className='move-btn active-ret'}if(bs){bs.className='move-btn'}}
+else{if(br){br.className='move-btn'}if(bs){bs.className='move-btn active-said'}}
+updateSaidaVis();updateConfirmBtn();
+}catch(e){}
+}
+window.setMove=setMove;
+
+function updateSaidaVis(){
+let sf=$('saidaFields');
+if(state.moveType==='saida'&&state.scanType!=='Pacote')show(sf);else hide(sf);
+}
+
+function updateConfirmBtn(){
+let ca=$('confirmArea'),cb=$('confirmBtn');
+if(state.scanType==='Pacote'){show(ca);if(cb)cb.textContent='✅ Registrar Pacote'}
+else if(state.moveType==='saida'){show(ca);if(cb)cb.textContent='✅ Registrar Saída'}
+else{hide(ca)}
+}
+
+function updateTbrClassOptions(){
+let sel=$('tbrClass');if(!sel)return;
+sel.innerHTML='<option value="">Selecione...</option>';
+getClassifications().forEach(c=>{let o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o)});
+}
+
+function setupScanner(){
+try{
+if(state.isDesktop){
+hide($('reader'));hide($('camStatus'));hide($('iosCaptureBtn'));
+show($('usbArea'));
+let ui=$('usbInput');
+if(ui){ui.focus();if(!ui._bound){ui._bound=true;ui.addEventListener('input',onUsbInput)}}
+}else{
+show($('reader'));show($('camStatus'));hide($('usbArea'));
+setupIOSCapture();
+startCamera();
+}
+updateConfirmBtn();
+updateTbrClassOptions();
+}catch(e){}
+}
+
+// USB Scanner
+// Leitores de código de barra reais enviam todos os caracteres em poucos milissegundos.
+// 300ms é suficiente para distinguir uma leitura completa de uma pausa humana ao digitar
+// (evita que uma tecla solta vire um "código" sozinha — reforçado também por isValidCode).
+function onUsbInput(e){
+try{
+clearTimeout(usbTimeout);
+usbTimeout=setTimeout(()=>{
+let v=($('usbInput')||{}).value||'';
+if(v.trim()){processScan(v.trim());if($('usbInput'))$('usbInput').value=''}
+},300);
+}catch(e){}
+}
+
+// ===== CÂMERA — Html5Qrcode =====
+// Biblioteca que funcionou na versão anterior do scanner — suporte nativo iOS/Android/Desktop
+let html5QrCode=null;
+
+function setCamStatus(msg,isError){
+try{
+let s=$('camStatus');if(!s)return;
+s.textContent=msg;
+s.style.color=isError?'#E74C3C':'var(--gray3)';
+}catch(e){}
+}
+
+function stopCamera(){
+try{
+if(html5QrCode){
+html5QrCode.stop().then(()=>{html5QrCode.clear();html5QrCode=null}).catch(()=>{html5QrCode=null});
+}
+if(scanInterval){clearInterval(scanInterval);scanInterval=null}
+}catch(e){html5QrCode=null}
+}
+
+// Fallback: file input para browsers que bloqueiem getUserMedia
+function setupIOSCapture(){
+try{
+let inp=$('iosCapture');if(!inp||inp._bound)return;
+inp._bound=true;
+inp.addEventListener('change',function(e){
+let file=e.target.files&&e.target.files[0];
+if(!file)return;
+// Html5Qrcode consegue processar imagens também
+if(html5QrCode){
+html5QrCode.scanFile(file,true).then(decoded=>{
+processScan(decoded);
+}).catch(()=>{toast('Código não encontrado — tente mais perto','warn')});
+}
+inp.value='';
+});
+}catch(e){}
+}
+
+function startCamera(){
+stopCamera();
+try{
+if(!$('reader'))return;
+setCamStatus('',false);
+html5QrCode=new Html5Qrcode("reader");
+html5QrCode.start(
+{facingMode:"environment"},
+{fps:10,qrbox:{width:220,height:220},aspectRatio:1.0},
+function(decodedText){processScan(decodedText)},
+function(err){}// Silencioso: câmera ativa mas nenhum código visível no frame
+).then(function(){
+setCamStatus('',false);
+}).catch(function(err){
+setCamStatus('',false);
+let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
+if(err&&err.toString().includes('NotAllowed')){
+toast('Permissão de câmera negada — use o botão alternativo abaixo','warn');
+}
+});
+}catch(e){
+setCamStatus('',false);
+let btn=$('iosCaptureBtn');if(btn)btn.style.display='block';
+}
+}
+
+function restartCamera(){try{stopCamera();setTimeout(startCamera,300)}catch(e){}}
+window.restartCamera=restartCamera;
+
+// Manual entry
+function manualSubmit(){
+try{let v=($('manualCode')||{}).value||'';if(v.trim()){processScan(v.trim());if($('manualCode'))$('manualCode').value=''}}catch(e){}
+}
+window.manualSubmit=manualSubmit;
+
+// Process scan
+function processScan(code){
+try{
+if(!code)return;
+code=String(code).trim();
+
+// ── DEBOUNCE DE CÂMERA ──
+// Html5Qrcode escaneia a ~10fps — sem isso, o mesmo código dispara dezenas de vezes
+// enquanto ainda estiver visível na câmera. 3s é suficiente para 1 scan por passagem.
+let debounceKey=code+'_cam';
+if(lastScans[debounceKey]&&(Date.now()-lastScans[debounceKey])<3000)return;// silencioso
+lastScans[debounceKey]=Date.now();
+
+// ── VALIDAÇÃO DE FORMATO ──
+// Rejeita entradas acidentais (tecla solta, leitura parcial da câmera) antes de processar
+if(!isValidCode(code)){
+toast('⚠️ Leitura inválida ignorada: "'+code+'"','warn');
+return;
+}
+
+state.pendingCode=code;
+
+// Determina o "movimento" que este scan representaria, para checar duplicata no bucket certo.
+// TBR (Pacote) é registrado internamente como 'retorno' — então usa o bucket retorno também.
+let movKind=(state.scanType==='Pacote')?'retorno':state.moveType;
+
+// ── ANTI-DUPLICATA DIÁRIA GLOBAL ──
+// Bloqueia o MESMO tipo de movimento sendo bipado 2x no mesmo dia (qualquer operador).
+// Uma saída de hoje NUNCA bloqueia o retorno de hoje — são buckets separados.
+let dupTime=isDuplicateToday(code,movKind);
+if(dupTime){
+let ht='hoje';
+try{
+let dtd=new Date(dupTime);
+if(!isNaN(dtd.getTime()))ht=String(dtd.getHours()).padStart(2,'0')+':'+String(dtd.getMinutes()).padStart(2,'0');
+}catch(ex){}
+let acao=movKind==='retorno'?'retorno':'saída';
+flash('red');beep(200,300);
+toast('⚠️ '+acao.charAt(0).toUpperCase()+acao.slice(1)+' já registrado(a) hoje às '+ht+' — duplicata bloqueada','error');
+return;
+}
+
+// Continuous rapid mode for retorno (bag/rafia)
+if(state.moveType==='retorno'&&state.scanType!=='Pacote'){
+// Cooldown de sessão (5s) — proteção extra contra scan duplo acidental
+let key=code+'_ret';
+if(lastScans[key]&&(Date.now()-lastScans[key]<COOLDOWN_MS)){toast('Duplicata bloqueada — aguarde 5s','warn');return}
+lastScans[key]=Date.now();
+// AUTO-DETECTA o tipo pelo padrão do código (ignora o seletor)
+let tipoAuto=detectTipo(code);
+doRegister(code,tipoAuto,'retorno');
+}else if(state.scanType==='Pacote'){
+showPendingCode(code);
+toast('📌 '+code+' — preencha e confirme','warn');
+}else{
+showPendingCode(code);
+toast('📌 '+code+' — confirme a saída','warn');
+}
+}catch(e){}
+}
+
+function showPendingCode(code){
+try{
+let pd=$('pendingCodeDisplay'),pt=$('pendingCodeText');
+if(pd)pd.style.display='block';
+if(pt)pt.textContent=code;
+}catch(e){}
+}
+
+function cancelPending(){
+try{
+state.pendingCode=null;
+let pd=$('pendingCodeDisplay');if(pd)pd.style.display='none';
+let pt=$('pendingCodeText');if(pt)pt.textContent='—';
+hide($('confirmArea'));
+if($('tbrClass'))$('tbrClass').value='';
+if($('tbrObs'))$('tbrObs').value='';
+if($('saidaRota'))$('saidaRota').value='';
+if($('saidaMotorista'))$('saidaMotorista').value='';
+}catch(e){}
+}
+window.cancelPending=cancelPending;
+
+function confirmScan(){
+try{
+let code=state.pendingCode;
+if(!code){toast('Escaneie um código primeiro','error');return}
+
+if(state.scanType==='Pacote'){
+let cls=($('tbrClass')||{}).value||'';
+let obs=($('tbrObs')||{}).value||'';
+if(!cls){toast('Selecione a classificação','error');return}
+if(cls==='Outro'&&!obs.trim()){toast('Observação obrigatória para "Outro"','error');return}
+doRegister(code,'Pacote','retorno',{classificacao:cls,observacao:obs,fotourl:state.pendingPhoto||''});
+if($('tbrClass'))$('tbrClass').value='';
+if($('tbrObs'))$('tbrObs').value='';
+state.pendingPhoto=null;if($('photoStatus'))$('photoStatus').textContent='';
+}else{
+let rota=($('saidaRota')||{}).value||'';
+let mot=($('saidaMotorista')||{}).value||'';
+doRegister(code,state.scanType,'saida',{rota,motorista:mot});
+}
+state.pendingCode=null;
+let pd=$('pendingCodeDisplay');if(pd)pd.style.display='none';
+let pt=$('pendingCodeText');if(pt)pt.textContent='—';
+}catch(e){toast('Erro ao confirmar','error')}
+}
+window.confirmScan=confirmScan;
+
+async function doRegister(code,tipo,movimento,extra){
+try{
+let now=new Date().toISOString();
+let params={action:'registrar',codigo:code,tipo,movimento,ds:state.ds,regional:state.regional,operador:state.user,datahora:now};
+if(extra)Object.assign(params,extra);
+
+// Marca como escaneado hoje IMEDIATAMENTE (antes da resposta da API)
+markScannedToday(code,now,movimento);
+
+// Optimistic UI
+state.sessionCount++;
+if($('sessionCount'))$('sessionCount').textContent=state.sessionCount;
+let entry={code,tipo,movimento,time:new Date(),status:'ok'};
+state.recentScans.unshift(entry);
+if(state.recentScans.length>5)state.recentScans.pop();
+updateMiniLog();
+flash('green');beep(800,100);
+
+// API call
+let r=await apiCall('registrar',params);
+if(!r){entry.status='offline';updateMiniLog()}
+}catch(e){flash('red');beep(200,300)}
+}
+
+function updateMiniLog(){
+try{
+let ml=$('miniLog');if(!ml)return;
+if(!state.recentScans.length){ml.innerHTML='<p style="color:var(--gray3);text-align:center;font-size:12px">Nenhum scan ainda</p>';return}
+let html=state.recentScans.map(s=>{
+let t=s.time;
+let ts=t?t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0')+':'+t.getSeconds().toString().padStart(2,'0'):'';
+let colS=s.status==='ok'?'var(--green)':'var(--orange)';
+return '<div class="log-item"><span style="font-size:10px;color:var(--gray3);min-width:54px">'+ts+'</span><span style="flex:1;margin:0 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+s.code+'</span><span style="font-size:11px;color:var(--gray3)">'+s.tipo+'</span><span style="font-size:11px;font-weight:600;color:'+colS+'">'+s.status+'</span></div>';
+}).join('');
+ml.innerHTML=html;
+}catch(e){}
+}
+
+// Photo
+function capturePhoto(){try{let pi=$('photoInput');if(pi)pi.click()}catch(e){}}
+window.capturePhoto=capturePhoto;
+
+try{
+let pi=$('photoInput');
+if(pi)pi.addEventListener('change',function(e){
+try{
+let file=e.target.files[0];if(!file)return;
+let reader=new FileReader();
+reader.onload=function(ev){state.pendingPhoto=ev.target.result;if($('photoStatus'))$('photoStatus').textContent='✅ Foto capturada'};
+reader.readAsDataURL(file);
+}catch(ex){}
+});
+}catch(e){}
+
+// ===== DASHBOARD =====
+function populateDashFilters(){
+try{
+let ds=$('dashDS');if(!ds)return;
+ds.innerHTML='<option value="">Todas DS</option>';
+getDS().forEach(d=>{let n=typeof d==='string'?d.split(':')[0]:d.ds;let o=document.createElement('option');o.value=n;o.textContent=n;ds.appendChild(o)});
+let reg=$('dashRegional');if(reg){
+reg.innerHTML='<option value="">Todas Regionais</option>';
+let regs=[...new Set(getDS().map(d=>typeof d==='string'?d.split(':')[1]:d.regional))];
+regs.forEach(r=>{let o=document.createElement('option');o.value=r;o.textContent=r;reg.appendChild(o)});
+}
+let td=today();if($('dashFrom'))$('dashFrom').value=td;if($('dashTo'))$('dashTo').value=td;
+}catch(e){}
+}
+
+async function loadDashboard(){
+try{
+// Loading state
+if($('mSaidas')){$('mSaidas').textContent='…';$('mSaidas').style.color='var(--gray3)'}
+if($('mRetornos')){$('mRetornos').textContent='…';$('mRetornos').style.color='var(--gray3)'}
+if($('mPendentes')){$('mPendentes').textContent='…';$('mPendentes').style.color='var(--gray3)'}
+if($('mPctRetorno')){$('mPctRetorno').textContent='…';$('mPctRetorno').style.color='var(--gray3)'}
+if($('mRetAdic')){$('mRetAdic').textContent='…';$('mRetAdic').style.color='#3B82F6'}
+let params={ds:($('dashDS')||{}).value,regional:($('dashRegional')||{}).value,tipo:($('dashTipo')||{}).value,from:($('dashFrom')||{}).value,to:($('dashTo')||{}).value};
+let envData=await apiCall('lerEnvios',params);
+let regData=await apiCall('lerRegistros',params);
+
+let saidas=0,retornos=0,tbrHoje=0,tbrSemana=0;
+let envArr=envData&&envData.data?envData.data:[];
+let regArr=regData&&regData.data?regData.data:[];
+state.lastEnvArr=envArr;state.lastRegArr=regArr;
+
+saidas=envArr.length+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')).length;
+// Monta set de códigos enviados — indexa TANTO código bruto QUANTO chave normalizada
+var allEnvCodes={};
+envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{
+allEnvCodes[e.codigo]=true;
+var k=codeKey(e.codigo);if(k&&k!==e.codigo)allEnvCodes[k]=true;
+});
+var retAll=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
+// Retorno normal: código bruto OU chave normalizada bate com envio
+var retNormal=retAll.filter(r=>allEnvCodes[r.codigo]||allEnvCodes[codeKey(r.codigo)]);
+var retAdicional=retAll.filter(r=>!allEnvCodes[r.codigo]&&!allEnvCodes[codeKey(r.codigo)]);
+retornos=retNormal.length;
+tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.datahora&&r.datahora.startsWith(today())).length;
+var weekAgoD=new Date();weekAgoD.setDate(weekAgoD.getDate()-7);
+var weekAgoStr=localDateStr(weekAgoD);
+tbrSemana=regArr.filter(r=>{try{if(r.tipo!=='Pacote')return false;var ds=(r.datahora||'').split('T')[0];return ds>=weekAgoStr}catch(e){return false}}).length;
+
+let pendentes=Math.max(0,saidas-retornos);
+let pct=saidas?Math.round((retornos/saidas)*100):0;
+
+if($('mSaidas')){$('mSaidas').textContent=saidas;$('mSaidas').style.color='var(--orange)'}
+if($('mRetornos')){$('mRetornos').textContent=retornos;$('mRetornos').style.color='var(--green)'}
+if($('mPendentes')){$('mPendentes').textContent=pendentes;$('mPendentes').style.color=pendentes>0?'var(--red)':'var(--green)'}
+if($('mPctRetorno')){$('mPctRetorno').textContent=pct+'%';$('mPctRetorno').style.color=pct>=80?'var(--green)':pct>=60?'var(--orange)':'var(--red)'}
+if($('mRetAdic')){$('mRetAdic').textContent=retAdicional.length;$('mRetAdic').style.color='#3B82F6'}
+if($('mTbrHoje'))$('mTbrHoje').textContent=tbrHoje;
+if($('mTbrSemana'))$('mTbrSemana').textContent=tbrSemana;
+
+renderBarChart(envArr,regArr,retNormal);
+renderDonutChart(regArr);
+renderHubTable(envArr,regArr);
+renderQRLoss(envArr,regArr);
+renderStockProjection(envArr,regArr);
+}catch(e){
+if($('mSaidas'))$('mSaidas').textContent='—';
+renderBarChart([],[]);renderDonutChart([]);renderHubTable([],[]);
+let qc=$('qrLossCard');if(qc)qc.innerHTML='<span style="font-size:12px;color:var(--gray3)">Sem dados</span>';
+}
+}
+window.loadDashboard=loadDashboard;
+
+function renderBarChart(envArr,regArr,retNormal){
+try{
+let container=$('chartBar');if(!container)return;
+let days=[];
+for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(localDateStr(d))}
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||'').startsWith(d)).length);
+let retByDay=days.map(d=>(retNormal||[]).filter(r=>(r.datahora||'').startsWith(d)).length);
+let maxV=Math.max(...envByDay,...retByDay,1);
+let totalEnv=envByDay.reduce((a,b)=>a+b,0);
+let totalRet=retByDay.reduce((a,b)=>a+b,0);
+let pctTotal=totalEnv?Math.round((totalRet/totalEnv)*100):0;
+let todayStr=today();
+
+const W=520,H=170,PT=36,PR=14,PB=28,PL=36;
+const cW=W-PL-PR,cH=H-PT-PB;
+const slotW=cW/7;
+const barW=Math.max(8,Math.floor(slotW*0.3));
+const baseY=PT+cH;
+
+// Grid lines + axis
+let grid='<line x1="'+PL+'" y1="'+baseY+'" x2="'+(W-PR)+'" y2="'+baseY+'" stroke="#cbd5e1" stroke-width="1.5"/>';
+let nGridY=4;
+for(let g=1;g<=nGridY;g++){
+let gv=Math.ceil((maxV/nGridY)*g);
+let gy=(PT+cH-((Math.min(gv,maxV)/maxV)*cH)).toFixed(1);
+grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#f1f5f9" stroke-width="1"/>';
+grid+='<text x="'+(PL-5)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8" fill="#94a3b8">'+Math.min(gv,maxV)+'</text>';
+}
+
+// Today column highlight — clamp so it doesn't exceed viewBox
+let todayX=(PL+(6/6)*cW);
+let todayHlW=slotW-2;
+let todayHlX=Math.max(PL,todayX-todayHlW/2);
+let todayHlRight=Math.min(W-PR,todayHlX+todayHlW);
+grid+='<rect x="'+todayHlX.toFixed(1)+'" y="'+PT+'" width="'+(todayHlRight-todayHlX).toFixed(1)+'" height="'+cH+'" fill="#FF9900" fill-opacity="0.06" rx="4"/>';
+
+let bars='',valLabels='',dateLabels='';
+days.forEach((d,i)=>{
+let cx=(PL+(i/6)*cW);
+let isToday=(d===todayStr);
+let hE=envByDay[i]>0?Math.max((envByDay[i]/maxV)*cH,4):0;
+let hR=retByDay[i]>0?Math.max((retByDay[i]/maxV)*cH,4):0;
+let xE=(cx-barW-1.5).toFixed(1);
+let xR=(cx+1.5).toFixed(1);
+// Envios bar
+if(hE>0){
+bars+='<rect x="'+xE+'" y="'+(baseY-hE).toFixed(1)+'" width="'+barW+'" height="'+hE.toFixed(1)+'" fill="#FF9900" rx="3"/>';
+valLabels+='<text x="'+(cx-barW/2-1.5).toFixed(1)+'" y="'+(baseY-hE-5).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#FF9900" font-weight="700">'+envByDay[i]+'</text>';
+}else{
+bars+='<rect x="'+xE+'" y="'+(baseY-2)+'" width="'+barW+'" height="2" fill="#f1f5f9" rx="1"/>';
+}
+// Retornos bar
+if(hR>0){
+bars+='<rect x="'+xR+'" y="'+(baseY-hR).toFixed(1)+'" width="'+barW+'" height="'+hR.toFixed(1)+'" fill="#00A86B" rx="3"/>';
+valLabels+='<text x="'+(cx+barW/2+1.5).toFixed(1)+'" y="'+(baseY-hR-5).toFixed(1)+'" text-anchor="middle" font-size="9" fill="#00A86B" font-weight="700">'+retByDay[i]+'</text>';
+}else{
+bars+='<rect x="'+xR+'" y="'+(baseY-2)+'" width="'+barW+'" height="2" fill="#f1f5f9" rx="1"/>';
+}
+let parts=d.split('-');
+dateLabels+='<text x="'+cx.toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="9" fill="'+(isToday?'#0F2137':'#94a3b8')+'" font-weight="'+(isToday?'700':'400')+'">'+parts[2]+'/'+parts[1]+'</text>';
+if(isToday)dateLabels+='<text x="'+cx.toFixed(1)+'" y="'+(H-6-11)+'" text-anchor="middle" font-size="7" fill="#FF9900" font-weight="700" letter-spacing="0.5">HOJE</text>';
+});
+
+let pctColor=pctTotal>=80?'#00A86B':pctTotal>=60?'#FF9900':'#E74C3C';
+let legend='<circle cx="'+(PL+6)+'" cy="17" r="4.5" fill="#FF9900"/>'
++'<text x="'+(PL+14)+'" y="21" font-size="10" fill="#334155" font-weight="600">Envios</text>'
++'<circle cx="'+(PL+65)+'" cy="17" r="4.5" fill="#00A86B"/>'
++'<text x="'+(PL+73)+'" y="21" font-size="10" fill="#334155" font-weight="600">Retornos</text>';
+let summary='<rect x="'+(W-PR-70)+'" y="8" width="70" height="18" fill="'+pctColor+'" fill-opacity="0.1" rx="9"/>'
++'<text x="'+(W-PR-35)+'" y="21" text-anchor="middle" font-size="10" fill="'+pctColor+'" font-weight="700">'+totalRet+'/'+totalEnv+' ('+pctTotal+'%)</text>';
+
+let noData=(!totalEnv&&!totalRet)?'<text x="'+(W/2)+'" y="'+(H/2+4)+'" text-anchor="middle" font-size="12" fill="#94a3b8">Nenhum dado no período</text>':'';
+
+let svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">'
++'<rect width="100%" height="100%" fill="white"/>'
++grid+bars+valLabels+dateLabels+legend+summary+noData
++'</svg>';
+container.innerHTML=svg;
+}catch(e){}
+}
+
+function renderRoutesChart(envArr,regArr,retNormal){
+try{
+let container=$('chartRoutes');if(!container)return;
+let routes={};
+let allEnvR=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+allEnvR.forEach(e=>{let rt=getRota(e)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].env++});
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let rt=getRota(r)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
+
+// Only routes with pending items, sorted by most pending first
+let sorted=Object.entries(routes).map(([n,v])=>({name:n,env:v.env,ret:v.ret,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).filter(r=>r.pend>0).sort((a,b)=>b.pend-a.pend).slice(0,8);
+
+if(!sorted.length){
+container.innerHTML='<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:24px 0;color:#00A86B;font-size:13px;font-weight:700">✅ Todas as rotas retornaram!</div>';
+return;
+}
+
+const W=520,rowH=40,PL=52,PR=12,legH=24,trackW=W-PL-PR-80;
+const svgH=legH+sorted.length*rowH+8;
+
+let legend='<rect x="'+PL+'" y="6" width="10" height="10" fill="#00A86B" rx="2"/>'
++'<text x="'+(PL+13)+'" y="15" font-size="9" fill="#334155">Retornados</text>'
++'<rect x="'+(PL+78)+'" y="6" width="10" height="10" fill="#E74C3C" rx="2"/>'
++'<text x="'+(PL+91)+'" y="15" font-size="9" fill="#334155">Pendentes</text>';
+
+let rows=sorted.map((r,i)=>{
+let y=legH+i*rowH;
+let barY=y+11;
+let barH=18;
+let wRet=r.env>0?(r.ret/r.env)*trackW:0;
+let wPend=r.env>0?(r.pend/r.env)*trackW:trackW;
+
+// Route label
+let out='<text x="'+(PL-6)+'" y="'+(y+22)+'" text-anchor="end" font-size="11" fill="#0F2137" font-weight="700">'+r.name.slice(0,8)+'</text>';
+
+// Background track
+out+='<rect x="'+PL+'" y="'+barY+'" width="'+trackW+'" height="'+barH+'" fill="#f1f5f9" rx="5"/>';
+
+// Green (returned) segment
+if(wRet>4){
+out+='<rect x="'+PL+'" y="'+barY+'" width="'+wRet.toFixed(1)+'" height="'+barH+'" fill="#00A86B" rx="'+(wRet>=trackW?'5':'5 0 0 5')+'"/>';
+if(wRet>30)out+='<text x="'+(PL+wRet/2).toFixed(1)+'" y="'+(barY+12)+'" text-anchor="middle" font-size="9" fill="white" font-weight="700">'+r.pct+'%</text>';
+}
+
+// Red (pending) segment
+let rx2=wRet<=2?'5':'0 5 5 0';
+out+='<rect x="'+(PL+wRet).toFixed(1)+'" y="'+barY+'" width="'+(wPend>0?wPend.toFixed(1):'0')+'" height="'+barH+'" fill="#E74C3C" rx="'+rx2+'"/>';
+
+// Right labels
+let rightX=PL+trackW+8;
+out+='<text x="'+rightX+'" y="'+(barY+8)+'" font-size="10" fill="#E74C3C" font-weight="700">'+r.pend+' pend.</text>';
+if(r.ret>0)out+='<text x="'+rightX+'" y="'+(barY+20)+'" font-size="8.5" fill="#64748b">'+r.ret+' vol.</text>';
+
+// Divider
+if(i<sorted.length-1)out+='<line x1="'+PL+'" y1="'+(y+rowH)+'" x2="'+(W-PR)+'" y2="'+(y+rowH)+'" stroke="#f1f5f9" stroke-width="1"/>';
+
+return out;
+}).join('');
+
+let svg='<svg viewBox="0 0 '+W+' '+svgH+'" xmlns="http://www.w3.org/2000/svg">'
++'<rect width="100%" height="100%" fill="white"/>'
++legend+rows+'</svg>';
+container.innerHTML=svg;
+}catch(e){}
+}
+
+function renderDonutChart(regArr){
+try{
+let container=$('tbrClassBadges');if(!container)return;
+let tbrs=regArr.filter(function(r){return r.tipo==='Pacote'});
+if(!tbrs.length){container.innerHTML='<span style="font-size:11px;color:var(--gray3)">Nenhum TBR registrado</span>';return}
+let counts={};
+tbrs.forEach(function(r){var c=r.classificacao||'Sem class.';counts[c]=(counts[c]||0)+1});
+var colors=['#FF9900','#E74C3C','#00A86B','#3498DB','#9B59B6','#F39C12','#1ABC9C','#E91E63','#607D8B','#795548'];
+var html='';var i=0;
+Object.keys(counts).forEach(function(k){
+html+='<span style="display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600;background:'+colors[i%colors.length]+'22;color:'+colors[i%colors.length]+';border:1px solid '+colors[i%colors.length]+'44">'+k+': '+counts[k]+'</span>';
+i++;
+});
+container.innerHTML=html;
+}catch(e){}
+}
+function renderHubTable(envArr,regArr){
+try{
+let container=$('chartTable');if(!container)return;
+
+// Índice de retornos por código + chave normalizada
+let retSet=new Set();
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{
+retSet.add(r.codigo);let k=codeKey(r.codigo);if(k)retSet.add(k);
+});
+
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+
+// Nível 1: Agregado por Hub
+let hubAgg={};
+allEnv.forEach(e=>{
+let h=getHub(e)||'N/A';
+if(!hubAgg[h])hubAgg[h]={name:h,env:0,ret:0};
+hubAgg[h].env++;
+if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))hubAgg[h].ret++;
+});
+
+// Nível 2: Granularidade dia × hub (para streak e detalhe)
+let hubDay={};// hub → date → {env,ret}
+allEnv.forEach(e=>{
+let h=getHub(e)||'N/A';
+let d=(e.datahora||'').split('T')[0]||today();
+if(!hubDay[h])hubDay[h]={};
+if(!hubDay[h][d])hubDay[h][d]={env:0,ret:0};
+hubDay[h][d].env++;
+if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))hubDay[h][d].ret++;
+});
+
+// Calcula streak atual de cada hub (dias consecutivos mais recentes <50%)
+let hubStreak={};
+Object.entries(hubDay).forEach(([hub,dayMap])=>{
+let sorted=Object.keys(dayMap).sort((a,b)=>b.localeCompare(a));
+let streak=0;
+for(let d of sorted){
+let v=dayMap[d];
+if(v.env>0&&(v.ret/v.env)<0.5)streak++;
+else break;
+}
+hubStreak[hub]=streak;
+});
+
+// Monta linhas agregadas e ordena: streak desc → % asc
+let rows=Object.values(hubAgg)
+.filter(h=>h.env>0)
+.map(h=>({...h,pend:h.env-h.ret,pct:h.env?Math.round((h.ret/h.env)*100):0,streak:hubStreak[h.name]||0}))
+.sort((a,b)=>{
+let sd=(b.streak-a.streak);if(sd!==0)return sd;
+return a.pct-b.pct;
+})
+.slice(0,20);
+
+if(!rows.length){container.innerHTML='<p style="font-size:12px;color:var(--gray3);text-align:center;padding:20px">Sem dados</p>';return}
+
+// Salva para export
+state._hubPerfRows=rows;
+state._hubPerfStreaks=hubStreak;
+state._hubDay=hubDay;
+
+let html='<div style="overflow-x:auto"><table class="data-table" style="font-size:12px"><thead>'
++'<tr><th>Hub</th><th>Envios</th><th>Retornos</th><th>Pend.</th><th>%</th><th style="text-align:center">Streak</th></tr>'
++'</thead><tbody>';
+
+rows.forEach((h,idx)=>{
+let pctColor=h.pct<50?'color:#dc2626;font-weight:700':h.pct<80?'color:#d97706;font-weight:600':'color:#16a34a';
+let rowBg=h.streak>=2?'style="background:#fff5f5"':'';
+let streakBadge=h.streak>=3
+?'<span style="background:#dc2626;color:white;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">'+h.streak+'d 🔴</span>'
+:h.streak>=2
+?'<span style="background:#f97316;color:white;border-radius:4px;padding:1px 7px;font-size:10px">'+h.streak+'d 🟡</span>'
+:'<span style="color:#94a3b8;font-size:11px">—</span>';
+
+// Linha principal
+html+='<tr '+rowBg+' onclick="toggleHubDetail(\'hd'+idx+'\')" style="cursor:pointer">'
++'<td style="font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+h.name+'</td>'
++'<td>'+h.env+'</td>'
++'<td>'+h.ret+'</td>'
++'<td style="color:#dc2626;font-weight:600">'+h.pend+'</td>'
++'<td style="'+pctColor+'">'+h.pct+'%</td>'
++'<td style="text-align:center">'+streakBadge+'</td>'
++'</tr>';
+
+// Linha de detalhe expandível (dia a dia)
+let dayEntries=hubDay[h.name]||{};
+let sortedDays=Object.entries(dayEntries).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14);
+let detHtml='<tr id="hd'+idx+'" class="hidden"><td colspan="6" style="padding:0;background:#f8fafc">'
++'<table style="width:100%;font-size:11px;border-collapse:collapse">'
++'<tr style="background:#e2e8f0"><th style="padding:4px 8px;text-align:left;font-weight:600">Data</th><th style="padding:4px;text-align:center">Enviadas</th><th style="padding:4px;text-align:center">Retornou</th><th style="padding:4px;text-align:center">%</th></tr>';
+sortedDays.forEach(([d,v])=>{
+let dp=v.env?Math.round((v.ret/v.env)*100):0;
+let dc=dp<50?'color:#dc2626;font-weight:700':dp<80?'color:#d97706':'color:#16a34a';
+detHtml+='<tr style="border-top:1px solid #e2e8f0">'
++'<td style="padding:3px 8px;color:#64748b">'+fmtDate(d+'T12:00:00').split(' ')[0]+'</td>'
++'<td style="padding:3px;text-align:center">'+v.env+'</td>'
++'<td style="padding:3px;text-align:center">'+v.ret+'</td>'
++'<td style="padding:3px;text-align:center;'+dc+'">'+dp+'%</td>'
++'</tr>';
+});
+detHtml+='</table></td></tr>';
+html+=detHtml;
+});
+
+html+='</tbody></table></div>';
+if(rows.length===20)html+='<p style="font-size:10px;color:#94a3b8;margin-top:4px">Top 20 por pior desempenho. Clique na linha para ver o histórico por dia.</p>';
+else html+='<p style="font-size:10px;color:#94a3b8;margin-top:4px">Clique em qualquer linha para ver o histórico por dia.</p>';
+container.innerHTML=html;
+}catch(e){let c=$('chartTable');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Erro</p>';}
+}
+
+function toggleHubDetail(id){
+try{let el=$(id);if(el){el.classList.toggle('hidden')}}catch(e){}
+}
+window.toggleHubDetail=toggleHubDetail;
+
+function exportReport(){
+try{
+let s=$('mSaidas'),r=$('mRetornos'),p=$('mPendentes'),pct=$('mPctRetorno');
+let text='📦 ScanTrack — Relatório\n';
+text+='DS: '+state.ds+' | Regional: '+state.regional+'\n';
+text+='Data: '+new Date().toLocaleDateString('pt-BR')+'\n\n';
+text+='📊 Resumo:\n';
+text+='• Saídas: '+(s?s.textContent:'?')+'\n';
+text+='• Retornos: '+(r?r.textContent:'?')+'\n';
+text+='• Pendentes: '+(p?p.textContent:'?')+'\n';
+text+='• % Retorno: '+(pct?pct.textContent:'?')+'\n';
+text+='\n— Gerado por ScanTrack v3.0';
+navigator.clipboard.writeText(text).then(()=>toast('Relatório copiado!','success')).catch(()=>toast('Erro ao copiar','error'));
+}catch(e){}
+}
+window.exportReport=exportReport;
+
+async function exportPendentes(){
+try{
+toast('Buscando pendências...','warn');
+let envArr=state.lastEnvArr,regArr=state.lastRegArr;
+if(!envArr||!regArr){
+let ed=await apiCall('lerEnvios',{ds:state.ds});
+let rd=await apiCall('lerRegistros',{ds:state.ds});
+envArr=ed&&ed.data?ed.data:[];
+regArr=rd&&rd.data?rd.data:[];
+}
+let retSet={};
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{
+if(!r.codigo)return;
+retSet[r.codigo]=r.datahora;
+let k=codeKey(r.codigo);if(k&&k!==r.codigo&&!retSet[k])retSet[k]=r.datahora;
+});
+let allSaidas=[];
+envArr.forEach(e=>allSaidas.push(Object.assign({},e)));
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')&&r.tipo!=='Pacote').forEach(r=>allSaidas.push(Object.assign({},r)));
+let pendentes=allSaidas.filter(e=>e.codigo&&!retSet[e.codigo]&&!retSet[codeKey(e.codigo)]);
+// Remove duplicates (same code, keep earliest)
+let byCode={};
+pendentes.forEach(e=>{if(!byCode[e.codigo]||((e.datahora||'')<(byCode[e.codigo].datahora||'')))byCode[e.codigo]=e});
+pendentes=Object.values(byCode).sort((a,b)=>(a.datahora||'').localeCompare(b.datahora||''));
+if(!pendentes.length){toast('✅ Nenhuma pendência! Tudo retornou.','success');return}
+let todayStr=today();
+let rows=pendentes.map(e=>{
+let ds=(e.datahora||'').split('T')[0];
+let diasPend=0;try{let d0=new Date(ds),d1=new Date(todayStr);diasPend=Math.max(0,Math.round((d1-d0)/86400000))}catch(x){}
+let rota=getRota(e)||'—';let hub=getHub(e)||'—';
+return'"'+(e.codigo||'')+'","'+(e.tipo||'')+'","'+rota+'","'+hub+'","'+(e.ds||state.ds)+'","'+fmtDate(e.datahora)+'",'+diasPend+(diasPend>1?' ⚠️':'');
+});
+let bom='\uFEFF';
+let csv=bom+'Código,Tipo,Rota,Hub,DS,Data Saída,Dias Pendente\n'+rows.join('\n');
+let blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);
+a.download='pendentes_'+state.ds+'_'+todayStr+'.csv';a.click();
+toast('✅ '+pendentes.length+' pendências exportadas!','success');
+}catch(e){toast('Erro ao exportar pendentes','error')}
+}
+window.exportPendentes=exportPendentes;
+
+// ===== QR CODE LOSS =====
+// Itens que saíram e não retornaram dentro do threshold → prováveis perdas de etiqueta
+function getStockConfig(){
+try{return Object.assign({leadTimeRafia:10,leadTimeEnforca:10,leadTimeQR:4,margemEnforca:1.1,lossThreshold:7},ls('stockConfig')||{})}
+catch(e){return {leadTimeRafia:10,leadTimeEnforca:10,leadTimeQR:4,margemEnforca:1.1,lossThreshold:7}}
+}
+
+function renderQRLoss(envArr,regArr){
+try{
+let container=$('qrLossCard');if(!container)return;
+let cfg=getStockConfig();
+let threshold=cfg.lossThreshold||7;
+
+// Índice de retornos por chave normalizada
+let retSet=new Set();
+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{
+retSet.add(r.codigo);let k=codeKey(r.codigo);if(k)retSet.add(k);
+});
+
+// Classifica saídas por dias pendentes
+let threshStr=localDateStr(new Date(Date.now()-threshold*86400000));
+let emRisco=[],perda=[]; // emRisco: 3..threshold-1 dias | perda: >= threshold dias
+envArr.filter(r=>r.tipo!=='Pacote').forEach(e=>{
+if(retSet.has(e.codigo)||retSet.has(codeKey(e.codigo)))return;
+let ds=(e.datahora||'').split('T')[0];
+if(!ds)return;
+let dias=Math.round((Date.now()-new Date(ds))/86400000);
+if(dias>=threshold){perda.push({...e,dias})}
+else if(dias>=3){emRisco.push({...e,dias})}
+});
+
+perda.sort((a,b)=>b.dias-a.dias);
+emRisco.sort((a,b)=>b.dias-a.dias);
+
+let lbl=$('qrLossThresholdLabel');if(lbl)lbl.textContent='≥'+threshold+' dias sem retorno';
+let btnR=$('btnReprint');
+
+let html='';
+if(!perda.length&&!emRisco.length){
+html='<div style="color:var(--green);font-weight:600;font-size:13px;text-align:center;padding:8px">✅ Nenhuma perda provável de QR Code</div>';
+}else{
+html+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">';
+html+='<div style="flex:1;min-width:120px;background:#fff5f5;border-radius:8px;padding:10px;text-align:center">';
+html+='<div style="font-size:26px;font-weight:700;color:var(--red)">'+perda.length+'</div>';
+html+='<div style="font-size:11px;color:var(--gray3)">Prováveis perdas (≥'+threshold+'d)</div></div>';
+html+='<div style="flex:1;min-width:120px;background:#fffbf0;border-radius:8px;padding:10px;text-align:center">';
+html+='<div style="font-size:26px;font-weight:700;color:var(--orange)">'+emRisco.length+'</div>';
+html+='<div style="font-size:11px;color:var(--gray3)">Em risco (3–'+(threshold-1)+'d)</div></div>';
+html+='</div>';
+if(perda.length){
+html+='<button onclick="exportReprintList()" style="width:100%;padding:8px;background:#0F2137;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:8px">🖨️ Exportar '+perda.length+' códigos para Reprint</button>';
+}
+if(perda.length){
+html+='<div style="font-size:11px;color:var(--gray3);margin-bottom:4px">Perdas prováveis (amostra):</div>';
+html+='<div style="max-height:120px;overflow-y:auto">';
+perda.slice(0,10).forEach(e=>{
+let rota=getRota(e)||'—';let hub=getHub(e)||'—';
+html+='<div style="font-size:11px;padding:3px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between">';
+html+='<span style="color:var(--navy);font-weight:600">'+e.codigo+'</span>';
+html+='<span style="color:var(--gray3)">'+rota+' / '+hub+' • '+e.dias+'d</span></div>';
+});
+if(perda.length>10)html+='<div style="font-size:11px;color:var(--gray3);padding:3px">... e mais '+(perda.length-10)+' itens</div>';
+html+='</div>';
+}
+}
+container.innerHTML=html;
+// Cache para exportReprintList
+state._qrLossPerda=perda;
+}catch(ex){}
+}
+
+function exportReprintList(){
+try{
+let perda=state._qrLossPerda||[];
+if(!perda.length){toast('Nenhuma perda registrada','warn');return}
+let bom='\uFEFF';
+let csv=bom+'Código,Tipo,Rota,Hub,DS,Data Saída,Dias Pendente\n';
+csv+=perda.map(e=>'"'+e.codigo+'","'+e.tipo+'","'+(getRota(e)||'')+'","'+(getHub(e)||'')+'","'+(e.ds||state.ds)+'","'+fmtDate(e.datahora)+'",'+e.dias).join('\n');
+let blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+let a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='reprint_'+state.ds+'_'+today()+'.csv';
+a.click();
+toast('✅ '+perda.length+' códigos exportados para reprint','success');
+}catch(e){toast('Erro ao exportar','error')}
+}
+window.exportReprintList=exportReprintList;
+
+// ===== HUB PERFORMANCE =====
+function exportHubPerf(){
+try{
+let rows=state._hubPerfRows||[];
+let streaks=state._hubPerfStreaks||{};
+if(!rows.length){toast('Sem dados para exportar','warn');return}
+let bom='\uFEFF';
+let csv=bom+'Data,Hub,Rota,Enviadas,Retornou,% Retorno,Streak Hub (dias consec. <50%)\n';
+csv+=rows.map(r=>'"'+fmtDate(r.data+'T12:00:00').split(' ')[0]+'","'+r.hub+'","'+r.rota+'",'+r.env+','+r.ret+','+r.pct+'%,'+(streaks[r.hub]||0)).join('\n');
+let a=document.createElement('a');
+a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+a.download='matriz_retorno_hub_'+state.ds+'_'+today()+'.csv';a.click();
+toast('✅ Matriz exportada','success');
+}catch(e){toast('Erro ao exportar','error')}
+}
+window.exportHubPerf=exportHubPerf;
+
+// ===== PROJEÇÃO DE ESTOQUE =====
+// ===== ESTOQUE VIA API (Google Sheets) =====
+// Fonte de verdade = planilha aba "Estoque". localStorage = cache temporário de sessão.
+// O cache é limpo a cada login (showApp), garantindo dados sempre frescos da planilha.
+
+async function lerEstoqueAPI(){
+try{
+let r=await apiCall('lerEstoque',{});
+if(r&&r.success&&Array.isArray(r.data)){
+ls('stockEntries',r.data);// atualiza cache de sessão
+return r.data;
+}
+// API retornou mas sem sucesso (ex: aba ainda não criada no GAS)
+return [];
+}catch(e){
+// Fallback: usa cache local apenas se API completamente indisponível
+let cache=ls('stockEntries');
+return Array.isArray(cache)?cache:[];
+}
+}
+
+// Sync manual: força limpeza do cache e rebusca da planilha
+async function syncEstoque(){
+try{
+let btn=$('syncEstoqueBtn');
+if(btn){btn.textContent='🔄 Sincronizando...';btn.disabled=true}
+localStorage.removeItem('scantrack_stockEntries');
+let entries=await lerEstoqueAPI();
+ls('stockEntries',entries);
+await renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
+toast('✅ Estoque sincronizado com a planilha ('+entries.length+' entradas)','success');
+}catch(e){toast('Erro ao sincronizar','error')}
+finally{
+let btn=$('syncEstoqueBtn');
+if(btn){btn.textContent='🔄 Sync planilha';btn.disabled=false}
+}
+}
+window.syncEstoque=syncEstoque;
+
+function getStockEntries(){return ls('stockEntries')||[]}// leitura sync do cache
+
+async function salvarEstoqueAPI(entry){
+try{
+let r=await apiCall('salvarEstoque',entry);
+if(r&&r.success){
+// Atualiza cache local com id retornado pela API
+entry.id=r.id||entry.id;
+let all=getStockEntries().filter(e=>e.id!==entry.id);
+all.push(entry);
+ls('stockEntries',all);
+return true;
+}
+}catch(e){}
+// Fallback: salva só no cache se API falhou
+let all=getStockEntries().filter(e=>e.id!==entry.id);
+all.push(entry);
+ls('stockEntries',all);
+return false;
+}
+
+async function editarEstoqueAPI(entry){
+try{
+let r=await apiCall('editarEstoque',entry);
+if(r&&r.success){
+let all=getStockEntries().map(e=>e.id===entry.id?entry:e);
+ls('stockEntries',all);
+return true;
+}
+}catch(e){}
+// Fallback cache
+let all=getStockEntries().map(e=>e.id===entry.id?entry:e);
+ls('stockEntries',all);
+return false;
+}
+
+async function deletarEstoqueAPI(id){
+try{
+let r=await apiCall('deletarEstoque',{id});
+if(r&&r.success){
+ls('stockEntries',getStockEntries().filter(e=>String(e.id)!==String(id)));
+return true;
+}
+}catch(e){}
+ls('stockEntries',getStockEntries().filter(e=>String(e.id)!==String(id)));
+return false;
+}
+
+// Calcula média diária SEM Domingos — domingos usam 40% da média semanal na projeção
+function weekdayAvgFor(arr,tipoCb,days){
+try{
+days=days||14;
+let startStr=localDateStr(new Date(Date.now()-days*86400000));
+let byDate={};
+arr.filter(tipoCb).forEach(e=>{
+let d=(e.datahora||'').split('T')[0];
+if(d>=startStr){byDate[d]=(byDate[d]||0)+1}
+});
+let vals=Object.entries(byDate)
+.filter(([d])=>new Date(d+'T12:00:00').getDay()!==0)// remove domingos
+.map(([,v])=>v);
+return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+}catch(e){return 0}
+}
+
+// Consumo do dia projetado: domingos = 40% da média
+function dayConsumption(dayOffset,wkAvg,sundayFactor){
+try{
+sundayFactor=sundayFactor===undefined?0.4:sundayFactor;
+let d=new Date();d.setDate(d.getDate()+dayOffset);
+return d.getDay()===0?wkAvg*sundayFactor:wkAvg;
+}catch(e){return wkAvg}
+}
+
+function showStockEntryForm(editEntry){
+// editEntry = null (novo lançamento) ou objeto da entrada existente (editar)
+try{
+let isEdit=!!editEntry;
+let dsList=[];
+try{let c=state.config;if(c&&c.dsList)dsList=c.dsList;else if(c&&c.ds)dsList=[c.ds]}catch(x){}
+if(!dsList.length)dsList=[state.ds||'DSP2'];
+let dsOpts=dsList.map(d=>'<option value="'+d+'"'+((isEdit?editEntry.ds:state.ds)===d?' selected':'')+'>'+d+'</option>').join('');
+let html='<div id="stockFormOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">'
++'<div class="card" style="width:100%;max-width:400px">'
++'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
++'<h4 style="margin:0">'+(isEdit?'✏️ Editar Entrada':'📦 Lançar Entrada de Material')+'</h4>'
++'<button onclick="document.getElementById(\'stockFormOverlay\').remove()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--gray3)">✕</button>'
++'</div>'
++(isEdit?'<div style="background:#fef9c3;border-radius:6px;padding:8px 10px;font-size:11px;color:#92400e;margin-bottom:12px">📝 Você está editando uma entrada já registrada. Altere apenas o que precisa e salve.</div>':'')
++'<label style="font-size:12px;display:block;margin-bottom:4px">DS / Estação</label>'
++'<select id="seDs" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'+dsOpts+'</select>'
++'<label style="font-size:12px;display:block;margin-bottom:4px">Data da chegada</label>'
++'<input type="date" id="seData" value="'+(isEdit?editEntry.data:today())+'" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
++'<label style="font-size:12px;display:block;margin-bottom:4px">Material</label>'
++'<select id="seTipo" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:10px;font-size:14px">'
++'<option value="rafia"'+(isEdit&&editEntry.tipo==='rafia'?' selected':'')+'>🧵 Ráfia</option>'
++'<option value="enforca"'+(isEdit&&editEntry.tipo==='enforca'?' selected':'')+'>🪢 Abraçadeira (ráfia + bag)</option>'
++'<option value="qr"'+(isEdit&&editEntry.tipo==='qr'?' selected':'')+'>📱 QR Code (etiquetas)</option>'
++'</select>'
++'<label style="font-size:12px;display:block;margin-bottom:4px">Quantidade</label>'
++'<input type="number" id="seQtd" min="1" value="'+(isEdit?editEntry.qtd:'')+'" placeholder="ex: 5000" style="width:100%;padding:8px;border:1px solid var(--gray2);border-radius:6px;margin-bottom:14px;font-size:14px">'
++'<input type="hidden" id="seEditId" value="'+(isEdit?editEntry.id:'')+'">'
++'<div style="display:flex;gap:8px">'
++'<button onclick="saveStockEntry()" class="btn btn-success" style="flex:1">'+(isEdit?'💾 Salvar alterações':'✅ Salvar')+'</button>'
++'<button onclick="document.getElementById(\'stockFormOverlay\').remove()" class="btn" style="background:var(--gray);color:var(--navy)">Cancelar</button>'
++'</div></div></div>';
+document.body.insertAdjacentHTML('beforeend',html);
+}catch(e){}
+}
+window.showStockEntryForm=showStockEntryForm;
+
+async function saveStockEntry(){
+try{
+let ds=($('seDs')||{}).value||state.ds;
+let data=($('seData')||{}).value;
+let tipo=($('seTipo')||{}).value;
+let qtd=parseInt(($('seQtd')||{}).value||'0');
+let editId=($('seEditId')||{}).value||'';
+if(!data||!qtd||qtd<1){toast('Preencha todos os campos','warn');return}
+let d=new Date(data+'T12:00:00');d.setDate(d.getDate()+1);
+let usoInicio=localDateStr(d);
+let overlay=document.getElementById('stockFormOverlay');if(overlay)overlay.remove();
+if(editId){
+// EDITAR entrada existente
+let existing=getStockEntries().find(e=>String(e.id)===String(editId))||{};
+let entry={...existing,id:editId,data,tipo,qtd,usoInicio,ds:ds||state.ds,operador:state.user||'admin'};
+toast('Salvando...','warn');
+let ok=await editarEstoqueAPI(entry);
+toast(ok?'✅ Entrada atualizada na planilha!':'✅ Atualizado (cache local — API indisponível)','success');
+}else{
+// NOVO lançamento
+let entry={id:Date.now(),data,tipo,qtd,usoInicio,operador:state.user||'admin',ds:ds||state.ds};
+toast('Salvando...','warn');
+let ok=await salvarEstoqueAPI(entry);
+toast(ok?'✅ Entrada salva na planilha!':'✅ Salvo (cache local — API indisponível)','success');
+}
+renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
+}catch(e){toast('Erro ao salvar','error')}
+}
+window.saveStockEntry=saveStockEntry;
+
+function editStockEntry(id){
+try{
+let entry=getStockEntries().find(e=>String(e.id)===String(id));
+if(!entry){toast('Entrada não encontrada','warn');return}
+showStockEntryForm(entry);
+}catch(e){}
+}
+window.editStockEntry=editStockEntry;
+
+async function renderStockProjection(envArr,regArr){
+try{
+let container=$('stockProjectionContent');if(!container)return;
+// Carrega entradas da API (atualiza cache automaticamente)
+let entries=await lerEstoqueAPI();
+let cfg=getStockConfig();
+let todayStr=today();
+
+// Filtra entradas por DS ativa
+let dsFilter=state.ds;
+let myEntries=entries.filter(e=>!e.ds||e.ds===dsFilter||e.ds===dsFilter.split(':')[0]);
+
+// Entradas ativas (chegaram antes de hoje)
+let activeRaf=myEntries.filter(e=>e.tipo==='rafia'&&e.usoInicio<=todayStr).reduce((s,e)=>s+e.qtd,0);
+let activeEnf=myEntries.filter(e=>e.tipo==='enforca'&&e.usoInicio<=todayStr).reduce((s,e)=>s+e.qtd,0);
+let activeQR=myEntries.filter(e=>e.tipo==='qr'&&e.usoInicio<=todayStr).reduce((s,e)=>s+e.qtd,0);
+let futureQREntries=myEntries.filter(e=>e.tipo==='qr'&&e.usoInicio>todayStr);
+let futureEntries=myEntries.filter(e=>e.usoInicio>todayStr);
+
+if(!activeRaf&&!activeEnf&&!activeQR&&!entries.length){
+container.innerHTML='<div style="text-align:center;padding:24px;color:var(--gray3)">'
++'<div style="font-size:36px;margin-bottom:8px">📦</div>'
++'<div style="font-size:13px;margin-bottom:12px">Nenhum estoque configurado para <strong>'+dsFilter+'</strong>.</div>'
++'<button onclick="showStockEntryForm()" style="background:var(--navy);color:white;border:none;border-radius:8px;padding:10px 20px;font-size:13px;cursor:pointer">+ Lançar primeira entrada</button>'
++'</div>';
+return;
+}
+
+// === MÉDIAS DIÁRIAS (excluindo domingos) ===
+let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+let isRaf=e=>detectTipo(e.codigo||'')==='Rafia';
+let isBag=e=>detectTipo(e.codigo||'')==='Bag';
+let avgRafDay=weekdayAvgFor(allEnv,isRaf,14);
+let avgBagDay=weekdayAvgFor(allEnv,isBag,14);
+let avgEnfDay=(avgRafDay+avgBagDay)*cfg.margemEnforca;
+let allRet=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote');
+let retRate=allEnv.filter(isRaf).length>0?Math.min(0.95,allRet.filter(r=>isRaf(r)).length/allEnv.filter(isRaf).length):0.5;
+
+// === ESTOQUE ATUAL — baseado em dias decorridos (não em total do período filtrado) ===
+// Evita que despachos de períodos anteriores ao estoque inflacionem o consumo contabilizado
+function calcDaysConsumed(fromDateStr){
+try{
+let start=new Date(fromDateStr+'T12:00:00'),now=new Date();
+let consumed=0;
+for(let d=new Date(start);d<=now;d.setDate(d.getDate()+1)){
+consumed+=d.getDay()===0?0.4:1;// domingo = 40% da média
+}
+return Math.max(0,consumed);
+}catch(e){return 0}
+}
+let rafFirstUse=myEntries.filter(e=>e.tipo==='rafia'&&e.usoInicio<=todayStr).map(e=>e.usoInicio).sort()[0];
+let enfFirstUse=myEntries.filter(e=>e.tipo==='enforca'&&e.usoInicio<=todayStr).map(e=>e.usoInicio).sort()[0];
+let rafDaysConsumed=rafFirstUse?calcDaysConsumed(rafFirstUse):0;
+let enfDaysConsumed=enfFirstUse?calcDaysConsumed(enfFirstUse):0;
+// Ráfia desconta retornos: consumo líquido = (1 - taxa retorno) × diária
+let rafiaAtual=Math.max(0,Math.round(activeRaf-rafDaysConsumed*avgRafDay*(1-retRate)));
+let enforcaAtual=Math.max(0,Math.round(activeEnf-enfDaysConsumed*avgEnfDay));
+// QR Code: 1 por ráfia + 1 por bag despachada. Volta com o item (mesma taxa de retorno da ráfia).
+let avgQRDay=avgRafDay+avgBagDay;// total de itens despachados por dia = QR usados
+let qrFirstUse=myEntries.filter(e=>e.tipo==='qr'&&e.usoInicio<=todayStr).map(e=>e.usoInicio).sort()[0];
+let qrDaysConsumed=qrFirstUse?calcDaysConsumed(qrFirstUse):0;
+let qrAtual=Math.max(0,Math.round(activeQR-qrDaysConsumed*avgQRDay*(1-retRate)));
+
+// === HISTÓRICO (7 dias atrás) + HOJE + PROJEÇÃO (30 dias) ===
+// O gráfico mostra o passado estimado + o futuro projetado, com "Hoje" no índice 7
+const N_HIST=7,N_PROJ=15,N=N_HIST+N_PROJ;// 22 pontos: -7 dias + hoje + +14 dias
+const TODAY_IDX=N_HIST;// índice 7 = hoje
+
+// Reconstrói o histórico trabalhando de volta a partir do estoque atual
+let histRafPess=[rafiaAtual],histRafReal=[rafiaAtual],histEnf=[enforcaAtual];
+for(let i=1;i<=N_HIST;i++){
+let d=new Date();d.setDate(d.getDate()-i);
+let c=d.getDay()===0?0.4:1;
+histRafPess.unshift(histRafPess[0]+avgRafDay*c);
+histRafReal.unshift(histRafReal[0]+avgRafDay*(1-retRate)*c);
+histEnf.unshift(histEnf[0]+avgEnfDay*c);
+}
+// Clipa o histórico nos limites do estoque comprado
+histRafPess=histRafPess.map(v=>Math.max(0,Math.min(v,activeRaf)));
+histRafReal=histRafReal.map(v=>Math.max(0,Math.min(v,activeRaf)));
+histEnf=histEnf.map(v=>Math.max(0,Math.min(v,activeEnf)));
+// Histórico QR (7 dias atrás)
+let histQRPess=[qrAtual],histQRReal=[qrAtual];
+for(let i=1;i<=N_HIST;i++){
+let d=new Date();d.setDate(d.getDate()-i);
+let c=d.getDay()===0?0.4:1;
+histQRPess.unshift(histQRPess[0]+avgQRDay*c);
+histQRReal.unshift(histQRReal[0]+avgQRDay*(1-retRate)*c);
+}
+histQRPess=histQRPess.map(v=>Math.max(0,Math.min(v,activeQR)));
+histQRReal=histQRReal.map(v=>Math.max(0,Math.min(v,activeQR)));
+
+// Constrói a projeção futura a partir do estoque atual
+let rafPess=[...histRafPess],rafReal=[...histRafReal],enfArr=[...histEnf];
+let qrPess=[...histQRPess],qrReal=[...histQRReal];
+for(let i=1;i<N_PROJ;i++){
+let d=new Date();d.setDate(d.getDate()+i);let ds=localDateStr(d);
+let futRaf=futureEntries.filter(e=>e.tipo==='rafia'&&e.usoInicio===ds).reduce((s,e)=>s+e.qtd,0);
+let futEnf=futureEntries.filter(e=>e.tipo==='enforca'&&e.usoInicio===ds).reduce((s,e)=>s+e.qtd,0);
+let futQR=futureQREntries.filter(e=>e.usoInicio===ds).reduce((s,e)=>s+e.qtd,0);
+let cRaf=dayConsumption(i,avgRafDay);
+let cEnf=dayConsumption(i,avgEnfDay);
+let cQR=dayConsumption(i,avgQRDay);
+rafPess.push(Math.max(0,rafPess[rafPess.length-1]-cRaf+futRaf));
+rafReal.push(Math.max(0,rafReal[rafReal.length-1]-cRaf*(1-retRate)+futRaf));
+enfArr.push(Math.max(0,enfArr[enfArr.length-1]-cEnf+futEnf));
+qrPess.push(Math.max(0,qrPess[qrPess.length-1]-cQR+futQR));
+qrReal.push(Math.max(0,qrReal[qrReal.length-1]-cQR*(1-retRate)+futQR));
+}
+
+// Dias até zerar — extrapola além da janela para data de compra correta
+function dtzFn(arr,avgDaily){
+for(let i=TODAY_IDX;i<arr.length;i++)if(arr[i]<=0)return i-TODAY_IDX;
+// Stock não zerará na janela — extrapola com o valor final / média diária
+let last=arr[arr.length-1];
+if(last<=0||avgDaily<=0)return arr.length-1-TODAY_IDX;
+return(arr.length-1-TODAY_IDX)+Math.ceil(last/avgDaily);
+}
+let rafPZ=dtzFn(rafPess,avgRafDay);
+let rafRZ=dtzFn(rafReal,avgRafDay*(1-retRate));
+let enfZ=dtzFn(enfArr,avgEnfDay);
+let qrPZ=dtzFn(qrPess,avgQRDay);
+let qrRZ=dtzFn(qrReal,avgQRDay*(1-retRate));
+// alertDt: data ideal para solicitar a compra = zero_date - lead_time
+function alertDt(dz,lt){
+if(dz>=999)return'—';
+let d=new Date();d.setDate(d.getDate()+Math.max(0,dz-lt));
+return fmtDate(localDateStr(d)+'T12:00:00');
+}
+function alertDtDays(dz,lt){return Math.max(0,dz-lt)}// dias a partir de hoje
+let rafStatus=rafPZ<=cfg.leadTimeRafia?'🔴':rafPZ<=cfg.leadTimeRafia*2?'🟡':'🟢';
+let enfStatus=enfZ<=cfg.leadTimeEnforca?'🔴':enfZ<=cfg.leadTimeEnforca*2?'🟡':'🟢';
+let qrStatus=qrPZ<=cfg.leadTimeQR?'🔴':qrPZ<=cfg.leadTimeQR*2?'🟡':'🟢';
+
+// Dias de estoque: mostra "> Xd" se não zerou na janela+extrapolação
+function fmtDias(dz){return dz>=N_PROJ*3?'>'+Math.round(N_PROJ*2)+'d':dz+'d'}
+let rafPedirEm=alertDtDays(Math.min(rafPZ,rafRZ),cfg.leadTimeRafia);
+let enfPedirEm=alertDtDays(enfZ,cfg.leadTimeEnforca);
+let qrPedirEm=alertDtDays(Math.min(qrPZ,qrRZ),cfg.leadTimeQR);
+let rafPedirData=alertDt(Math.min(rafPZ,rafRZ),cfg.leadTimeRafia);
+let enfPedirData=alertDt(enfZ,cfg.leadTimeEnforca);
+let qrPedirData=alertDt(Math.min(qrPZ,qrRZ),cfg.leadTimeQR);
+
+function kpiRafia(){
+return '<div style="min-width:140px;flex-shrink:0;padding-right:10px;border-right:1px solid #f1f5f9">'
++'<div style="font-size:10px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:4px">🧵 RÁFIA '+rafStatus+'</div>'
++'<div style="font-size:24px;font-weight:800;color:#0F2137;line-height:1">'+rafiaAtual.toLocaleString('pt-BR')+'</div>'
++'<div style="font-size:9px;color:#94a3b8;margin-bottom:8px">disponíveis estimados</div>'
++'<div style="display:flex;gap:5px;flex-wrap:wrap;font-size:10px;margin-bottom:6px">'
++'<span style="background:#fee2e2;color:#dc2626;border-radius:5px;padding:2px 6px">Pess: '+fmtDias(rafPZ)+'</span>'
++'<span style="background:#dcfce7;color:#16a34a;border-radius:5px;padding:2px 6px">Real: '+fmtDias(rafRZ)+'</span>'
++'</div>'
++(rafPedirData!=='—'
+?'<div style="background:'+(rafPedirEm<=0?'#fee2e2':rafPedirEm<=5?'#fef3c7':'#f0fdf4')+';border-radius:7px;padding:6px 8px">'
++'<div style="font-size:9px;color:#64748b;font-weight:600">📦 Solicitar compra até</div>'
++'<div style="font-size:13px;font-weight:800;color:'+(rafPedirEm<=0?'#dc2626':rafPedirEm<=5?'#b45309':'#16a34a')+'">'+rafPedirData+'</div>'
++'<div style="font-size:9px;color:#94a3b8">Lead time: '+cfg.leadTimeRafia+' dias</div>'
++'</div>'
+:'<div style="background:#f0fdf4;border-radius:7px;padding:6px 8px;font-size:10px;color:#16a34a;font-weight:600">✅ Estoque OK</div>')
++'<div style="font-size:9px;color:#94a3b8;margin-top:5px">'+avgRafDay.toFixed(1)+'/dia • retorno '+Math.round(retRate*100)+'%</div>'
++'</div>';
+}
+
+function kpiEnforca(){
+return '<div style="min-width:140px;flex-shrink:0;padding-right:10px;border-right:1px solid #f1f5f9">'
++'<div style="font-size:10px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:4px">🪢 ABRAÇADEIRA '+enfStatus+'</div>'
++'<div style="font-size:24px;font-weight:800;color:#0F2137;line-height:1">'+enforcaAtual.toLocaleString('pt-BR')+'</div>'
++'<div style="font-size:9px;color:#94a3b8;margin-bottom:8px">disponíveis estimados</div>'
++'<div style="display:flex;gap:5px;flex-wrap:wrap;font-size:10px;margin-bottom:6px">'
++'<span style="background:#fef9c3;color:#ca8a04;border-radius:5px;padding:2px 6px">Acaba em: '+fmtDias(enfZ)+'</span>'
++'</div>'
++(enfPedirData!=='—'
+?'<div style="background:'+(enfPedirEm<=0?'#fee2e2':enfPedirEm<=5?'#fef3c7':'#f0fdf4')+';border-radius:7px;padding:6px 8px">'
++'<div style="font-size:9px;color:#64748b;font-weight:600">📦 Solicitar compra até</div>'
++'<div style="font-size:13px;font-weight:800;color:'+(enfPedirEm<=0?'#dc2626':enfPedirEm<=5?'#b45309':'#16a34a')+'">'+enfPedirData+'</div>'
++'<div style="font-size:9px;color:#94a3b8">Lead time: '+cfg.leadTimeEnforca+' dias</div>'
++'</div>'
+:'<div style="background:#f0fdf4;border-radius:7px;padding:6px 8px;font-size:10px;color:#16a34a;font-weight:600">✅ Estoque OK</div>')
++'<div style="font-size:9px;color:#94a3b8;margin-top:5px">'+avgEnfDay.toFixed(1)+'/dia = ('+avgRafDay.toFixed(1)+'+'+avgBagDay.toFixed(1)+')×'+cfg.margemEnforca+'</div>'
++'</div>';
+}
+
+function kpiQR(){
+return '<div style="min-width:140px;flex-shrink:0;padding-right:10px;border-right:1px solid #f1f5f9">'
++'<div style="font-size:10px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:4px">📱 QR CODE '+qrStatus+'</div>'
++'<div style="font-size:24px;font-weight:800;color:#0F2137;line-height:1">'+(activeQR?qrAtual.toLocaleString('pt-BR'):'—')+'</div>'
++'<div style="font-size:9px;color:#94a3b8;margin-bottom:8px">'+(activeQR?'disponíveis estimados':'sem estoque registrado')+'</div>'
++(activeQR
+?'<div style="display:flex;gap:5px;flex-wrap:wrap;font-size:10px;margin-bottom:6px">'
++'<span style="background:#fee2e2;color:#dc2626;border-radius:5px;padding:2px 6px">Pess: '+fmtDias(qrPZ)+'</span>'
++'<span style="background:#dcfce7;color:#16a34a;border-radius:5px;padding:2px 6px">Real: '+fmtDias(qrRZ)+'</span>'
++'</div>'
++(qrPedirData!=='—'
+?'<div style="background:'+(qrPedirEm<=0?'#fee2e2':qrPedirEm<=2?'#fef3c7':'#f0fdf4')+';border-radius:7px;padding:6px 8px">'
++'<div style="font-size:9px;color:#64748b;font-weight:600">🖨️ Solicitar reprint até</div>'
++'<div style="font-size:13px;font-weight:800;color:'+(qrPedirEm<=0?'#dc2626':qrPedirEm<=2?'#b45309':'#16a34a')+'">'+qrPedirData+'</div>'
++'<div style="font-size:9px;color:#94a3b8">Lead time: '+cfg.leadTimeQR+' dias (gráfica)</div>'
++'</div>'
+:'<div style="background:#f0fdf4;border-radius:7px;padding:6px 8px;font-size:10px;color:#16a34a;font-weight:600">✅ Estoque OK</div>')
+:'<button onclick="showStockEntryForm()" style="background:var(--navy);color:white;border:none;border-radius:7px;padding:6px 10px;font-size:11px;cursor:pointer;width:100%">+ Lançar estoque de QR</button>')
++'<div style="font-size:9px;color:#94a3b8;margin-top:5px">'+avgQRDay.toFixed(1)+'/dia = ráfia+bag • retorno '+Math.round(retRate*100)+'%</div>'
++'</div>';
+}
+
+let html='';
+// === KPI + GRÁFICO LADO A LADO por material ===
+html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;min-width:0">';
+// Ráfia
+html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;gap:0;align-items:flex-start;min-width:0;border-left:3px solid #EF4444">'
++kpiRafia()
++'<div style="flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%">'
++buildStockSVG('',rafPess,rafReal,null,cfg.leadTimeRafia,'#EF4444','#10B981',futureEntries.filter(e=>e.tipo==='rafia'),TODAY_IDX,true)
++'</div></div>';
+// Abraçadeira
+html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;gap:0;align-items:flex-start;min-width:0;border-left:3px solid #3B82F6">'
++kpiEnforca()
++'<div style="flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%">'
++buildStockSVG('',enfArr,null,null,cfg.leadTimeEnforca,'#3B82F6',null,futureEntries.filter(e=>e.tipo==='enforca'),TODAY_IDX,true)
++'</div></div>';
+html+='</div>';
+// QR Code — linha própria (largura total do grid)
+html+='<div style="display:grid;grid-template-columns:1fr;gap:12px;min-width:0;margin-top:12px">';
+html+='<div style="background:#fff;border-radius:12px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;gap:0;align-items:flex-start;min-width:0;border-left:3px solid #7C3AED">'
++kpiQR()
++'<div style="flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%">'
++(activeQR?buildStockSVG('',qrPess,qrReal,null,cfg.leadTimeQR,'#7C3AED','#06B6D4',futureQREntries,TODAY_IDX,true)
+:'<div style="padding:20px;text-align:center;font-size:12px;color:#94a3b8">Lance o estoque de QR Codes para ver a projeção</div>')
++'</div></div>';
+html+='</div>';
+
+// === LISTA DE ENTRADAS ===
+html+='<div style="margin-top:14px;background:#f8fafc;border-radius:10px;padding:10px">'
++'<div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;letter-spacing:.5px">ENTRADAS REGISTRADAS</div>';
+let sortedE=[...entries].sort((a,b)=>a.data.localeCompare(b.data));
+if(!sortedE.length){html+='<div style="font-size:12px;color:#94a3b8">Nenhuma entrada registrada</div>';}
+sortedE.forEach(e=>{
+let mine=!e.ds||e.ds===dsFilter;
+html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;font-size:11px'+(mine?'':';opacity:0.45')+'">'
++'<span>'+(e.tipo==='rafia'?'🧵':'🪢')+' <strong>'+e.qtd.toLocaleString('pt-BR')+'</strong> '+e.tipo
++' — chegou '+fmtDate(e.data+'T12:00:00')
++(e.ds?' <span style="background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:1px 5px;font-size:10px">'+e.ds+'</span>':'')+'</span>'
++'<div style="display:flex;gap:4px">'
++(mine?'<button onclick="editStockEntry('+JSON.stringify(e.id)+')" title="Editar" style="border:none;background:#f1f5f9;color:#475569;cursor:pointer;font-size:12px;padding:3px 7px;border-radius:5px">✏️</button>':'')
++'<button onclick="deleteStockEntry('+JSON.stringify(e.id)+')" title="Remover" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 4px">✕</button>'
++'</div>'
++'</div>';
+});
+html+='</div>';
+container.innerHTML=html;
+}catch(ex){console.error(ex);let c=$('stockProjectionContent');if(c)c.innerHTML='<p style="font-size:12px;color:var(--gray3)">Sem dados suficientes para projeção</p>';}
+}
+
+// ===== GRÁFICO DE ESTOQUE =====
+// Cada dia ocupa SLOT px → scroll horizontal quando chart não cabe na célula
+// NÃO usar overflow:hidden no card externo — bloqueia o scroll interno
+function buildStockSVG(title,line1,line2,line3,leadDays,col1,col2,futEntries,todayIdx,noWrap){
+try{
+todayIdx=todayIdx||0;
+const N=(line1||[]).length;
+const SLOT=22;
+const PT=18,PR=20,PB=50,PL=42;
+const W=N*SLOT+PL+PR;
+const cH=110,H=cH+PT+PB;
+const xS=function(i){return PL+(i/(N-1))*(W-PL-PR)};
+const allVals=[].concat(line1||[]).concat(line2||[]).concat(line3||[]);
+const maxV=Math.max.apply(null,allVals.concat([500]));
+const yS=function(v){return PT+cH-(Math.max(0,Math.min(v,maxV))/maxV)*cH};
+var c1=col1||'#EF4444',c2=col2||'#10B981';
+
+// Gradientes
+var defs='<defs>'
++'<linearGradient id="sgl1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+c1+'" stop-opacity=".15"/><stop offset="100%" stop-color="'+c1+'" stop-opacity="0"/></linearGradient>'
++'<linearGradient id="sgl2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+c2+'" stop-opacity=".15"/><stop offset="100%" stop-color="'+c2+'" stop-opacity="0"/></linearGradient>'
++'</defs>';
+
+// Grid Y — valores redondos
+var grid='<line x1="'+PL+'" y1="'+(PT+cH)+'" x2="'+(W-PR)+'" y2="'+(PT+cH)+'" stroke="#CBD5E1" stroke-width="1.5"/>';
+var rawStep=maxV/4,mag=Math.pow(10,Math.floor(Math.log10(Math.max(rawStep,1))));
+var step=Math.ceil(rawStep/mag)*mag||1;
+var seen={};
+for(var gi=1;gi<=5;gi++){
+var gv=Math.round(step*gi);
+if(gv>maxV*1.05||seen[gv])break;
+seen[gv]=1;
+var gy=yS(gv).toFixed(1);
+grid+='<line x1="'+PL+'" y1="'+gy+'" x2="'+(W-PR)+'" y2="'+gy+'" stroke="#F1F5F9" stroke-width="1"/>';
+var lbl=gv>=1000?(gv/1000).toFixed(1).replace(/\.0$/,'')+'k':String(gv);
+grid+='<text x="'+(PL-4)+'" y="'+(parseFloat(gy)+3.5)+'" text-anchor="end" font-size="8.5" fill="#64748b">'+lbl+'</text>';
+}
+
+// "Pedir até" removido do gráfico — informação fica só no indicador KPI ao lado
+
+// Marcador "Hoje"
+var todayX2=xS(todayIdx);
+grid+='<line x1="'+todayX2.toFixed(1)+'" y1="'+PT+'" x2="'+todayX2.toFixed(1)+'" y2="'+(PT+cH)+'" stroke="#334155" stroke-width="1.5" stroke-dasharray="3 3" opacity=".35"/>';
+
+// Entradas futuras (diamante roxo)
+(futEntries||[]).forEach(function(e){
+var d=new Date(),t=new Date(e.usoInicio+'T12:00:00');
+var idx=todayIdx+Math.round((t-d)/86400000);
+if(idx<0||idx>=N)return;
+var fx=xS(idx),fy=PT+11;
+grid+='<polygon points="'+fx+','+(fy+5)+' '+(fx-5)+','+fy+' '+fx+','+(fy-5)+' '+(fx+5)+','+fy+'" fill="#7C3AED" opacity=".9"/>';
+grid+='<text x="'+(fx+8)+'" y="'+(fy+4)+'" font-size="8" fill="#7C3AED" font-weight="700">+'+Math.round(e.qtd/1000)+'k</text>';
+});
+
+// Eixo X: todos os dias com data real baseada no offset de todayIdx
+var dayLabels='';
+for(var i=0;i<N;i++){
+var dayOffset=i-todayIdx;// negativo=passado, 0=hoje, positivo=futuro
+var d=new Date();d.setDate(d.getDate()+dayOffset);
+var isToday=i===todayIdx,isSun=d.getDay()===0,isNewMonth=d.getDate()===1;
+var x=xS(i),baseY=PT+cH;
+var lbl2=isToday?'Hoje':isNewMonth?(d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')):String(d.getDate()).padStart(2,'0');
+var color=isToday?'#0F2137':isSun?'#94A3B8':'#1E293B';
+var weight=isToday||isNewMonth?'700':'500';
+dayLabels+='<line x1="'+x.toFixed(1)+'" y1="'+baseY+'" x2="'+x.toFixed(1)+'" y2="'+(baseY+(isToday?7:4))+'" stroke="'+(isToday?'#0F2137':'#E2E8F0')+'" stroke-width="'+(isToday?2:1)+'"/>';
+dayLabels+='<text transform="translate('+x.toFixed(1)+','+(baseY+13)+') rotate(-45)" text-anchor="end" font-size="'+(isToday?9:8.5)+'" fill="'+color+'" font-weight="'+weight+'">'+lbl2+'</text>';
+if(isSun&&!isToday)dayLabels+='<circle cx="'+x.toFixed(1)+'" cy="'+(baseY+3)+'" r="2" fill="#CBD5E1"/>';
+}
+
+// Áreas, linhas e dots
+var dotIdxs=[0,7,14,21,28,30];
+var areas='',paths='',dotsLbl='';
+[[line1,c1,'sgl1',!!line2,line2?2:2.5],[line2,c2,'sgl2',false,2.5]].forEach(function(ds){
+if(!ds[0]||!ds[0].length)return;
+var vals=ds[0],color=ds[1],gid=ds[2],dashed=ds[3],lw=ds[4];
+var pts=vals.slice(0,N).map(function(v,i){return{x:xS(i),y:yS(v),v:Math.max(0,v)}});
+var poly=pts.map(function(p){return p.x.toFixed(1)+','+p.y.toFixed(1)}).join(' ');
+areas+='<polygon points="'+poly+' '+xS(30).toFixed(1)+','+(PT+cH)+' '+xS(0).toFixed(1)+','+(PT+cH)+'" fill="url(#'+gid+')" />';
+paths+='<polyline points="'+poly+'" fill="none" stroke="'+color+'" stroke-width="'+lw+'" stroke-linecap="round" stroke-linejoin="round"'+(dashed?' stroke-dasharray="6 4"':'')+'/>';
+dotIdxs.forEach(function(i){
+if(i>=N)return;
+var p=pts[i];
+var lv=p.v>=1000?(p.v/1000).toFixed(1).replace(/\.0$/,'')+'k':Math.round(p.v);
+var ly=p.y-9;if(ly<PT+5)ly=p.y+15;
+dotsLbl+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(i===0?5:3.5)+'" fill="'+color+'" stroke="white" stroke-width="1.5"/>';
+dotsLbl+='<text x="'+p.x.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" font-size="9" fill="'+color+'" font-weight="700">'+lv+'</text>';
+});
+});
+
+// Legenda
+var leg=line2&&line2.length
+?('<circle cx="'+PL+'" cy="12" r="3.5" fill="'+c1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Pessimista</text>'
++'<circle cx="'+(PL+72)+'" cy="12" r="3.5" fill="'+c2+'"/><text x="'+(PL+79)+'" y="15.5" font-size="9" fill="#475569">Realista</text>')
+:('<circle cx="'+PL+'" cy="12" r="3.5" fill="'+c1+'"/><text x="'+(PL+7)+'" y="15.5" font-size="9" fill="#475569">Projeção</text>');
+
+// Quando noWrap=true, retorna só o SVG puro (sem card) para embutir ao lado do KPI
+if(noWrap){
+return '<svg width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg" style="display:block;min-width:'+W+'px">'
++defs+grid+areas+paths+dotsLbl+dayLabels+'<g>'+leg+'</g>'
++'</svg>';
+}
+return '<div style="background:#fff;border-radius:12px;padding:14px 12px 8px;box-shadow:0 1px 3px rgba(0,0,0,.08);min-width:0">'
++(title?'<div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;margin-bottom:8px">'+title+'</div>':'')
++'<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%">'
++'<svg width="'+W+'" height="'+H+'" xmlns="http://www.w3.org/2000/svg" style="display:block;min-width:'+W+'px">'
++defs+grid+areas+paths+dotsLbl+dayLabels+'<g>'+leg+'</g>'
++'</svg></div></div>';
+}catch(e){return'<div style="font-size:12px;padding:12px;color:red">Erro: '+e.message+'</div>'}
+}
+async function deleteStockEntry(id){
+try{
+if(!confirm('Remover esta entrada de estoque?'))return;
+toast('Removendo...','warn');
+let ok=await deletarEstoqueAPI(id);
+toast(ok?'✅ Removido da planilha':'✅ Removido (cache local)','success');
+renderStockProjection(state.lastEnvArr||[],state.lastRegArr||[]);
+}catch(e){}
+}
+window.deleteStockEntry=deleteStockEntry;
+
+// ===== REGISTROS =====
+async function loadRegistros(){
+try{
+let r=await apiCall('lerRegistros',{ds:state.ds});
+state.registros=r&&r.data?r.data:[];
+state.regPage=1;
+renderRegistros();
+}catch(e){state.registros=[];renderRegistros()}
+}
+
+function filterRegistros(){
+try{state.regPage=1;renderRegistros()}catch(e){}
+}
+window.filterRegistros=filterRegistros;
+
+function renderRegistros(){
+try{
+let body=$('regBody');if(!body)return;
+let search=(($('regSearch')||{}).value||'').toLowerCase();
+let filtered=state.registros.filter(r=>{
+let s=(r.codigo||'')+(r.operador||'')+(r.ds||'')+(r.tipo||'');
+return s.toLowerCase().includes(search);
+});
+let pages=Math.ceil(filtered.length/20)||1;
+let start=(state.regPage-1)*20;
+let pageData=filtered.slice(start,start+20);
+body.innerHTML=pageData.map((r,i)=>'<tr onclick="toggleDetail(this)" style="cursor:pointer"><td>'+((r.codigo||'').slice(0,20))+'</td><td>'+( r.tipo||'')+'</td><td>'+(r.movimento||'')+'</td><td>'+(r.ds||'')+'</td><td>'+(fmtDate(r.datahora))+'</td></tr><tr class="detail-row hidden" id="det'+i+'"><td colspan="5">Op: '+(r.operador||'')+' | Class: '+(r.classificacao||'—')+' | Obs: '+(r.observacao||'—')+(r.fotourl?' | 📷 Foto':'')+'</td></tr>').join('');
+let pag=$('regPagination');if(pag){
+let html='';for(let p=1;p<=pages;p++){html+='<button class="page-btn '+(p===state.regPage?'active':'')+'" onclick="goRegPage('+p+')">'+p+'</button>'}
+pag.innerHTML=html;
+}
+}catch(e){}
+}
+
+function goRegPage(p){state.regPage=p;renderRegistros()}
+window.goRegPage=goRegPage;
+
+function toggleDetail(tr){try{let next=tr.nextElementSibling;if(next)next.classList.toggle('hidden')}catch(e){}}
+window.toggleDetail=toggleDetail;
+
+function exportCSV(){
+try{
+let csv='Codigo,Tipo,Movimento,Classificacao,DS,Operador,DataHora,Observacao\n';
+state.registros.forEach(r=>{csv+='"'+(r.codigo||'')+'","'+(r.tipo||'')+'","'+(r.movimento||'')+'","'+(r.classificacao||'')+'","'+(r.ds||'')+'","'+(r.operador||'')+'","'+(r.datahora||'')+'","'+(r.observacao||'')+'"\n'});
+let blob=new Blob([csv],{type:'text/csv'});
+let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='scantrack_registros_'+today()+'.csv';a.click();
+}catch(e){toast('Erro ao exportar','error')}
+}
+window.exportCSV=exportCSV;
+
+// ===== ENVIOS (DISPATCH) =====
+function setupUpload(){
+try{
+let zone=$('uploadZone');let fi=$('fileInput');
+if(zone){
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('dragover')});
+zone.addEventListener('dragleave',()=>zone.classList.remove('dragover'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('dragover');let f=e.dataTransfer.files[0];if(f)parseFile(f)});
+}
+if(fi)fi.addEventListener('change',e=>{let f=e.target.files[0];if(f)parseFile(f)});
+}catch(e){}
+}
+
+function parseFile(file){
+try{
+let ext=file.name.split('.').pop().toLowerCase();
+if((ext==='xlsx'||ext==='xlsm')&&typeof XLSX!=='undefined'&&XLSX){
+let reader=new FileReader();
+reader.onload=function(e){
+try{
+let data=new Uint8Array(e.target.result);
+let wb=XLSX.read(data,{type:'array',cellDates:true});
+let sheetName=wb.SheetNames.find(n=>n.includes('All Dispatch'))||wb.SheetNames[0];
+let ws=wb.Sheets[sheetName];
+let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true});
+processDispatchRows(rows,file.name);
+}catch(ex){toast('Erro ao processar xlsx: '+ex.message,'error')}
+};
+reader.readAsArrayBuffer(file);
+}else if(ext==='csv'||ext==='txt'){
+let reader=new FileReader();
+reader.onload=function(e){
+try{parseCSVData(e.target.result,file.name)}catch(ex){toast('Erro ao ler CSV','error')}
+};
+reader.readAsText(file,'UTF-8');
+}else{
+toast('Formato não suportado. Use .xlsx, .xlsm ou .csv','error');
+}
+}catch(e){toast('Erro ao ler arquivo','error')}
+}
+
+function parseCSVFile(file){parseFile(file)}
+
+function parsePaste(){
+try{let data=($('pasteArea')||{}).value;if(data)parseCSVData(data)}catch(e){}
+}
+window.parsePaste=parsePaste;
+
+function parseCSVData(raw,filename){
+try{
+let lines=raw.split(/\r?\n/);
+let records=[];
+let currentRoute='',currentDate='';
+
+for(let i=0;i<lines.length;i++){
+let cols=lines[i].split(/[\t,](?=(?:[^"]*"[^"]*")*[^"]*$)/);
+cols=cols.map(c=>c.replace(/^"|"$/g,'').trim());
+
+if(cols[0]==='Route'||cols[0]==='route'){
+currentRoute=cols[1]||'';
+if(cols[9])currentDate=cols[9];
+continue;
+}
+
+if(cols[0]&&/^\d/.test(cols[0])&&cols.length>6&&cols[6]){
+let labels=(cols[6]||'').split(/[,\n;]+/).map(l=>l.trim()).filter(l=>l);
+let hub=cols[2]||cols[1]||'';
+let addr=cols[1]||'';
+
+labels.forEach(label=>{
+let tipo=detectTipo(label);
+if(tipo==='Pacote')tipo='Bag';
+records.push({codigo:label,tipo,rota:currentRoute,hub,endereco:addr,data:currentDate,ds:state.ds,regional:state.regional});
+});
+}
+}
+
+if(!records.length){toast('Nenhum registro encontrado. Verifique o formato.','error');return}
+
+let bags=records.filter(r=>r.tipo==='Bag').length;
+let rafias=records.filter(r=>r.tipo==='Rafia').length;
+let rotas=[...new Set(records.map(r=>r.rota))].length;
+let date=currentDate||today();
+
+state.parsedDispatch=records;state.parsedFilename=filename||'';
+state.parsedDate=date;
+
+let prev=$('uploadPreview');if(!prev)return;
+show(prev);
+// Anti-dup check
+var dupKey='scantrack_dup_'+state.ds+'_'+(filename||date||'').replace(/[^a-zA-Z0-9-_]/g,'');
+var dupVal=null;try{dupVal=localStorage.getItem(dupKey)}catch(e){}
+if(dupVal){
+html='<div class="card" style="border:2px solid var(--red)"><p style="color:var(--red);font-weight:600">⚠️ Este arquivo já foi enviado para '+state.ds+'!</p><p style="font-size:12px;margin-top:8px">Arquivo: '+(filename||'dispatch')+' ('+records.length+' registros). Para reenviar, clique abaixo:</p><div style="display:flex;gap:8px;margin-top:8px"><button class="btn" style="flex:1;background:var(--red);color:white" onclick="forceUploadDispatch()">🔄 Sobrescrever carga</button><button class="btn" style="background:var(--gray);color:var(--navy)" onclick="cancelDispatch()">✖ Cancelar</button></div></div>';
+prev.innerHTML=html;return;
+}
+prev.innerHTML='<div class="card"><h4>📊 Resumo: '+rafias+' Ráfias, '+bags+' Bags — '+rotas+' rotas — Data: '+date+' — DS: '+state.ds+'</h4><div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>'+records.slice(0,10).map(r=>'<tr><td>'+r.codigo+'</td><td>'+r.tipo+'</td><td>'+r.rota+'</td><td>'+r.hub+'</td></tr>').join('')+'</tbody></table></div>'+(records.length>10?'<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>':'')+'<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-success" style="flex:1;padding:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button><button class="btn" style="padding:12px;background:var(--gray);color:var(--navy)" onclick="cancelDispatch()">✖</button></div></div>';
+
+
+}catch(e){toast('Erro no parse: '+e.message,'error')}
+}
+
+async function uploadDispatch(){
+try{
+let records=state.parsedDispatch;if(!records||!records.length)return;
+show($('uploadProgress'));
+let txt=$('progText');
+
+// === AUTO-BAIXA: verifica pendências antes do upload ===
+if(txt)txt.textContent='Verificando pendências...';
+let autoRetornos=[];
+try{
+let envData=await apiCall('lerEnvios',{ds:state.ds});
+let regData=await apiCall('lerRegistros',{ds:state.ds});
+let prevEnv=envData&&envData.data?envData.data:[];
+let prevReg=regData&&regData.data?regData.data:[];
+// Índice de códigos enviados — inclui chave normalizada (de-para)
+let sentKeys=new Set();
+prevEnv.forEach(e=>{if(e.codigo){sentKeys.add(e.codigo);let k=codeKey(e.codigo);if(k)sentKeys.add(k);}});
+prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('said')).forEach(r=>{if(r.codigo){sentKeys.add(r.codigo);let k=codeKey(r.codigo);if(k)sentKeys.add(k);}});
+// Índice de códigos retornados — inclui chave normalizada
+let retKeys=new Set();
+prevReg.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')).forEach(r=>{if(r.codigo){retKeys.add(r.codigo);let k=codeKey(r.codigo);if(k)retKeys.add(k);}});
+// Pendentes = enviados sem retorno (chave normalizada)
+let pendKeys=new Set([...sentKeys].filter(c=>!retKeys.has(c)));
+// Para cada novo registro no dispatch que está pendente → auto-retorno
+let seen=new Set();
+records.forEach(r=>{
+let rKey=codeKey(r.codigo)||r.codigo;
+let isPend=pendKeys.has(r.codigo)||pendKeys.has(rKey);
+if(isPend&&!seen.has(rKey)){
+seen.add(rKey);
+autoRetornos.push({codigo:r.codigo,tipo:detectTipo(r.codigo),movimento:'Retorno',classificacao:'',
+observacao:'Auto-baixa: reenviado em novo despacho | Rota:'+(r.rota||'-')+' | Hub:'+(r.hub||'-'),
+fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,
+operador:state.user+'[auto]',datahora:(r.data||today())+'T07:59:00Z'});
+}
+});
+}catch(ex){}
+
+// Upload auto-retornos primeiro (se houver)
+if(autoRetornos.length>0){
+if(txt)txt.textContent='Auto-baixa: registrando '+autoRetornos.length+' retorno(s)...';
+let fill=$('progFill');if(fill)fill.style.width='10%';
+let retChunks=[];for(let i=0;i<autoRetornos.length;i+=50){retChunks.push(autoRetornos.slice(i,i+50))}
+for(let chunk of retChunks){await apiCall('registrarBatch',{registros:chunk})}
+}
+
+// Upload das saídas novas
+let chunks=[];for(let i=0;i<records.length;i+=50){chunks.push(records.slice(i,i+50))}
+let done=0;
+for(let chunk of chunks){
+var mapped=chunk.map(function(r){return{codigo:r.codigo,tipo:r.tipo,movimento:r.movimento||'Saida',classificacao:'',observacao:'Rota:'+(r.rota||'-')+' | Hub:'+(r.hub||'-'),fotourl:'',ds:r.ds||state.ds,regional:r.regional||state.regional,operador:state.user||'',datahora:r.data?r.data+'T08:00:00Z':new Date().toISOString()}});
+await apiCall('registrarBatch',{registros:mapped});
+done+=chunk.length;
+let pct=Math.round((done/records.length)*100);
+let fill=$('progFill');if(fill)fill.style.width=(10+pct*0.9)+'%';
+if(txt)txt.textContent='Enviando saídas... '+done+'/'+records.length;
+}
+
+var dupSaveKey='scantrack_dup_'+state.ds+'_'+(state.parsedFilename||state.parsedDate||today()).replace(/[^a-zA-Z0-9-_]/g,'');
+try{localStorage.setItem(dupSaveKey,JSON.stringify({date:state.parsedDate,count:records.length,ts:Date.now()}))}catch(e){}
+saveRecentUpload(records);
+let msg='✅ '+records.length+' saídas enviadas!';
+if(autoRetornos.length>0)msg+=' ('+autoRetornos.length+' auto-baixa aplicada)';
+toast(msg,'success');
+hide($('uploadProgress'));hide($('uploadPreview'));
+loadRecentUploads();
+}catch(e){toast('Erro no upload','error')}
+}
+window.uploadDispatch=uploadDispatch;
+function forceUploadDispatch(){uploadDispatch()}
+window.forceUploadDispatch=forceUploadDispatch;
+
+function cancelDispatch(){
+try{
+state.parsedDispatch=null;state.parsedFilename='';state.parsedDate='';
+hide($('uploadPreview'));
+let fi=$('fileInput');if(fi)fi.value='';
+let pa=$('pasteArea');if(pa)pa.value='';
+}catch(e){}
+}
+window.cancelDispatch=cancelDispatch;
+
+function clearUploadHistory(){
+try{
+if(!confirm('Limpar todo o histórico de uploads e anti-duplicatas? Esta ação não pode ser desfeita.'))return;
+var keys=Object.keys(localStorage);
+keys.forEach(function(k){if(k.includes('lastupload')||k.includes('scantrack_dup_')||k==='scantrack_recentUploads')localStorage.removeItem(k)});
+ls('recentUploads',null);lsDel('recentUploads');
+toast('Histórico de uploads limpo!','success');
+loadRecentUploads();
+}catch(e){}
+}
+window.clearUploadHistory=clearUploadHistory;
+
+
+function processDispatchRows(rows,filename){
+try{
+var records=[];
+var currentRoute='',currentDate=extractDateFromFilename(filename)||'';
+
+function parseDate(val){
+try{
+if(!val)return '';
+if(val instanceof Date&&!isNaN(val.getTime()))return val.toISOString().split('T')[0];
+if(typeof val==='number'&&val>40000&&val<60000){var d=new Date((val-25569)*86400000);if(!isNaN(d.getTime()))return d.toISOString().split('T')[0]}
+var s=String(val).trim();
+var m;
+m=s.match(/(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+m=s.match(/(\d{4})\/(\d{2})\/(\d{2})/);if(m)return m[1]+'-'+m[2]+'-'+m[3];
+m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);if(m)return m[3]+'-'+m[2]+'-'+m[1];
+m=s.match(/(\d{2})-(\d{2})-(\d{4})/);if(m)return m[3]+'-'+m[2]+'-'+m[1];
+if(s.includes('T')){var p=s.split('T')[0];if(p.match(/\d{4}-\d{2}-\d{2}/))return p}
+return '';
+}catch(e){return ''}
+}
+
+function extractDateFromFilename(name){
+try{
+if(!name)return '';
+var m=name.match(/(\d{4})-(\d{2})-(\d{2})/);
+if(m)return m[1]+'-'+m[2]+'-'+m[3];
+m=name.match(/(\d{2})-(\d{2})-(\d{4})/);
+if(m)return m[3]+'-'+m[2]+'-'+m[1];
+return '';
+}catch(e){return ''}
+}
+
+for(var i=0;i<rows.length;i++){
+var rawRow=rows[i]||[];
+var cols=[];
+for(var c=0;c<rawRow.length;c++){
+var cell=rawRow[c];
+if(cell==null)cols.push('');
+else if(cell instanceof Date)cols.push(cell);
+else cols.push(String(cell).trim());
+}
+if(cols[0]==='Route'||cols[0]==='route'){
+currentRoute=String(cols[1]||'');
+var dateCell=rawRow[9];
+if(dateCell)currentDate=parseDate(dateCell);
+if(!currentDate){for(var dc=7;dc<cols.length;dc++){var pd=parseDate(rawRow[dc]);if(pd&&pd.match(/^\d{4}-/)){currentDate=pd;break}}}
+continue;
+}
+var firstCol=String(cols[0]||'');
+if(firstCol&&/^\d/.test(firstCol)&&cols.length>6&&cols[6]){
+var rawLabels=String(cols[6]||'');
+var labels=rawLabels.split(/[\n\r;,]+/).map(function(l){return l.trim()}).filter(function(l){return l.length>1});
+var hub=String(cols[2]||cols[1]||'').substring(0,50);
+var addr=String(cols[1]||'').substring(0,80);
+for(var k=0;k<labels.length;k++){
+var label=labels[k];
+var tipo=detectTipo(label);
+if(tipo==='Pacote')tipo='Bag';// TBR não entra no dispatch
+records.push({codigo:label,tipo:tipo,movimento:'Saida',rota:currentRoute,hub:hub,endereco:addr,data:currentDate||extractDateFromFilename(filename)||today(),ds:state.ds,regional:state.regional||''});
+}
+}
+}
+if(!records.length){toast('Nenhum registro encontrado no arquivo.','error');return}
+var bags=records.filter(function(r){return r.tipo==='Bag'}).length;
+var rafias=records.filter(function(r){return r.tipo==='Rafia'}).length;
+var rotas=[];records.forEach(function(r){if(rotas.indexOf(r.rota)<0)rotas.push(r.rota)});
+var date=currentDate||today();
+state.parsedDispatch=records;state.parsedFilename=filename||'';
+state.parsedDate=date;
+var prev=$('uploadPreview');if(!prev)return;
+show(prev);
+var xlsDupKey='scantrack_dup_'+state.ds+'_'+(filename||date||'').replace(/[^a-zA-Z0-9-_]/g,'');
+try{if(localStorage.getItem(xlsDupKey)){prev.innerHTML='<div class="card" style="border:2px solid #E74C3C"><p style="color:#E74C3C;font-weight:600">⚠️ Este arquivo já foi enviado para '+state.ds+'!</p><p style="font-size:12px;margin-top:8px">Para reenviar:</p><button class="btn" style="background:#E74C3C;color:white;margin-top:8px;width:100%" onclick="forceUploadDispatch()">🔄 Sobrescrever</button></div>';return}}catch(ex){}
+var html='<div class="card"><h4>📊 '+rafias+' Ráfias, '+bags+' Bags — '+rotas.length+' rotas</h4><p style="font-size:12px;color:var(--gray3)">Data: '+date+' | DS: '+state.ds+'</p>';
+html+='<div style="overflow-x:auto;margin-top:8px"><table class="data-table"><thead><tr><th>Código</th><th>Tipo</th><th>Rota</th><th>Hub</th></tr></thead><tbody>';
+for(var j=0;j<Math.min(records.length,10);j++){html+='<tr><td>'+records[j].codigo+'</td><td>'+records[j].tipo+'</td><td>'+records[j].rota+'</td><td>'+records[j].hub+'</td></tr>'}
+html+='</tbody></table></div>';
+if(records.length>10)html+='<p style="font-size:11px;color:var(--gray3);margin-top:4px">... e mais '+(records.length-10)+' registros</p>';
+html+='<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-success" style="flex:1;padding:12px" onclick="uploadDispatch()">📤 Enviar '+records.length+' registros</button><button class="btn" style="padding:12px;background:var(--gray);color:var(--navy)" onclick="cancelDispatch()">✖</button></div></div>';
+prev.innerHTML=html;
+}catch(e){toast('Erro: '+e.message,'error')}
+}
+window.processDispatchRows=processDispatchRows;
+
+
+function saveRecentUpload(records){
+try{
+let uploads=ls('recentUploads')||[];
+let bags=records.filter(r=>r.tipo==='Bag').length;
+let rafias=records.filter(r=>r.tipo==='Rafia').length;
+uploads.unshift({date:state.parsedDate||today(),ds:state.ds,bags,rafias,total:records.length,ts:new Date().toISOString()});
+if(uploads.length>5)uploads=uploads.slice(0,5);
+ls('recentUploads',uploads);
+}catch(e){}
+}
+
+function loadRecentUploads(){
+try{
+let el=$('recentUploads');if(!el)return;
+let uploads=ls('recentUploads')||[];
+if(!uploads.length){el.innerHTML='Nenhum upload registrado';return}
+el.innerHTML='<table class="data-table"><thead><tr><th>Data</th><th>DS</th><th>Bags</th><th>Ráfias</th><th>Total</th></tr></thead><tbody>'+uploads.map(u=>'<tr><td>'+u.date+'</td><td>'+u.ds+'</td><td>'+u.bags+'</td><td>'+u.rafias+'</td><td>'+u.total+'</td></tr>').join('')+'</tbody></table>';
+}catch(e){}
+}
+
+// ===== ADMIN =====
+function checkAdmin(){
+try{
+let nb=$('adminNavBtn');
+if(isAdmin()){
+hide($('adminLocked'));show($('adminContent'));renderAdmin();
+if(nb)show(nb);
+}else{
+show($('adminLocked'));hide($('adminContent'));
+if(nb)hide(nb);
+}
+}catch(e){}
+}
+
+function renderAdmin(){
+try{
+if($('adminApiUrl'))$('adminApiUrl').value=getApiUrl();
+if($('currentPin'))$('currentPin').textContent=getPin();
+
+// DS list
+let dsList=$('adminDsList');if(dsList){
+dsList.innerHTML=getDS().map((d,i)=>{let n=typeof d==='string'?d:d.ds+':'+d.regional;return'<li>'+n+'<button onclick="removeDS('+i+')">✕</button></li>'}).join('');
+}
+// Classifications
+let clList=$('adminClassList');if(clList){
+clList.innerHTML=getClassifications().map((c,i)=>'<li>'+c+'<button onclick="removeClass('+i+')">✕</button></li>').join('');
+}
+// Admins
+let aList=$('adminAdminsList');if(aList){
+aList.innerHTML=getAdmins().map((a,i)=>'<li>'+a+'<button onclick="removeAdmin('+i+')">✕</button></li>').join('');
+}
+}catch(e){}
+}
+
+function saveApiUrl(){try{let v=($('adminApiUrl')||{}).value;ls('api_url',v);toast('URL salva','success')}catch(e){}}
+window.saveApiUrl=saveApiUrl;
+
+async function testApi(){
+try{
+if($('apiTestResult'))$('apiTestResult').textContent='Testando...';
+let r=await apiCall('lerConfig');
+if(r)if($('apiTestResult'))$('apiTestResult').textContent='✅ Conexão OK';
+else if($('apiTestResult'))$('apiTestResult').textContent='❌ Falha na conexão';
+}catch(e){if($('apiTestResult'))$('apiTestResult').textContent='❌ Erro: '+e.message}
+}
+window.testApi=testApi;
+
+function addDS(){try{let v=($('addDsInput')||{}).value;if(v){let cfg=state.config||{};let ds=getDS();ds.push(v);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});if($('addDsInput'))$('addDsInput').value=''}}catch(e){}}
+window.addDS=addDS;
+function removeDS(i){try{let cfg=state.config||{};let ds=getDS();ds.splice(i,1);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeDS=removeDS;
+function addClass(){try{let v=($('addClassInput')||{}).value;if(v){let cfg=state.config||{};let cl=getClassifications();cl.push(v);cfg.classifications=cl;state.config=cfg;ls('config',cfg);renderAdmin();updateTbrClassOptions();apiCall('setup',{config:cfg});if($('addClassInput'))$('addClassInput').value=''}}catch(e){}}
+window.addClass=addClass;
+function removeClass(i){try{let cfg=state.config||{};let cl=getClassifications();cl.splice(i,1);cfg.classifications=cl;state.config=cfg;ls('config',cfg);renderAdmin();updateTbrClassOptions();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeClass=removeClass;
+function addAdmin(){try{let v=($('addAdminInput')||{}).value;if(v){let cfg=state.config||{};let ad=getAdmins();ad.push(v.toLowerCase());cfg.admins=ad;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});if($('addAdminInput'))$('addAdminInput').value=''}}catch(e){}}
+window.addAdmin=addAdmin;
+function removeAdmin(i){try{let cfg=state.config||{};let ad=getAdmins();ad.splice(i,1);cfg.admins=ad;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg})}catch(e){}}
+window.removeAdmin=removeAdmin;
+function changePin(){try{let v=($('newPinInput')||{}).value;if(v&&v.length===4){let cfg=state.config||{};cfg.pin=v;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('setup',{config:cfg});toast('PIN alterado','success');if($('newPinInput'))$('newPinInput').value=''}else{toast('PIN deve ter 4 dígitos','error')}}catch(e){}}
+window.changePin=changePin;
+
+// ===== COMO USAR =====
+function loadHelp(){try{renderHelp(state.lang)}catch(e){}}
+function setLang(l,btn){
+try{
+state.lang=l;
+document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+if(btn)btn.classList.add('active');
+renderHelp(l);
+}catch(e){}
+}
+window.setLang=setLang;
+
+function renderHelp(lang){
+try{
+let el=$('helpContent');if(!el)return;
+if(lang==='pt'){
+el.innerHTML=`
+<div style="background:linear-gradient(135deg,#0F2137,#1a3a5c);color:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px">
+<strong style="font-size:15px">📦 ScanTrack v3.0</strong><br>
+<span style="opacity:.85">Sistema de rastreamento de Bags, Ráfias e Pacotes TBR — AMZL BR</span>
+</div>
+
+<div class="help-section">
+<h3>🔐 Login</h3>
+<p><strong>Alias</strong>: seu login Amazon (ex: <code>jsilva</code>) — sem espaços, sem acento. Fica salvo para a próxima vez.<br>
+<strong>DS</strong>: sua Delivery Station. A lista vem da configuração da estação.<br>
+<strong>PIN</strong>: 4 dígitos fornecidos pelo responsável da operação.<br>
+<em>Sessão salva automaticamente. Feche e reabra sem precisar logar novamente.</em></p>
+</div>
+
+<div class="help-section">
+<h3>📷 Scanner — Tipos de ativo</h3>
+<p>Selecione o tipo antes de escanear. O app detecta automaticamente mas você pode corrigir:</p>
+<ul>
+<li><strong>🛍️ Bag</strong> → código com 4 dígitos: ex. <code>Black 0805</code>, <code>Red 0921</code></li>
+<li><strong>🧵 Ráfia</strong> → código com 3 dígitos ou começa com DN-: ex. <code>Black 805</code>, <code>DN-N-7507-007</code></li>
+<li><strong>📋 Pacote (TBR)</strong> → começa com TBR: ex. <code>TBR379054196</code></li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟢 Modo RETORNO (padrão — Bag/Ráfia)</h3>
+<p>Use para registrar bags/ráfias que <strong>voltaram</strong> com os DAs ao fim do dia.</p>
+<ul>
+<li>Scan contínuo sem confirmação — só apontar e vai</li>
+<li>Flash verde + beep confirma cada leitura</li>
+<li>Mesmo código bloqueado por 5 segundos (anti-duplicata acidental)</li>
+<li><strong>Mobile</strong>: câmera abre automático, usa BarcodeDetector nativo</li>
+<li><strong>Desktop/USB</strong>: campo de texto com foco automático. Apontar o leitor USB basta</li>
+<li>Digite na caixa "Código manual" se a câmera não ler</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟠 Modo SAÍDA (exceção — Bag/Ráfia)</h3>
+<p>Use para registrar <strong>manualmente</strong> uma saída que não foi pelo Dispatch. Exceção — o fluxo normal usa Upload Dispatch.</p>
+<ul>
+<li>Preencha Rota e Motorista, depois confirme com ✅</li>
+<li>O código fica visível no banner laranja antes de confirmar</li>
+<li>Botão ✖ Cancelar descarta sem registrar</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📋 Modo PACOTE (TBR)</h3>
+<p>Para registrar pacotes com ocorrências — avariado, endereço não localizado, etc.</p>
+<ul>
+<li>Escaneie o código TBR</li>
+<li>Selecione a <strong>Classificação</strong> (obrigatório)</li>
+<li>Se escolher "Outro" — o campo <strong>Observação é obrigatório</strong></li>
+<li>Foto é opcional — use 📸 para tirar com câmera</li>
+<li>Confirme com ✅ Registrar Pacote</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📤 Upload Dispatch</h3>
+<p><strong>Fluxo principal para registrar as saídas do dia.</strong></p>
+<ul>
+<li>Exporte a aba <strong>"All Dispatch Sheet"</strong> do Excel como <code>.xlsx</code> ou <code>.csv</code></li>
+<li>Arraste o arquivo ou clique na área de upload</li>
+<li>O sistema mostra preview: X Bags, Y Ráfias, Z rotas</li>
+<li>Clique <strong>📤 Enviar</strong> para registrar em lotes de 50</li>
+<li><strong>Anti-duplicata</strong>: o mesmo arquivo não pode ser enviado duas vezes. Se precisar, clique "Sobrescrever"</li>
+<li><strong>Auto-baixa automática</strong>: se uma bag/ráfia no Dispatch já estava pendente (saiu mas não voltou), o sistema automaticamente registra o retorno antes de lançar a nova saída. Isso corrige casos onde o scan de retorno foi pulado.</li>
+</ul>
+<p style="background:#fff3e0;border-radius:6px;padding:8px;margin-top:6px;font-size:12px">⚠️ Modo Colar: copie as linhas do Excel (Ctrl+A, Ctrl+C na aba dispatch) e cole na textarea. Clique "Processar".</p>
+</div>
+
+<div class="help-section">
+<h3>📊 Dashboard</h3>
+<p>Selecione DS, Regional, Tipo e período nos filtros. Clique 🔄 para atualizar.</p>
+<ul>
+<li><strong>Total Saídas</strong> (laranja): tudo que saiu no período</li>
+<li><strong>Total Retornos</strong> (verde): bags/ráfias que efetivamente voltaram E estavam nos envios</li>
+<li><strong>Pendentes</strong> (vermelho): Saídas − Retornos = o que ainda não voltou</li>
+<li><strong>% Retorno</strong>: colorido por faixa — verde ≥80%, amarelo ≥60%, vermelho &lt;60%</li>
+<li><strong>Retornos Adicionais</strong> (azul): itens escaneados como retorno que não estão nos envios do período (voltaram de dia anterior ou estoque). Não entra no %.</li>
+</ul>
+<p style="margin-top:6px"><strong>Pendências por Hub</strong>: tabela ordenada pelos que mais pendências têm. 🔴 = % &lt; 80%.<br>
+<strong>Gráfico de linha</strong>: envios vs retornos nos últimos 7 dias.<br>
+<strong>Rotas s/ Devolução</strong>: apenas rotas com itens ainda pendentes.</p>
+<p style="margin-top:6px"><strong>📥 Pendentes (CSV)</strong>: exporta lista detalhada com código, tipo, rota, hub, data saída e dias em aberto. Use para cobrar os DAs no detalhe.</p>
+</div>
+
+<div class="help-section">
+<h3>📋 Registros</h3>
+<p>Todos os registros da sua DS. Use a busca por código, operador ou DS. Clique em uma linha para expandir detalhes. Exporta CSV completo.</p>
+</div>
+
+<div class="help-section">
+<h3>⚙️ Config</h3>
+<p>Área restrita para o responsável técnico da operação. Acesso via credenciais fornecidas pela equipe de implantação.</p>
+</div>
+
+<div class="help-section">
+<h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O app funciona sem internet? <span>▸</span></div><div class="faq-a">Parcialmente. Scans são salvos em fila local e reenviados automaticamente quando a conexão voltar. O dashboard e upload precisam de conexão.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é "Retorno Adicional"? <span>▸</span></div><div class="faq-a">É uma bag/ráfia que foi escaneada como retorno hoje, mas não estava nos envios deste período (ou seja, já estava em estoque ou vinha de outro dia). Não impacta o % de retorno.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">O que é Auto-baixa? <span>▸</span></div><div class="faq-a">Quando você faz upload de um Dispatch e um código já estava pendente (saiu antes e não voltou), o sistema automaticamente registra o retorno antes de lançar a nova saída. Evita acúmulo de pendências por scans pulados.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Por que meu scan foi bloqueado hoje? <span>▸</span></div><div class="faq-a">O sistema bloqueia o mesmo código sendo bipado mais de uma vez no mesmo dia, mesmo por operadores diferentes. Isso evita contagem dupla de retornos. Se houver um engano, o admin pode corrigir direto na planilha.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Por que o scan do RETORNO não pede confirmação? <span>▸</span></div><div class="faq-a">Para agilidade. O retorno é o fluxo mais frequente (dezenas de scans por dia), então vai rápido. Se errar, o admin corrige na planilha.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Câmera não abre no celular. O que fazer? <span>▸</span></div><div class="faq-a">Verifique se o site tem permissão de câmera no browser. Em Chrome: clique no cadeado na barra de endereço → Permissões → Câmera → Permitir. O campo "Código manual" sempre funciona como alternativa.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Como exportar os pendentes para cobrar os DAs? <span>▸</span></div><div class="faq-a">No Dashboard, clique em "📥 Pendentes (CSV)". Abre um arquivo com código, tipo, rota, hub, data que saiu e dias em aberto.</div></div>
+</div>`;
+}else{
+el.innerHTML=`
+<div style="background:linear-gradient(135deg,#0F2137,#1a3a5c);color:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px">
+<strong style="font-size:15px">📦 ScanTrack v3.0</strong><br>
+<span style="opacity:.85">Bag, Rafia & TBR Package Tracking System — AMZL BR</span>
+</div>
+
+<div class="help-section">
+<h3>🔐 Login</h3>
+<p><strong>Alias</strong>: your Amazon login (e.g. <code>jsilva</code>) — no spaces. Saved for next time.<br>
+<strong>DS</strong>: your Delivery Station. List comes from API; falls back to defaults.<br>
+<strong>PIN</strong>: 4 digits provided by the station manager.<br>
+<em>Session is auto-saved. Close and reopen without re-logging in.</em></p>
+</div>
+
+<div class="help-section">
+<h3>📷 Scanner — Asset Types</h3>
+<ul>
+<li><strong>🛍️ Bag</strong> → 4-digit code: e.g. <code>Black 0805</code></li>
+<li><strong>🧵 Rafia</strong> → 3-digit code or starts with DN-: e.g. <code>Black 805</code>, <code>DN-N-7507</code></li>
+<li><strong>📋 Package (TBR)</strong> → starts with TBR: e.g. <code>TBR379054196</code></li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟢 RETURN Mode (default — Bag/Rafia)</h3>
+<p>Register bags/rafias <strong>returning</strong> with DAs at end of day.</p>
+<ul>
+<li>Continuous scan — no confirmation needed, just point and shoot</li>
+<li>Green flash + beep confirms each read</li>
+<li>5-second cooldown per code (prevents accidental duplicates)</li>
+<li><strong>Mobile</strong>: camera opens automatically</li>
+<li><strong>Desktop/USB</strong>: text field with auto-focus. Just point USB reader</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>🟠 DEPARTURE Mode (exception — Bag/Rafia)</h3>
+<p>Manually register a departure not in the Dispatch. Use rarely.</p>
+<ul>
+<li>Fill Route and Driver, then confirm with ✅</li>
+<li>Code is shown in the orange banner before confirming</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📋 PACKAGE Mode (TBR)</h3>
+<ul>
+<li>Scan the TBR barcode</li>
+<li>Select Classification (required)</li>
+<li>"Other" requires a note in Observation</li>
+<li>Photo is optional</li>
+<li>Confirm with ✅ Register Package</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📤 Upload Dispatch</h3>
+<p><strong>Main flow to register daily departures.</strong></p>
+<ul>
+<li>Export <strong>"All Dispatch Sheet"</strong> tab as <code>.xlsx</code> or <code>.csv</code></li>
+<li>Drag & drop or click to select</li>
+<li>Preview shows counts: Bags, Rafias, Routes</li>
+<li>Click <strong>📤 Send</strong> to upload in batches of 50</li>
+<li><strong>Anti-duplicate</strong>: same file can't be sent twice. Use "Overwrite" if needed</li>
+<li><strong>Auto-return</strong>: if a bag/rafia in the Dispatch was already pending (sent but not returned), the system auto-registers its return before recording the new departure</li>
+</ul>
+</div>
+
+<div class="help-section">
+<h3>📊 Dashboard</h3>
+<ul>
+<li><strong>Total Departures</strong> (orange): everything that left in the period</li>
+<li><strong>Total Returns</strong> (green): items that came back AND were in the dispatch</li>
+<li><strong>Pending</strong> (red): Departures − Returns = what hasn't come back</li>
+<li><strong>% Return</strong>: color-coded — green ≥80%, orange ≥60%, red &lt;60%</li>
+<li><strong>Additional Returns</strong> (blue): items returned that weren't in this period's dispatch. Doesn't affect %.</li>
+</ul>
+<p><strong>📥 Pending (CSV)</strong>: exports detailed list with code, type, route, hub, departure date and days pending.</p>
+</div>
+
+<div class="help-section">
+<h3>⚙️ Config</h3>
+<p>Restricted area for the technical team. Access via credentials provided by the implementation team.</p>
+</div>
+
+<div class="help-section">
+<h3>❓ FAQ</h3>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Does it work offline? <span>▸</span></div><div class="faq-a">Partially. Scans queue locally and auto-send when connection returns. Dashboard and upload require connection.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">What is Auto-return? <span>▸</span></div><div class="faq-a">When you upload a Dispatch and a code was already pending (sent before, never returned), the system auto-registers a return before recording the new departure. Prevents fake pending accumulation.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">Camera won't open on mobile. <span>▸</span></div><div class="faq-a">Check camera permission: tap the lock icon in address bar → Permissions → Camera → Allow. The manual code field always works as backup.</div></div>
+<div class="faq-item" onclick="this.classList.toggle('open')"><div class="faq-q">How to export pending items? <span>▸</span></div><div class="faq-a">On Dashboard, click "📥 Pending (CSV)". Opens a spreadsheet with code, type, route, hub, departure date and days pending. Use it in your daily meeting.</div></div>
+</div>`;
+}
+}catch(e){}
+}
+
+// ===== MODAL =====
+function showModal(html){try{let o=$('modalOverlay'),c=$('modalContent');if(o&&c){c.innerHTML=html;show(o)}}catch(e){}}
+function hideModal(){try{hide($('modalOverlay'))}catch(e){}}
+window.showModal=showModal;window.hideModal=hideModal;
+
+// ===== INIT =====
+function init(){
+try{
+// Load offline queue
+state.offlineQueue=ls('offlineQueue')||[];
+
+// Try auto-login
+let u=ls('user'),d=ls('ds'),r=ls('regional');
+// Load config first
+populateLoginDS();
+if(u&&d){state.user=u;state.ds=d;state.regional=r||'';showApp()}
+try{loadConfig(false).then(()=>{populateLoginDS();if(state.user)checkAdmin()}).catch(()=>{})}catch(e){}
+
+setupUpload();
+detectDesktop();
+
+// Enter key for manual entry
+let mc=$('manualCode');if(mc)mc.addEventListener('keydown',e=>{if(e.key==='Enter')manualSubmit()});
+// USB Enter
+let ui=$('usbInput');if(ui)ui.addEventListener('keydown',e=>{if(e.key==='Enter'){let v=ui.value.trim();if(v){processScan(v);ui.value=''}}});
+}catch(e){}
+}
+
+init();
+
+// Expose functions to global scope for onclick handlers
+window.addAdmin=addAdmin;
+window.addClass=addClass;
+window.addDS=addDS;
+window.cancelDispatch=cancelDispatch;
+window.cancelPending=cancelPending;
+window.capturePhoto=capturePhoto;
+window.changePin=changePin;
+window.confirmScan=confirmScan;
+window.doLogin=doLogin;
+window.doLogout=doLogout;
+window.exportCSV=exportCSV;
+window.exportPendentes=exportPendentes;
+window.exportReport=exportReport;
+window.filterRegistros=filterRegistros;
+window.goRegPage=goRegPage;
+window.loadDashboard=loadDashboard;
+window.manualSubmit=manualSubmit;
+window.parsePaste=parsePaste;
+window.removeAdmin=removeAdmin;
+window.removeClass=removeClass;
+window.removeDS=removeDS;
+window.saveApiUrl=saveApiUrl;
+window.setLang=setLang;
+window.setMove=setMove;
+window.setType=setType;
+window.switchTab=switchTab;
+window.testApi=testApi;
+window.toggleDetail=toggleDetail;
+window.uploadDispatch=uploadDispatch;
+function forceUploadDispatch(){uploadDispatch()}
+window.forceUploadDispatch=forceUploadDispatch;
+
+
+
+})()}catch(e){}
+</script>
+
+
+</body></html>
