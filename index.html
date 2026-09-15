@@ -3285,7 +3285,7 @@ if(r){
 }
 window.testApi=testApi;
 
-function addDS(){try{let v=($('addDsInput')||{}).value;if(v){let cfg=state.config||{};let ds=getDS();ds.push(v);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('salvarConfig',{config:cfg});if($('addDsInput'))$('addDsInput').value=''}}catch(e){}}
+function addDS(){try{let v=($('addDsInput')||{}).value;if(v){let cfg=state.config||{};let ds=getDS();let parts=v.split(':');ds.push({ds:parts[0].trim(),regional:(parts[1]||'').trim()});cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();populateLoginDS();apiCall('salvarConfig',{config:cfg});if($('addDsInput'))$('addDsInput').value=''}}catch(e){}}
 window.addDS=addDS;
 function removeDS(i){try{let cfg=state.config||{};let ds=getDS();ds.splice(i,1);cfg.ds=ds;state.config=cfg;ls('config',cfg);renderAdmin();apiCall('salvarConfig',{config:cfg})}catch(e){}}
 window.removeDS=removeDS;
