@@ -654,6 +654,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <button class="btn btn-sm" id="bagSubBtn_hub" onclick="showBagSection('hub')" style="white-space:nowrap">🏢 Cobrar por Hub</button>
 <button class="btn btn-sm" id="bagSubBtn_cobrar" onclick="showBagSection('cobrar')" style="white-space:nowrap">🚨 COBRAR</button>
 <button class="btn btn-sm" id="bagSubBtn_hist" onclick="showBagSection('hist')" style="white-space:nowrap">📋 Histórico</button>
+<select id="bagDsFilter" style="white-space:nowrap;font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid #cbd5e1;background:#f8fafc;color:var(--navy);margin-left:4px"><option value="">Minha DS</option></select>
 <button class="btn btn-sm" onclick="loadBagControl()" style="white-space:nowrap;margin-left:auto">🔄</button>
 </div>
 <div id="bagLoading" style="text-align:center;padding:40px;color:#94a3b8">Toque em 🔄 para carregar a análise de bags</div>
@@ -3617,10 +3618,18 @@ function _getRota(e){var o=String(e.observacao||'');var m=o.match(/Rota:([^|]*)/
 async function loadBagControl(){
 var loading=document.getElementById('bagLoading');
 ['resume','hub','cobrar','hist'].forEach(function(s){var el=document.getElementById('bagSection'+s.charAt(0).toUpperCase()+s.slice(1));if(el)el.style.display='none';});
-if(loading){loading.style.display='';loading.innerHTML='<div style="padding:40px;text-align:center;color:#94a3b8">⏳ Buscando registros...</div>';}
+// Popula select de DS
+var dsSel=document.getElementById('bagDsFilter');
+if(dsSel){
+var prevVal=dsSel.value;
+dsSel.innerHTML='<option value="">Minha DS ('+state.ds+')</option>';
+getDS().forEach(function(d){var n=typeof d==='string'?d.split(':')[0]:d.ds;if(n&&n!==state.ds){var o=document.createElement('option');o.value=n;o.textContent=n;if(n===prevVal)o.selected=true;dsSel.appendChild(o);}});
+}
+var activeDS=(dsSel&&dsSel.value)?dsSel.value:state.ds;
+if(loading){loading.style.display='';loading.innerHTML='<div style="padding:40px;text-align:center;color:#94a3b8">⏳ Buscando registros para '+activeDS+'...</div>';}
 try{
-var envD=await apiCall('lerEnvios',{ds:state.ds});
-var regD=await apiCall('lerRegistros',{ds:state.ds});
+var envD=await apiCall('lerEnvios',{ds:activeDS});
+var regD=await apiCall('lerRegistros',{ds:activeDS});
 var allEnv=(envD&&envD.data)?envD.data:[];
 var allReg=(regD&&regD.data)?regD.data:[];
 if(loading)loading.innerHTML='<div style="padding:40px;text-align:center;color:#94a3b8">⏳ Calculando matching por ciclo...</div>';
