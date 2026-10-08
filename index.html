@@ -4,14 +4,14 @@
   --color-text: #131920;
   --color-navbar-bg: #f9f9fb;
   --color-bg-chat-view: #fcfcfd;
-  --color-bg-secondary: #ffffff;
+  --color-bg-secondary: #fff;
   --color-bg-tertiary: #f9fafb;
   --color-bg-hover: #f3f4f6;
   --color-surface: #f9fafb;
   --color-surface-hover: #f3f4f6;
   --color-surface-active: #e5e7eb;
-  --color-border: rgba(0, 0, 0, .12);
-  --color-border-light: rgba(0, 0, 0, .06);
+  --color-border: #0000001f;
+  --color-border-light: #0000000f;
   --color-border-strong: #d1d5db;
   --color-primary: #4200db;
   --color-primary-dark: #35009e;
@@ -35,20 +35,24 @@
   --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
   --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
   --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
+  --block-hover-outline: 1px dashed color-mix(in srgb, #4200db 50%, transparent);
+  --block-selected-outline: 1px solid #8575ff;
+  --block-selection-outline-offset: 2px;
+  --block-selected-halo: 0 0 8px color-mix(in srgb, #4200db 40%, transparent);
   --color-accent: #4200db;
   --color-accent-foreground: #4200db;
   --color-accent-dark: #35009e;
   --color-accent-light: #e8e6ff;
-  --color-accent-inverse: #ffffff;
+  --color-accent-inverse: #fff;
   --color-link: #4200db;
   --color-primary-gradient-end: #e8e6ff;
   --color-primary-bg-solid: #e8e6ff;
-  --color-user-bubble: #F3F3F7;
+  --color-user-bubble: #f3f3f7;
   --color-user-bubble-text: #131920;
   --color-text-secondary: #5e5e5e;
   --color-text-tertiary: #656871;
   --color-text-muted: #9ca3af;
-  --color-text-on-primary: #ffffff;
+  --color-text-on-primary: #fff;
   --color-success: #00802f;
   --color-success-dark: #00471e;
   --color-success-light: #d9ffd6;
@@ -67,7 +71,7 @@
   --color-error-active-border: #db0000;
   --color-error-foreground: #db0000;
   --color-error-dark-foreground: #700000;
-  --color-error-inverse: #ffffff;
+  --color-error-inverse: #fff;
   --color-error-text: #700000;
   --color-warning: #f2b100;
   --color-warning-dark: #573a00;
@@ -88,20 +92,20 @@
   --color-info-border: #b3d1f0;
   --color-info-foreground: #006ce0;
   --color-info-dark-foreground: #002a66;
-  --color-info-inverse: #ffffff;
-  --color-overlay: rgba(0, 0, 0, .5);
-  --color-shadow: rgba(0, 0, 0, .08);
-  --color-hover: rgba(0, 0, 0, .05);
-  --color-tooltip-bg: rgba(0, 0, 0, .85);
-  --color-tooltip-text: #ffffff;
+  --color-info-inverse: #fff;
+  --color-overlay: #00000080;
+  --color-shadow: #00000014;
+  --color-hover: #0000000d;
+  --color-tooltip-bg: #000000d9;
+  --color-tooltip-text: #fff;
   --color-voice-purple: #8575ff;
   --color-voice-purple-dark: #4200db;
   --color-voice-purple-light: #8575ff;
   --color-voice-red: #db0000;
   --color-voice-red-dark: #700000;
   --color-voice-amber: #f2b100;
-  --color-voice-purple-glow: rgba(66, 0, 219, .4);
-  --color-voice-red-glow: rgba(219, 0, 0, .4);
+  --color-voice-purple-glow: #4200db66;
+  --color-voice-red-glow: #db000066;
   --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
   --text-2xs: .5625rem;
@@ -131,8 +135,8 @@
   --radius-card: 12px;
   --radius-lg: 16px;
   --radius-pill: 8px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+  --shadow-sm: 0 1px 2px #0000000d;
+  --shadow-md: 0 4px 12px #00000014;
   --color-success-bg-solid: #d9ffd6;
   --color-error-bg-solid: #ffe0e0;
   --color-error-border-solid: #ffe0e0;
@@ -144,62 +148,62 @@
   --color-info-text-alt: #002a66;
   --color-emerald: #10b981;
   --color-teal: #4ecdc4;
-  --color-code-bg: #F3F3F7;
+  --color-code-bg: #f3f3f7;
   --color-code-header-bg: #f1f3f5;
   --color-code-text: #24292e;
   --color-code-border: #e1e4e8;
   --color-code-muted: #6a737d;
-  --color-inline-code-bg: #F3F3F7;
+  --color-inline-code-bg: #f3f3f7;
   --color-inline-code-text: #24292e;
   --color-inline-code-border: #e1e4e8;
   --color-scrollbar-thumb: #d1d5db;
   --color-scrollbar-track: transparent;
-  --color-graph-node-text: #333333;
-  --color-graph-node-text-dim: #7F8C8D;
-  --color-graph-edge-default: #95A5A6;
-  --color-graph-edge-cross: #E67E22;
-  --color-graph-edge-text: #666666;
-  --color-graph-edge-stroke: #ffffff;
-  --color-graph-highlight-bg: #FF6B6B;
-  --color-graph-highlight-border: #E74C3C;
-  --color-graph-search-bg: #FFD700;
-  --color-graph-search-border: #FFA500;
-  --color-graph-focus-border: #C0392B;
-  --color-graph-external-border: #95A5A6;
-  --color-graph-cat-file: #3498DB;
-  --color-graph-cat-folder: #7F8C8D;
-  --color-graph-cat-file-aggregate: #2980B9;
-  --color-graph-cat-class: #9B59B6;
-  --color-graph-cat-function: #2ECC71;
-  --color-graph-cat-method: #1ABC9C;
-  --color-graph-cat-variable: #F39C12;
-  --color-graph-cat-import: #D35400;
-  --color-graph-cat-module: #5B6ABF;
-  --color-graph-cat-concept: #E74C3C;
-  --color-graph-cat-person: #FF6B6B;
-  --color-graph-cat-org: #4ECDC4;
-  --color-graph-cat-organization: #4ECDC4;
-  --color-graph-cat-product: #A29BFE;
-  --color-graph-cat-metric: #FD79A8;
-  --color-graph-cat-location: #34495E;
-  --color-graph-cat-date: #E056A0;
-  --color-graph-cat-code: #3498DB;
-  --color-graph-cat-doc: #7F8C8D;
-  --color-graph-cat-url: #00B894;
-  --color-graph-cat-email: #6C5CE7;
-  --color-graph-cat-unknown: #BDC3C7;
-  --color-graph-rel-contains: #BDC3C7;
-  --color-graph-rel-extends: #9B59B6;
-  --color-graph-rel-implements: #3498DB;
-  --color-graph-rel-imports: #E67E22;
-  --color-graph-rel-uses: #2ECC71;
-  --color-graph-rel-calls: #27AE60;
-  --color-graph-rel-references: #F39C12;
-  --color-graph-rel-related-to: #95A5A6;
-  --color-graph-rel-works-on: #E74C3C;
-  --color-graph-rel-owns: #1ABC9C;
-  --color-graph-rel-depends-on: #E67E22;
-  --color-graph-rel-parent-of: #BDC3C7;
+  --color-graph-node-text: #333;
+  --color-graph-node-text-dim: #7f8c8d;
+  --color-graph-edge-default: #95a5a6;
+  --color-graph-edge-cross: #e67e22;
+  --color-graph-edge-text: #666;
+  --color-graph-edge-stroke: #fff;
+  --color-graph-highlight-bg: #ff6b6b;
+  --color-graph-highlight-border: #e74c3c;
+  --color-graph-search-bg: gold;
+  --color-graph-search-border: orange;
+  --color-graph-focus-border: #c0392b;
+  --color-graph-external-border: #95a5a6;
+  --color-graph-cat-file: #3498db;
+  --color-graph-cat-folder: #7f8c8d;
+  --color-graph-cat-file-aggregate: #2980b9;
+  --color-graph-cat-class: #9b59b6;
+  --color-graph-cat-function: #2ecc71;
+  --color-graph-cat-method: #1abc9c;
+  --color-graph-cat-variable: #f39c12;
+  --color-graph-cat-import: #d35400;
+  --color-graph-cat-module: #5b6abf;
+  --color-graph-cat-concept: #e74c3c;
+  --color-graph-cat-person: #ff6b6b;
+  --color-graph-cat-org: #4ecdc4;
+  --color-graph-cat-organization: #4ecdc4;
+  --color-graph-cat-product: #a29bfe;
+  --color-graph-cat-metric: #fd79a8;
+  --color-graph-cat-location: #34495e;
+  --color-graph-cat-date: #e056a0;
+  --color-graph-cat-code: #3498db;
+  --color-graph-cat-doc: #7f8c8d;
+  --color-graph-cat-url: #00b894;
+  --color-graph-cat-email: #6c5ce7;
+  --color-graph-cat-unknown: #bdc3c7;
+  --color-graph-rel-contains: #bdc3c7;
+  --color-graph-rel-extends: #9b59b6;
+  --color-graph-rel-implements: #3498db;
+  --color-graph-rel-imports: #e67e22;
+  --color-graph-rel-uses: #2ecc71;
+  --color-graph-rel-calls: #27ae60;
+  --color-graph-rel-references: #f39c12;
+  --color-graph-rel-related-to: #95a5a6;
+  --color-graph-rel-works-on: #e74c3c;
+  --color-graph-rel-owns: #1abc9c;
+  --color-graph-rel-depends-on: #e67e22;
+  --color-graph-rel-parent-of: #bdc3c7;
   --qs-content: #fff;
   --qs-main: #fff;
   --qs-primary-foreground: #131920;
@@ -218,6 +222,10 @@
   --qs-success-default: #00802f;
   --qs-error-default: #db0000;
   --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --safe-top: 0px;
+  --safe-bottom: 0px;
+  --safe-left: 0px;
+  --safe-right: 0px;
   --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
   --qs-font-base-letter-spacing: .15px;
   --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
@@ -326,8 +334,8 @@
   --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
   --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
   --react-pdf-text-layer: 1;
-  --highlight-bg-color: rgba(180, 0, 170, 1);
-  --highlight-selected-bg-color: rgba(0, 100, 0, 1);
+  --highlight-bg-color: #b400aa;
+  --highlight-selected-bg-color: #006400;
   --react-pdf-annotation-layer: 1;
   --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
   --input-focus-border-color: Highlight;
@@ -342,7 +350,7 @@ body { background: var(--color-bg); color: var(--color-text); }
 a { color: var(--color-link, var(--color-primary)); }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ScanTrack v3.8</title>
+<title>ScanTrack v3.9</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--navy:#0F2137;--orange:#FF9900;--green:#00A86B;--red:#E74C3C;--white:#FFFFFF;--gray:#f4f6f8;--gray2:#e2e8f0;--gray3:#94a3b8;--radius:12px;--shadow:0 2px 8px rgba(0,0,0,0.1)}
@@ -486,7 +494,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--orange)}
 <!-- Login Screen -->
 <div id="loginScreen">
 <div class="login-box">
-<h1>📦 ScanTrack v3.8</h1>
+<h1>📦 ScanTrack v3.9</h1>
 <p class="subtitle">Gestão de Bags, Ráfias e TBR — AMZL BR</p>
 <label>Alias (login Amazon)</label>
 <input type="text" id="loginAlias" placeholder="ex: jsilva" autocomplete="off">
@@ -860,7 +868,7 @@ try{(function(){
 // ===== STATE =====
 const LS_PREFIX='scantrack_';
 const state={user:null,ds:null,regional:null,isDesktop:false,config:null,configTimestamp:0,sessionCount:0,recentScans:[],offlineQueue:[],currentTab:'scanner',scanType:'Bag',moveType:'retorno',pendingCode:null,pendingPhoto:null,registros:[],envios:[],regPage:1,lang:'pt',lastEnvArr:null,lastRegArr:null,todayScans:{retorno:{},saida:{}}};
-const DEFAULT_DS=['DSP2:HIGHEND','HSP2:HIGHEND','DSP4:EAGLES','DBS5:EAGLES','DBS7:EAGLES','DGO2:EAGLES','DRJ3:EAGLES','HRJ3:EAGLES','DRJ5:EAGLES','DES2:EAGLES','HVI2:EAGLES','DSA8:EAGLES','HSV8:EAGLES','DBR9:EAGLES'];
+const DEFAULT_DS=['DSP7:HIGHEND','DSP4:EAGLES','DBS5:EAGLES','DBS7:EAGLES','DGO2:EAGLES','DRJ3:EAGLES','HRJ3:EAGLES','DRJ5:EAGLES','DES2:EAGLES','HVI2:EAGLES','DSA8:EAGLES','HSV8:EAGLES','DBR9:EAGLES'];
 const DEFAULT_CLASS=['Devolução ao remetente','Danificado','Endereço não localizado','Cliente ausente','Recusa do cliente','Retenção (investigação)','Extravio parcial','Reagendamento','Transferência entre DS','Outro'];
 const COOLDOWN_MS=5000;
 let lastScans={};
@@ -1641,7 +1649,11 @@ if(_from||_to){
 }
 state.lastEnvArr=envArr;state.lastRegArr=regArr;
 
-saidas=envArr.length+regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')).length;
+// v3.9 FIX: dedup saídas por (codeKey, data) — evita inflação por upload duplicado
+var allSaidaRecs=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
+var _saidaDayKey={};
+allSaidaRecs.forEach(function(r){if(r.codigo){var k=(codeKey(r.codigo)||r.codigo)+'|'+((r.datahora||'').split('T')[0]||'');_saidaDayKey[k]=true;}});
+saidas=Object.keys(_saidaDayKey).length;
 // Monta set de códigos enviados — indexa TANTO código bruto QUANTO chave normalizada
 var allEnvCodes={};
 envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said'))).forEach(e=>{
@@ -1652,7 +1664,10 @@ var retAll=regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&
 // Retorno normal: código bruto OU chave normalizada bate com envio
 var retNormal=retAll.filter(r=>allEnvCodes[r.codigo]||allEnvCodes[codeKey(r.codigo)]);
 var retAdicional=retAll.filter(r=>!allEnvCodes[r.codigo]&&!allEnvCodes[codeKey(r.codigo)]);
-retornos=retNormal.length;
+// v3.9 FIX: dedup retornos por (codeKey, data)
+var _retNormalDayKey={};
+retNormal.forEach(function(r){if(r.codigo){var k=(codeKey(r.codigo)||r.codigo)+'|'+((r.datahora||'').split('T')[0]||'');_retNormalDayKey[k]=true;}});
+retornos=Object.keys(_retNormalDayKey).length;
 tbrHoje=regArr.filter(r=>r.tipo==='Pacote'&&r.datahora&&r.datahora.startsWith(today())).length;
 var weekAgoD=new Date();weekAgoD.setDate(weekAgoD.getDate()-7);
 var weekAgoStr=localDateStr(weekAgoD);
@@ -1688,8 +1703,9 @@ let container=$('chartBar');if(!container)return;
 let days=[];
 for(let i=6;i>=0;i--){let d=new Date();d.setDate(d.getDate()-i);days.push(localDateStr(d))}
 let allEnv=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
-let envByDay=days.map(d=>allEnv.filter(e=>(e.datahora||'').startsWith(d)).length);
-let retByDay=days.map(d=>(retNormal||[]).filter(r=>(r.datahora||'').startsWith(d)).length);
+// v3.9 FIX: dedup bags por dia no gráfico de barras
+let envByDay=days.map(function(d){var seen={};allEnv.filter(function(e){return(e.datahora||'').startsWith(d)}).forEach(function(e){if(e.codigo)seen[codeKey(e.codigo)||e.codigo]=true});return Object.keys(seen).length});
+let retByDay=days.map(function(d){var seen={};(retNormal||[]).filter(function(r){return(r.datahora||'').startsWith(d)}).forEach(function(r){if(r.codigo)seen[codeKey(r.codigo)||r.codigo]=true});return Object.keys(seen).length});
 let maxV=Math.max(...envByDay,...retByDay,1);
 let totalEnv=envByDay.reduce((a,b)=>a+b,0);
 let totalRet=retByDay.reduce((a,b)=>a+b,0);
@@ -1769,8 +1785,12 @@ try{
 let container=$('chartRoutes');if(!container)return;
 let routes={};
 let allEnvR=envArr.concat(regArr.filter(r=>(r.movimento||'').toLowerCase().includes('said')));
-allEnvR.forEach(e=>{let rt=getRota(e)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].env++});
-regArr.filter(r=>(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote').forEach(r=>{let rt=getRota(r)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};routes[rt].ret++});
+// v3.9 FIX: dedup por (rota, codeKey, data) no gráfico de rotas
+var _routeSeen={};
+allEnvR.forEach(function(e){var rt=getRota(e)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};if(e.codigo){var dk=(codeKey(e.codigo)||e.codigo)+'|'+((e.datahora||'').split('T')[0]||'')+'|'+rt;if(!_routeSeen[dk]){_routeSeen[dk]=true;routes[rt].env++}}else{routes[rt].env++}});
+// v3.9 FIX: dedup retornos por rota
+var _routeRetSeen={};
+regArr.filter(function(r){return(r.movimento||'').toLowerCase().includes('retorn')&&r.tipo!=='Pacote'}).forEach(function(r){var rt=getRota(r)||'S/R';if(!routes[rt])routes[rt]={env:0,ret:0};if(r.codigo){var dk=(codeKey(r.codigo)||r.codigo)+'|'+((r.datahora||'').split('T')[0]||'')+'|'+rt;if(!_routeRetSeen[dk]){_routeRetSeen[dk]=true;routes[rt].ret++}}else{routes[rt].ret++}});
 
 // Only routes with pending items, sorted by most pending first
 let sorted=Object.entries(routes).map(([n,v])=>({name:n,env:v.env,ret:v.ret,pend:v.env-v.ret,pct:v.env?Math.round((v.ret/v.env)*100):0})).filter(r=>r.pend>0).sort((a,b)=>b.pend-a.pend).slice(0,8);
@@ -1904,11 +1924,13 @@ matchedRet[key]=(matchedRet[key]||0)+1;
 });
 
 // Nível 1: Agregado por Hub
+// v3.9 FIX: dedup envios por (hub, codeKey, data) na tabela de hubs
 let hubAgg={};
+var _hubEnvSeen={};
 allEnv.forEach(function(e){
 let h=getHub(e)||'N/A';
 if(!hubAgg[h])hubAgg[h]={name:h,env:0,ret:0};
-hubAgg[h].env++;
+if(e.codigo){var dk=(codeKey(e.codigo)||e.codigo)+'|'+((e.datahora||'').split('T')[0]||'')+'|'+h;if(!_hubEnvSeen[dk]){_hubEnvSeen[dk]=true;hubAgg[h].env++}}else{hubAgg[h].env++}
 });
 Object.entries(matchedRet).forEach(function([key,cnt]){
 let parts=key.split('|||');let d=parts[0];let h=parts.slice(1).join('|||');
@@ -1917,12 +1939,14 @@ if(hubAgg[h])hubAgg[h].ret+=cnt;
 
 // Nível 2: Granularidade dia × hub
 let hubDay={};
+// v3.9 FIX: dedup envios por (hub, codeKey, data)
+var _hubDaySeen={};
 allEnv.forEach(function(e){
 let h=getHub(e)||'N/A';
 let d=(e.datahora||'').split('T')[0]||today();
 if(!hubDay[h])hubDay[h]={};
 if(!hubDay[h][d])hubDay[h][d]={env:0,ret:0};
-hubDay[h][d].env++;
+if(e.codigo){var dk=(codeKey(e.codigo)||e.codigo)+'|'+d+'|'+h;if(!_hubDaySeen[dk]){_hubDaySeen[dk]=true;hubDay[h][d].env++}}else{hubDay[h][d].env++}
 });
 Object.entries(matchedRet).forEach(function([key,cnt]){
 let parts=key.split('|||');let d=parts[0];let h=parts.slice(1).join('|||');
@@ -2013,7 +2037,7 @@ text+='• Saídas: '+(s?s.textContent:'?')+'\n';
 text+='• Retornos: '+(r?r.textContent:'?')+'\n';
 text+='• Pendentes: '+(p?p.textContent:'?')+'\n';
 text+='• % Retorno: '+(pct?pct.textContent:'?')+'\n';
-text+='\n— Gerado por ScanTrack v3.8';
+text+='\n— Gerado por ScanTrack v3.9';
 navigator.clipboard.writeText(text).then(()=>toast('Relatório copiado!','success')).catch(()=>toast('Erro ao copiar','error'));
 }catch(e){}
 }
@@ -2326,7 +2350,7 @@ try{
 let isEdit=!!editEntry;
 let dsList=[];
 try{let c=state.config;if(c&&c.dsList)dsList=c.dsList;else if(c&&c.ds)dsList=[c.ds]}catch(x){}
-if(!dsList.length)dsList=[state.ds||'DSP2'];
+if(!dsList.length)dsList=[state.ds||'DSP7'];
 let dsOpts=dsList.map(d=>'<option value="'+d+'"'+((isEdit?editEntry.ds:state.ds)===d?' selected':'')+'>'+d+'</option>').join('');
 let html='<div id="stockFormOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">'
 +'<div class="card" style="width:100%;max-width:400px">'
@@ -3050,6 +3074,15 @@ let rafias=records.filter(r=>r.tipo==='Rafia').length;
 let rotas=[...new Set(records.map(r=>r.rota))].length;
 let date=currentDate||today();
 
+// v3.9 FIX: dedup registros do dispatch por (codigo, data) antes de salvar
+var _parseSeen={};
+records=records.filter(function(r){
+  if(!r.codigo)return true;
+  var dk=(codeKey(r.codigo)||r.codigo)+'|'+(r.data||'');
+  if(_parseSeen[dk])return false;
+  _parseSeen[dk]=true;
+  return true;
+});
 state.parsedDispatch=records;state.parsedFilename=filename||'';
 state.parsedDate=date;
 
@@ -3117,6 +3150,15 @@ for(let chunk of retChunks){
 }
 }
 
+// v3.9 FIX: dedup records por (codigo, data) antes do upload
+var _uploadSeen={};
+records=records.filter(function(r){
+  if(!r.codigo)return true;
+  var dk=(codeKey(r.codigo)||r.codigo)+'|'+(r.data||'');
+  if(_uploadSeen[dk])return false;
+  _uploadSeen[dk]=true;
+  return true;
+});
 // Upload das saídas novas
 let chunks=[];for(let i=0;i<records.length;i+=50){chunks.push(records.slice(i,i+50))}
 let done=0;
@@ -3234,6 +3276,15 @@ var bags=records.filter(function(r){return r.tipo==='Bag'}).length;
 var rafias=records.filter(function(r){return r.tipo==='Rafia'}).length;
 var rotas=[];records.forEach(function(r){if(rotas.indexOf(r.rota)<0)rotas.push(r.rota)});
 var date=currentDate||today();
+// v3.9 FIX: dedup registros do dispatch por (codigo, data) antes de salvar
+var _parseSeen={};
+records=records.filter(function(r){
+  if(!r.codigo)return true;
+  var dk=(codeKey(r.codigo)||r.codigo)+'|'+(r.data||'');
+  if(_parseSeen[dk])return false;
+  _parseSeen[dk]=true;
+  return true;
+});
 state.parsedDispatch=records;state.parsedFilename=filename||'';
 state.parsedDate=date;
 var prev=$('uploadPreview');if(!prev)return;
@@ -3416,7 +3467,7 @@ let el=$('helpContent');if(!el)return;
 if(lang==='pt'){
 el.innerHTML=`
 <div style="background:linear-gradient(135deg,#0F2137,#1a3a5c);color:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px">
-<strong style="font-size:15px">📦 ScanTrack v3.8</strong><br>
+<strong style="font-size:15px">📦 ScanTrack v3.9</strong><br>
 <span style="opacity:.85">Sistema de rastreamento de Bags, Ráfias e Pacotes TBR — AMZL BR</span>
 </div>
 
@@ -3526,7 +3577,7 @@ el.innerHTML=`
 }else{
 el.innerHTML=`
 <div style="background:linear-gradient(135deg,#0F2137,#1a3a5c);color:white;border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px">
-<strong style="font-size:15px">📦 ScanTrack v3.8</strong><br>
+<strong style="font-size:15px">📦 ScanTrack v3.9</strong><br>
 <span style="opacity:.85">Bag, Rafia & TBR Package Tracking System — AMZL BR</span>
 </div>
 
@@ -3893,6 +3944,7 @@ window.showBagSection=showBagSection;
 // ============================================================
 })()}catch(e){}
 </script>
+
 
 
 </body></html>
